@@ -281,7 +281,92 @@ export const rubicCube = {
             ],
             axis: new THREE.Vector3(0, 0, -1),
             angle: Math.PI / 2
-        }
+        },
+        E:{
+            permutation : [
+                -1, -1, -1,
+                21, 12, 3,
+                -1, -1, -1,
+    
+                -1, -1, -1,
+                22, 13, 4,
+                -1, -1, -1,
+    
+                -1, -1, -1,
+                23, 14, 5,
+                -1, -1, -1
+            ],
+            axis: new THREE.Vector3(0, -1, 0),
+            angle: Math.PI / 2
+        },
+        E_ :{
+            permutation : [
+                -1, -1, -1,
+                5, 14, 23,
+                -1, -1, -1,
+    
+                -1, -1, -1,
+                4, 13, 22,
+                -1, -1, -1,
+    
+                -1, -1, -1,
+                3, 12, 21,
+                -1, -1, -1
+            ],
+            axis: new THREE.Vector3(0, 1, 0),
+            angle: Math.PI / 2
+        },
+        M:{
+            permutation : [
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1,
+    
+                11, 14, 17,
+                10, 13, 16,
+                9, 12, 15,
+    
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1
+            ],
+            axis: new THREE.Vector3( -1, 0, 0 ),
+            angle: Math.PI / 2
+        },
+        M_:{
+            permutation : [
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1,
+    
+                15, 12, 9,
+                16, 13, 10,
+                17, 14, 11,
+                
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1
+            ],
+            axis: new THREE.Vector3( 1, 0, 0 ),
+            angle: Math.PI / 2
+        },
+        // S:{
+        //     permutation : [
+        //         -1, -1, 8,
+        //         -1, -1, 17,
+        //         -1, -1, 26,
+    
+        //         -1, -1, 5,
+        //         -1, 13, 14,
+        //         -1, -1, 23,
+    
+        //         -1, -1, 2,
+        //         -1, -1, 11,
+        //         -1, -1, 20
+        //     ],
+        //     axis: new THREE.Vector3(0, 0, -1),
+        //     angle: Math.PI / 2
+        // }
     },
     doAction: function(action){
         this.move(action.axis, action.permutation, action.angle);
