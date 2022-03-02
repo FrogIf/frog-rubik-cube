@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>FrogRubicCube</title>
+		<style>
+			body { margin: 0; }
+		</style>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "./js/threejs/three.module.js"
+                }
+            }
+        </script>
+        <script type="module">
+            import * as frog from './ruuubic.js';
+            window.onload = function(){
+                frog.init(true);
+            }
+            window.onresize = function () {
+                frog.resize();
+            };
+
+            var elements = document.getElementsByClassName("action_control");
+            for(let i = 0; i < elements.length; i++){
+                elements[i].onclick = (e) =>{
+                    let action = e.target.getAttribute("action");
+                    frog.rubicCube.doAction(frog.rubicCube.action[action]);
+                }
+            }
+
+            document.onkeydown = (e) => {
+                let action = frog.rubicCube.action[e.key];
+                if(action){
+                    frog.rubicCube.doAction(action);
+                }
+            }
+        </script>
+	</head>
+	<body>
+        <a action="R" class="action_control" href="javascript:;" >R</a>
+        <a action="R_" class="action_control" href="javascript:;" >R'</a>
+        <a action="U" class="action_control" href="javascript:;" >U</a>
+        <a action="U_" class="action_control" href="javascript:;" >U'</a>
+        <a action="F" class="action_control" href="javascript:;" >F</a>
+        <a action="F_" class="action_control" href="javascript:;" >F'</a>
+        <a action="D" class="action_control" href="javascript:;" >D</a>
+        <a action="D_" class="action_control" href="javascript:;" >D'</a>
+        <a action="L" class="action_control" href="javascript:;" >L</a>
+        <a action="L_" class="action_control" href="javascript:;" >L'</a>
+        <a action="B" class="action_control" href="javascript:;" >B</a>
+        <a action="B_" class="action_control" href="javascript:;" >B'</a>
+	</body>
+</html>
