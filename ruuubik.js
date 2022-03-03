@@ -367,7 +367,15 @@ export const rubicCube = {
         b : [ ActionGroup.B, ActionGroup.S_ ],
         b_ : [ ActionGroup.B_, ActionGroup.S ],
         b2 : [ ActionGroup.B, ActionGroup.S_, ActionGroup.B, ActionGroup.S_ ],
-        r : [ ActionGroup.R, ActionGroup.M_ ],
+        x : [ ActionGroup.R, ActionGroup.M_, ActionGroup.L_ ],
+        x_ : [ ActionGroup.R_, ActionGroup.M, ActionGroup.L ],
+        x2 : [ ActionGroup.R, ActionGroup.M_, ActionGroup.L_, ActionGroup.R, ActionGroup.M_, ActionGroup.L_ ],
+        y : [ ActionGroup.U, ActionGroup.E_, ActionGroup.D_ ],
+        y_ : [ ActionGroup.U_, ActionGroup.E, ActionGroup.D ],
+        y2 : [ ActionGroup.U, ActionGroup.E_, ActionGroup.D_, ActionGroup.U, ActionGroup.E_, ActionGroup.D_ ],
+        z: [ ActionGroup.F, ActionGroup.S, ActionGroup.B_ ],
+        z_: [ ActionGroup.F_, ActionGroup.S_, ActionGroup.B ],
+        z2: [ ActionGroup.F, ActionGroup.S, ActionGroup.B_, ActionGroup.F, ActionGroup.S, ActionGroup.B_ ],
     },
     doAction: function(action){
         this.move(action);
