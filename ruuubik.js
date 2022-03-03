@@ -42,6 +42,16 @@ class CubeAction{
     }
 }
 
+// W - 0, B - 1, Y - 2, G - 3, R - 4, O - 5
+const ColorPermutationGroup = {
+    x: [3, 0, 1, 2, 4, 5],
+    x_: [1, 2, 3, 0, 4, 5],
+    y : [0, 4, 2, 5, 3, 1],
+    y_ : [0, 5, 2, 4, 1, 3],
+    z : [4, 1, 5, 3, 2, 0],
+    z_ : [5, 1, 4, 3, 0, 2]
+};
+
 const ActionGroup = {
     R : new CubeAction([
         -1, -1, -1, 
@@ -285,12 +295,12 @@ export const rubicCube = {
     cubes:{},
     init : function(){
         const geometry = new THREE.BoxGeometry();
-        const m1 = generateMaterial(CubeColor.ORANGE);
-        const m2 = generateMaterial(CubeColor.RED);
+        const m1 = generateMaterial(CubeColor.RED);
+        const m2 = generateMaterial(CubeColor.ORANGE);
         const m3 = generateMaterial(CubeColor.YELLOW);
         const m4 = generateMaterial(CubeColor.WHITE);
-        const m5 = generateMaterial(CubeColor.GREEN);
-        const m6 = generateMaterial(CubeColor.BLUE);
+        const m5 = generateMaterial(CubeColor.BLUE);
+        const m6 = generateMaterial(CubeColor.GREEN);
         const meterials = new Array();
         meterials.push(m1);
         meterials.push(m2);
@@ -457,7 +467,36 @@ export const rubicCube = {
                 this.doMove(top.action);
             }
         }
-    }
+    },
+    colorFace: [
+        [0,3,5],
+        [0,5],
+        [0,1,5],
+        [3,5],
+        [5],
+        [1,5],
+        [1,2,5],
+        [2,5],
+        [2,3,5],
+        [0,3],
+        [0],
+        [0,1],
+        [3],
+        [],
+        [1],
+        [2,3],
+        [2],
+        [1,2],
+        [0,3,4],
+        [0,4],
+        [0,1,4],
+        [1,4],
+        [4],
+        [3,4],
+        [2,3,4],
+        [2,4],
+        [1,2,4]
+    ]
 };
 
 export function init(debug) {
