@@ -35,6 +35,250 @@ const raycaster = new THREE.Raycaster();//光线碰撞检测器
 var mouse = new THREE.Vector2();//存储鼠标坐标或者触摸坐标
 
 
+class CubeAction{
+    constructor(permutation, axis){
+        this.permutation = permutation;
+        this.axis = axis;
+    }
+}
+
+const ActionGroup = {
+    R : new CubeAction([
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        20, 23, 26,
+        19, 22, 25,
+        18, 21, 24
+    ], new THREE.Vector3( -1, 0, 0 )),
+    R_ : new CubeAction([
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1,
+        
+        24, 21, 18,
+        25, 22, 19,
+        26, 23, 20
+    ], new THREE.Vector3( 1, 0, 0 )),
+    U: new CubeAction([
+        -1, -1, -1,
+        -1, -1, -1,
+        24, 15, 6,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        25, 16, 7,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        26, 17, 8
+    ], new THREE.Vector3(0, -1, 0)),
+    U_: new CubeAction([
+        -1, -1, -1,
+        -1, -1, -1,
+        8, 17, 26,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        7, 16, 25,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        6, 15, 24
+    ], new THREE.Vector3(0, 1, 0)),
+    F : new CubeAction([
+        -1, -1, 8,
+        -1, -1, 17,
+        -1, -1, 26,
+
+        -1, -1, 5,
+        -1, -1, 14,
+        -1, -1, 23,
+
+        -1, -1, 2,
+        -1, -1, 11,
+        -1, -1, 20
+    ], new THREE.Vector3(0, 0, -1)),
+    F_ : new CubeAction([
+        -1, -1, 20,
+        -1, -1, 11,
+        -1, -1, 2,
+
+        -1, -1, 23,
+        -1, -1, 14,
+        -1, -1, 5,
+
+        -1, -1, 26,
+        -1, -1, 17,
+        -1, -1, 8
+    ], new THREE.Vector3(0, 0, 1)),
+    D : new CubeAction([
+        2, 11, 20,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        1, 10, 19,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        0, 9, 18,
+        -1, -1, -1,
+        -1, -1, -1
+    ], new THREE.Vector3(0, 1, 0)),
+    D_ : new CubeAction([
+        18, 9, 0,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        19, 10, 1,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        20, 11, 2,
+        -1, -1, -1,
+        -1, -1, -1
+    ], new THREE.Vector3(0, -1, 0)),
+    L : new CubeAction([
+        6, 3, 0, 
+        7, 4, 1,
+        8, 5, 2,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1
+    ], new THREE.Vector3(1, 0, 0)),
+    L_ : new CubeAction([
+        2, 5, 8,
+        1, 4, 7,
+        0, 3, 6,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1
+    ], new THREE.Vector3(-1, 0, 0)),
+    B : new CubeAction([
+        18, -1, -1,
+        9, -1, -1,
+        0, -1, -1,
+
+        21, -1, -1,
+        12, -1, -1,
+        3, -1, -1,
+
+        24, -1, -1,
+        15, -1, -1,
+        6, -1, -1
+    ], new THREE.Vector3(0, 0, 1)),
+    B_ : new CubeAction([
+        6, -1, -1,
+        15, -1, -1,
+        24, -1, -1,
+
+        3, -1, -1,
+        12, -1, -1,
+        21, -1, -1,
+
+        0, -1, -1,
+        9, -1, -1,
+        18, -1, -1
+    ], new THREE.Vector3(0, 0, -1)),
+    E : new CubeAction([
+        -1, -1, -1,
+        5, 14, 23,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        4, 13, 22,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        3, 12, 21,
+        -1, -1, -1
+    ], new THREE.Vector3(0, 1, 0)),
+    E_ : new CubeAction([
+        -1, -1, -1,
+        21, 12, 3,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        22, 13, 4,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        23, 14, 5,
+        -1, -1, -1
+    ], new THREE.Vector3(0, -1, 0)),
+    M : new CubeAction([
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1,
+
+        15, 12, 9,
+        16, 13, 10,
+        17, 14, 11,
+        
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1
+    ], new THREE.Vector3( 1, 0, 0 )),
+    M_ : new CubeAction([
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1,
+
+        11, 14, 17,
+        10, 13, 16,
+        9, 12, 15,
+
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1
+    ], new THREE.Vector3( -1, 0, 0 )),
+    S : new CubeAction([
+        -1, 7, -1,
+        -1, 16, -1,
+        -1, 25, -1,
+
+        -1, 4, -1,
+        -1, 13, -1,
+        -1, 22, -1,
+
+        -1, 1, -1,
+        -1, 10, -1,
+        -1, 19, -1
+    ], new THREE.Vector3(0, 0, -1)),
+    S_ : new CubeAction([
+        -1, 19, -1,
+        -1, 10, -1,
+        -1, 1, -1,
+
+        -1, 22, -1,
+        -1, 13, -1,
+        -1, 4, -1,
+
+        -1, 25, -1,
+        -1, 16, -1,
+        -1, 7, -1
+    ], new THREE.Vector3(0, 0, 1))
+};
+
 export const rubicCube = {
     rank: 3,
     cubemap:[],
@@ -78,507 +322,114 @@ export const rubicCube = {
         };
     },
     action:{
-        R:{
-            permutation : [
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                20, 23, 26,
-                19, 22, 25,
-                18, 21, 24
-            ],
-            axis: new THREE.Vector3( -1, 0, 0 ),
-            angle: Math.PI / 2
-        },
-        R_:{
-            permutation : [
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1,
-                
-                24, 21, 18,
-                25, 22, 19,
-                26, 23, 20
-            ],
-            axis: new THREE.Vector3( 1, 0, 0 ),
-            angle: Math.PI / 2
-        },
-        U:{
-            permutation : [
-                -1, -1, -1,
-                -1, -1, -1,
-                24, 15, 6,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                25, 16, 7,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                26, 17, 8
-            ],
-            axis: new THREE.Vector3(0, -1, 0),
-            angle: Math.PI / 2
-        },
-        U_ :{
-            permutation : [
-                -1, -1, -1,
-                -1, -1, -1,
-                8, 17, 26,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                7, 16, 25,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                6, 15, 24
-            ],
-            axis: new THREE.Vector3(0, 1, 0),
-            angle: Math.PI / 2
-        },
-        F:{
-            permutation : [
-                -1, -1, 8,
-                -1, -1, 17,
-                -1, -1, 26,
-    
-                -1, -1, 5,
-                -1, -1, 14,
-                -1, -1, 23,
-    
-                -1, -1, 2,
-                -1, -1, 11,
-                -1, -1, 20
-            ],
-            axis: new THREE.Vector3(0, 0, -1),
-            angle: Math.PI / 2
-        },
-        F_:{
-            permutation : [
-                -1, -1, 20,
-                -1, -1, 11,
-                -1, -1, 2,
-    
-                -1, -1, 23,
-                -1, -1, 14,
-                -1, -1, 5,
-    
-                -1, -1, 26,
-                -1, -1, 17,
-                -1, -1, 8
-            ],
-            axis: new THREE.Vector3(0, 0, 1),
-            angle: Math.PI / 2
-        },
-        D:{
-            permutation : [
-                2, 11, 20,
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                1, 10, 19,
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                0, 9, 18,
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(0, 1, 0),
-            angle: Math.PI / 2
-        },
-        D_:{
-            permutation : [
-                18, 9, 0,
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                19, 10, 1,
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                20, 11, 2,
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(0, -1, 0),
-            angle: Math.PI / 2
-        },
-        L:{
-            permutation : [
-                6, 3, 0, 
-                7, 4, 1,
-                8, 5, 2,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(1, 0, 0),
-            angle: Math.PI / 2
-        },
-        L_:{
-            permutation : [
-                2, 5, 8,
-                1, 4, 7,
-                0, 3, 6,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(-1, 0, 0),
-            angle: Math.PI / 2
-        },
-        B:{
-            permutation : [
-                18, -1, -1,
-                9, -1, -1,
-                0, -1, -1,
-    
-                21, -1, -1,
-                12, -1, -1,
-                3, -1, -1,
-    
-                24, -1, -1,
-                15, -1, -1,
-                6, -1, -1
-            ],
-            axis: new THREE.Vector3(0, 0, 1),
-            angle: Math.PI / 2
-        },
-        B_:{
-            permutation : [
-                6, -1, -1,
-                15, -1, -1,
-                24, -1, -1,
-    
-                3, -1, -1,
-                12, -1, -1,
-                21, -1, -1,
-    
-                0, -1, -1,
-                9, -1, -1,
-                18, -1, -1
-            ],
-            axis: new THREE.Vector3(0, 0, -1),
-            angle: Math.PI / 2
-        },
-        E:{
-            permutation : [
-                -1, -1, -1,
-                21, 12, 3,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                22, 13, 4,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                23, 14, 5,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(0, -1, 0),
-            angle: Math.PI / 2
-        },
-        E_ :{
-            permutation : [
-                -1, -1, -1,
-                5, 14, 23,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                4, 13, 22,
-                -1, -1, -1,
-    
-                -1, -1, -1,
-                3, 12, 21,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(0, 1, 0),
-            angle: Math.PI / 2
-        },
-        M:{
-            permutation : [
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                15, 12, 9,
-                16, 13, 10,
-                17, 14, 11,
-                
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3( 1, 0, 0 ),
-            angle: Math.PI / 2
-        },
-        M_:{
-            permutation : [
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                11, 14, 17,
-                10, 13, 16,
-                9, 12, 15,
-    
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3( -1, 0, 0 ),
-            angle: Math.PI / 2
-        },
-        S:{
-            permutation : [
-                -1, 7, -1,
-                -1, 16, -1,
-                -1, 25, -1,
-    
-                -1, 4, -1,
-                -1, 13, -1,
-                -1, 22, -1,
-    
-                -1, 1, -1,
-                -1, 10, -1,
-                -1, 19, -1
-            ],
-            axis: new THREE.Vector3(0, 0, -1),
-            angle: Math.PI / 2
-        },
-        S_:{
-            permutation : [
-                -1, 19, -1,
-                -1, 10, -1,
-                -1, 1, -1,
-    
-                -1, 22, -1,
-                -1, 13, -1,
-                -1, 4, -1,
-    
-                -1, 25, -1,
-                -1, 16, -1,
-                -1, 7, -1
-            ],
-            axis: new THREE.Vector3(0, 0, 1),
-            angle: Math.PI / 2
-        },
-        r : {
-            permutation : [
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                11, 14, 17,
-                10, 13, 16,
-                9, 12, 15,
-    
-                20, 23, 26,
-                19, 22, 25,
-                18, 21, 24
-            ],
-            axis: new THREE.Vector3( -1, 0, 0 ),
-            angle: Math.PI / 2
-        },
-        r_ :{
-            permutation : [
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1,
-    
-                15, 12, 9,
-                16, 13, 10,
-                17, 14, 11,
-                
-                24, 21, 18,
-                25, 22, 19,
-                26, 23, 20
-            ],
-            axis: new THREE.Vector3( 1, 0, 0 ),
-            angle: Math.PI / 2
-        },
-        u : {
-            permutation : [
-                -1, -1, -1,
-                21, 12, 3,
-                24, 15, 6,
-    
-                -1, -1, -1,
-                22, 13, 4,
-                25, 16, 7,
-    
-                -1, -1, -1,
-                23, 14, 5,
-                26, 17, 8
-            ],
-            axis: new THREE.Vector3(0, -1, 0),
-            angle: Math.PI / 2
-        },
-        u_ : {
-            permutation : [
-                -1, -1, -1,
-                5, 14, 23,
-                8, 17, 26,
-    
-                -1, -1, -1,
-                4, 13, 22,
-                7, 16, 25,
-    
-                -1, -1, -1,
-                3, 12, 21,
-                6, 15, 24
-            ],
-            axis: new THREE.Vector3(0, 1, 0),
-            angle: Math.PI / 2
-        },
-        f:{
-            permutation : [
-                -1, 7, 8,
-                -1, 16, 17,
-                -1, 25, 26,
-    
-                -1, 4, 5,
-                -1, 13, 14,
-                -1, 22, 23,
-    
-                -1, 1, 2,
-                -1, 10, 11,
-                -1, 19, 20
-            ],
-            axis: new THREE.Vector3(0, 0, -1),
-            angle: Math.PI / 2
-        },
-        f_:{
-            permutation : [
-                -1, 19, 20,
-                -1, 10, 11,
-                -1, 1, 2,
-    
-                -1, 22, 23,
-                -1, 13, 14,
-                -1, 4, 5,
-    
-                -1, 25, 26,
-                -1, 16, 17,
-                -1, 7, 8
-            ],
-            axis: new THREE.Vector3(0, 0, 1),
-            angle: Math.PI / 2
-        },
-        l:{
-            permutation : [
-                6, 3, 0, 
-                7, 4, 1,
-                8, 5, 2,
-    
-                15, 12, 9,
-                16, 13, 10,
-                17, 14, 11,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(1, 0, 0),
-            angle: Math.PI / 2
-        },
-        l_ : {
-            permutation : [
-                2, 5, 8,
-                1, 4, 7,
-                0, 3, 6,
-    
-                11, 14, 17,
-                10, 13, 16,
-                9, 12, 15,
-    
-                -1, -1, -1,
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3(-1, 0, 0),
-            angle: Math.PI / 2
-        }
+        R:[ ActionGroup.R ],
+        R_: [ ActionGroup.R_ ],
+        R2 : [ ActionGroup.R, ActionGroup.R ],
+        U: [ ActionGroup.U ],
+        U_ : [ActionGroup.U_ ],
+        U2 : [ ActionGroup.U, ActionGroup.U ],
+        F: [ ActionGroup.F ],
+        F_: [ ActionGroup.F_ ],
+        F2 : [ ActionGroup.F, ActionGroup.F ],
+        D: [ ActionGroup.D ],
+        D_: [ ActionGroup.D_ ],
+        D2: [ ActionGroup.D, ActionGroup.D ],
+        L: [ ActionGroup.L ],
+        L_: [ ActionGroup.L_ ],
+        L2: [ ActionGroup.L, ActionGroup.L ],
+        B: [ ActionGroup.B ],
+        B_: [ ActionGroup.B_ ],
+        B2: [ ActionGroup.B, ActionGroup.B ],
+        E : [ ActionGroup.E ],
+        E_: [ ActionGroup.E_ ],
+        E2 : [ ActionGroup.E, ActionGroup.E ],
+        M: [ ActionGroup.M ],
+        M_: [ ActionGroup.M_ ],
+        M2: [ ActionGroup.M, ActionGroup.M ],
+        S: [ ActionGroup.S ],
+        S_: [ ActionGroup.S_],
+        S2: [ ActionGroup.S, ActionGroup.S ],
+        r : [ ActionGroup.R, ActionGroup.M_ ],
+        r_ : [ ActionGroup.R_, ActionGroup.M ],
+        r2 : [ ActionGroup.R, ActionGroup.M_, ActionGroup.R, ActionGroup.M_ ],
+        u : [ ActionGroup.U, ActionGroup.E_ ],
+        u_ : [ ActionGroup.U_, ActionGroup.E ],
+        u2 : [ ActionGroup.U, ActionGroup.E_, ActionGroup.U, ActionGroup.E_ ],
+        f : [ ActionGroup.F, ActionGroup.S ],
+        f_ : [ ActionGroup.F_, ActionGroup.S_ ],
+        f2 : [ ActionGroup.F, ActionGroup.S, ActionGroup.F, ActionGroup.S ],
+        d : [ ActionGroup.D, ActionGroup.E ],
+        d_ : [ ActionGroup.D_, ActionGroup.E_ ],
+        d2 : [ ActionGroup.D, ActionGroup.E, ActionGroup.D, ActionGroup.E ],
+        l : [ ActionGroup.L, ActionGroup.M ],
+        l_ : [ ActionGroup.L_, ActionGroup.M_ ],
+        l2 : [ ActionGroup.L, ActionGroup.M, ActionGroup.L, ActionGroup.M ],
+        b : [ ActionGroup.B, ActionGroup.S_ ],
+        b_ : [ ActionGroup.B_, ActionGroup.S ],
+        b2 : [ ActionGroup.B, ActionGroup.S_, ActionGroup.B, ActionGroup.S_ ],
+        r : [ ActionGroup.R, ActionGroup.M_ ],
     },
     doAction: function(action){
-        this.move(action.axis, action.permutation, action.angle);
+        this.move(action);
     },
-    permute: function(permutation){
+    permute: function(action){
         // 根据定义的置换, 对cubemap进行置换操作
-        let newCubeMap = [];
-        for(let v of this.cubemap){
-            newCubeMap.push(v);
-        }
-        let i = 0;
-        for(let x = 0; x < this.rank; x++){
-            for(let y = 0; y < this.rank; y++){
-                for(let z = 0; z < this.rank; z++){
-                    let target = permutation[i];
-                    if(target >= 0){
-                        newCubeMap[target] = this.cubemap[i];
+        for(let act of action){
+            let newCubeMap = [];
+            for(let v of this.cubemap){
+                newCubeMap.push(v);
+            }
+            let i = 0;
+            for(let x = 0; x < this.rank; x++){
+                for(let y = 0; y < this.rank; y++){
+                    for(let z = 0; z < this.rank; z++){
+                        let target = act.permutation[i];
+                        if(target >= 0){
+                            newCubeMap[target] = this.cubemap[i];
+                        }
+                        i++;
                     }
-                    i++;
                 }
             }
+            this.cubemap = newCubeMap;
         }
-        this.cubemap = newCubeMap;
     },
-    move: function(rotateAxis, permutation, angle){
+    move: function(action){
         // 根据置换的定义, 按照指定轴进行旋转
         this.animationQueue.push({
             currentFrameIndex: 0,
-            rotateAxis: rotateAxis,
-            permutation: permutation,
-            angle: angle
+            action: action
         });
     },
-    doMove: function(rotateAxis, permutation, angle){
+    doMove: function(action){
         const matrix = new THREE.Matrix4();
         let v = new THREE.Vector3();
         let q = new THREE.Quaternion();
         let s = new THREE.Vector3();
-        let i = 0;
-        for(let x = 0; x < this.rank; x++){
-            for(let y = 0; y < this.rank; y++){
-                for(let z = 0; z < this.rank; z++){
-                    let target = permutation[i];
-                    if(target >= 0){
-                        let index = this.cubemap[i];
-                        this.cubes.getMatrixAt(index, matrix);
-                        
-                        matrix.decompose(v, q, s);
-            
-                        const quaternion = new THREE.Quaternion();
-                        quaternion.setFromAxisAngle(rotateAxis, angle);
-                        v.applyQuaternion(quaternion);
-            
-                        q.premultiply(quaternion);
-            
-                        matrix.compose(v, q, s);
-                        this.cubes.setMatrixAt(index, matrix);
+        const angle = Math.PI / (2 * this.animationSpeed);
+        for(let act of action){
+            let i = 0;
+            for(let x = 0; x < this.rank; x++){
+                for(let y = 0; y < this.rank; y++){
+                    for(let z = 0; z < this.rank; z++){
+                        let target = act.permutation[i];
+                        if(target >= 0){
+                            let index = this.cubemap[i];
+                            this.cubes.getMatrixAt(index, matrix);
+                            
+                            matrix.decompose(v, q, s);
+                
+                            const quaternion = new THREE.Quaternion();
+                            quaternion.setFromAxisAngle(act.axis, angle);
+                            v.applyQuaternion(quaternion);
+                
+                            q.premultiply(quaternion);
+                
+                            matrix.compose(v, q, s);
+                            this.cubes.setMatrixAt(index, matrix);
+                        }
+                        i++;
                     }
-                    i++;
                 }
             }
         }
@@ -586,16 +437,16 @@ export const rubicCube = {
         renderer.render(scene, camera);
     },
     animationQueue:[],
-    animationSpeed: Math.PI / 40, // 每一帧多少弧度
+    animationSpeed: 20, // 到达指定位置所需帧数量
     animation: function(){
         if(this.animationQueue.length > 0){
-            let first = this.animationQueue[0];
-            if(first.currentFrameIndex * this.animationSpeed >= first.angle){
+            let top = this.animationQueue[0];
+            if(top.currentFrameIndex >= this.animationSpeed){
                 this.animationQueue.shift();
-                this.permute(first.permutation);
+                this.permute(top.action);
             }else{
-                first.currentFrameIndex++;
-                this.doMove(first.rotateAxis, first.permutation, this.animationSpeed);
+                top.currentFrameIndex++;
+                this.doMove(top.action);
             }
         }
     }
