@@ -322,23 +322,6 @@ export const rubicCube = {
                 -1, -1, -1,
                 -1, -1, -1,
     
-                11, 14, 17,
-                10, 13, 16,
-                9, 12, 15,
-    
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1
-            ],
-            axis: new THREE.Vector3( -1, 0, 0 ),
-            angle: Math.PI / 2
-        },
-        M_:{
-            permutation : [
-                -1, -1, -1, 
-                -1, -1, -1,
-                -1, -1, -1,
-    
                 15, 12, 9,
                 16, 13, 10,
                 17, 14, 11,
@@ -350,23 +333,193 @@ export const rubicCube = {
             axis: new THREE.Vector3( 1, 0, 0 ),
             angle: Math.PI / 2
         },
-        // S:{
-        //     permutation : [
-        //         -1, -1, 8,
-        //         -1, -1, 17,
-        //         -1, -1, 26,
+        M_:{
+            permutation : [
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1,
     
-        //         -1, -1, 5,
-        //         -1, 13, 14,
-        //         -1, -1, 23,
+                11, 14, 17,
+                10, 13, 16,
+                9, 12, 15,
     
-        //         -1, -1, 2,
-        //         -1, -1, 11,
-        //         -1, -1, 20
-        //     ],
-        //     axis: new THREE.Vector3(0, 0, -1),
-        //     angle: Math.PI / 2
-        // }
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1
+            ],
+            axis: new THREE.Vector3( -1, 0, 0 ),
+            angle: Math.PI / 2
+        },
+        S:{
+            permutation : [
+                -1, 7, -1,
+                -1, 16, -1,
+                -1, 25, -1,
+    
+                -1, 4, -1,
+                -1, 13, -1,
+                -1, 22, -1,
+    
+                -1, 1, -1,
+                -1, 10, -1,
+                -1, 19, -1
+            ],
+            axis: new THREE.Vector3(0, 0, -1),
+            angle: Math.PI / 2
+        },
+        S_:{
+            permutation : [
+                -1, 19, -1,
+                -1, 10, -1,
+                -1, 1, -1,
+    
+                -1, 22, -1,
+                -1, 13, -1,
+                -1, 4, -1,
+    
+                -1, 25, -1,
+                -1, 16, -1,
+                -1, 7, -1
+            ],
+            axis: new THREE.Vector3(0, 0, 1),
+            angle: Math.PI / 2
+        },
+        r : {
+            permutation : [
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1,
+    
+                11, 14, 17,
+                10, 13, 16,
+                9, 12, 15,
+    
+                20, 23, 26,
+                19, 22, 25,
+                18, 21, 24
+            ],
+            axis: new THREE.Vector3( -1, 0, 0 ),
+            angle: Math.PI / 2
+        },
+        r_ :{
+            permutation : [
+                -1, -1, -1, 
+                -1, -1, -1,
+                -1, -1, -1,
+    
+                15, 12, 9,
+                16, 13, 10,
+                17, 14, 11,
+                
+                24, 21, 18,
+                25, 22, 19,
+                26, 23, 20
+            ],
+            axis: new THREE.Vector3( 1, 0, 0 ),
+            angle: Math.PI / 2
+        },
+        u : {
+            permutation : [
+                -1, -1, -1,
+                21, 12, 3,
+                24, 15, 6,
+    
+                -1, -1, -1,
+                22, 13, 4,
+                25, 16, 7,
+    
+                -1, -1, -1,
+                23, 14, 5,
+                26, 17, 8
+            ],
+            axis: new THREE.Vector3(0, -1, 0),
+            angle: Math.PI / 2
+        },
+        u_ : {
+            permutation : [
+                -1, -1, -1,
+                5, 14, 23,
+                8, 17, 26,
+    
+                -1, -1, -1,
+                4, 13, 22,
+                7, 16, 25,
+    
+                -1, -1, -1,
+                3, 12, 21,
+                6, 15, 24
+            ],
+            axis: new THREE.Vector3(0, 1, 0),
+            angle: Math.PI / 2
+        },
+        f:{
+            permutation : [
+                -1, 7, 8,
+                -1, 16, 17,
+                -1, 25, 26,
+    
+                -1, 4, 5,
+                -1, 13, 14,
+                -1, 22, 23,
+    
+                -1, 1, 2,
+                -1, 10, 11,
+                -1, 19, 20
+            ],
+            axis: new THREE.Vector3(0, 0, -1),
+            angle: Math.PI / 2
+        },
+        f_:{
+            permutation : [
+                -1, 19, 20,
+                -1, 10, 11,
+                -1, 1, 2,
+    
+                -1, 22, 23,
+                -1, 13, 14,
+                -1, 4, 5,
+    
+                -1, 25, 26,
+                -1, 16, 17,
+                -1, 7, 8
+            ],
+            axis: new THREE.Vector3(0, 0, 1),
+            angle: Math.PI / 2
+        },
+        l:{
+            permutation : [
+                6, 3, 0, 
+                7, 4, 1,
+                8, 5, 2,
+    
+                15, 12, 9,
+                16, 13, 10,
+                17, 14, 11,
+    
+                -1, -1, -1,
+                -1, -1, -1,
+                -1, -1, -1
+            ],
+            axis: new THREE.Vector3(1, 0, 0),
+            angle: Math.PI / 2
+        },
+        l_ : {
+            permutation : [
+                2, 5, 8,
+                1, 4, 7,
+                0, 3, 6,
+    
+                11, 14, 17,
+                10, 13, 16,
+                9, 12, 15,
+    
+                -1, -1, -1,
+                -1, -1, -1,
+                -1, -1, -1
+            ],
+            axis: new THREE.Vector3(-1, 0, 0),
+            angle: Math.PI / 2
+        }
     },
     doAction: function(action){
         this.move(action.axis, action.permutation, action.angle);
@@ -374,8 +527,8 @@ export const rubicCube = {
     permute: function(permutation){
         // 根据定义的置换, 对cubemap进行置换操作
         let newCubeMap = [];
-        for(let i = 0; i < this.cubemap.length; i++){
-            newCubeMap.push(this.cubemap[i]);
+        for(let v of this.cubemap){
+            newCubeMap.push(v);
         }
         let i = 0;
         for(let x = 0; x < this.rank; x++){
@@ -397,7 +550,7 @@ export const rubicCube = {
             currentFrameIndex: 0,
             rotateAxis: rotateAxis,
             permutation: permutation,
-            angle, angle
+            angle: angle
         });
     },
     doMove: function(rotateAxis, permutation, angle){
