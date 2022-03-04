@@ -62,9 +62,9 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
 
-        20, 23, 26,
-        19, 22, 25,
-        18, 21, 24
+        24, 21, 18,
+        25, 22, 19,
+        26, 23, 20
     ], new THREE.Vector3( -1, 0, 0 )),
     R_ : new CubeAction([
         -1, -1, -1, 
@@ -75,24 +75,11 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         
-        24, 21, 18,
-        25, 22, 19,
-        26, 23, 20
+        20, 23, 26,
+        19, 22, 25,
+        18, 21, 24
     ], new THREE.Vector3( 1, 0, 0 )),
     U: new CubeAction([
-        -1, -1, -1,
-        -1, -1, -1,
-        24, 15, 6,
-
-        -1, -1, -1,
-        -1, -1, -1,
-        25, 16, 7,
-
-        -1, -1, -1,
-        -1, -1, -1,
-        26, 17, 8
-    ], new THREE.Vector3(0, -1, 0)),
-    U_: new CubeAction([
         -1, -1, -1,
         -1, -1, -1,
         8, 17, 26,
@@ -104,21 +91,21 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         6, 15, 24
+    ], new THREE.Vector3(0, -1, 0)),
+    U_: new CubeAction([
+        -1, -1, -1,
+        -1, -1, -1,
+        24, 15, 6,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        25, 16, 7,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        26, 17, 8
     ], new THREE.Vector3(0, 1, 0)),
     F : new CubeAction([
-        -1, -1, 8,
-        -1, -1, 17,
-        -1, -1, 26,
-
-        -1, -1, 5,
-        -1, -1, 14,
-        -1, -1, 23,
-
-        -1, -1, 2,
-        -1, -1, 11,
-        -1, -1, 20
-    ], new THREE.Vector3(0, 0, -1)),
-    F_ : new CubeAction([
         -1, -1, 20,
         -1, -1, 11,
         -1, -1, 2,
@@ -130,21 +117,21 @@ const ActionGroup = {
         -1, -1, 26,
         -1, -1, 17,
         -1, -1, 8
+    ], new THREE.Vector3(0, 0, -1)),
+    F_ : new CubeAction([
+        -1, -1, 8,
+        -1, -1, 17,
+        -1, -1, 26,
+
+        -1, -1, 5,
+        -1, -1, 14,
+        -1, -1, 23,
+
+        -1, -1, 2,
+        -1, -1, 11,
+        -1, -1, 20
     ], new THREE.Vector3(0, 0, 1)),
     D : new CubeAction([
-        2, 11, 20,
-        -1, -1, -1,
-        -1, -1, -1,
-
-        1, 10, 19,
-        -1, -1, -1,
-        -1, -1, -1,
-
-        0, 9, 18,
-        -1, -1, -1,
-        -1, -1, -1
-    ], new THREE.Vector3(0, 1, 0)),
-    D_ : new CubeAction([
         18, 9, 0,
         -1, -1, -1,
         -1, -1, -1,
@@ -156,21 +143,21 @@ const ActionGroup = {
         20, 11, 2,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(0, -1, 0)),
-    L : new CubeAction([
-        6, 3, 0, 
-        7, 4, 1,
-        8, 5, 2,
-
-        -1, -1, -1,
+    ], new THREE.Vector3(0, 1, 0)),
+    D_ : new CubeAction([
+        2, 11, 20,
         -1, -1, -1,
         -1, -1, -1,
 
+        1, 10, 19,
         -1, -1, -1,
+        -1, -1, -1,
+
+        0, 9, 18,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(1, 0, 0)),
-    L_ : new CubeAction([
+    ], new THREE.Vector3(0, -1, 0)),
+    L : new CubeAction([
         2, 5, 8,
         1, 4, 7,
         0, 3, 6,
@@ -182,21 +169,21 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         -1, -1, -1
+    ], new THREE.Vector3(1, 0, 0)),
+    L_ : new CubeAction([
+        6, 3, 0, 
+        7, 4, 1,
+        8, 5, 2,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        -1, -1, -1,
+        -1, -1, -1
     ], new THREE.Vector3(-1, 0, 0)),
     B : new CubeAction([
-        18, -1, -1,
-        9, -1, -1,
-        0, -1, -1,
-
-        21, -1, -1,
-        12, -1, -1,
-        3, -1, -1,
-
-        24, -1, -1,
-        15, -1, -1,
-        6, -1, -1
-    ], new THREE.Vector3(0, 0, 1)),
-    B_ : new CubeAction([
         6, -1, -1,
         15, -1, -1,
         24, -1, -1,
@@ -208,21 +195,21 @@ const ActionGroup = {
         0, -1, -1,
         9, -1, -1,
         18, -1, -1
+    ], new THREE.Vector3(0, 0, 1)),
+    B_ : new CubeAction([
+        18, -1, -1,
+        9, -1, -1,
+        0, -1, -1,
+
+        21, -1, -1,
+        12, -1, -1,
+        3, -1, -1,
+
+        24, -1, -1,
+        15, -1, -1,
+        6, -1, -1
     ], new THREE.Vector3(0, 0, -1)),
     E : new CubeAction([
-        -1, -1, -1,
-        5, 14, 23,
-        -1, -1, -1,
-
-        -1, -1, -1,
-        4, 13, 22,
-        -1, -1, -1,
-
-        -1, -1, -1,
-        3, 12, 21,
-        -1, -1, -1
-    ], new THREE.Vector3(0, 1, 0)),
-    E_ : new CubeAction([
         -1, -1, -1,
         21, 12, 3,
         -1, -1, -1,
@@ -234,21 +221,21 @@ const ActionGroup = {
         -1, -1, -1,
         23, 14, 5,
         -1, -1, -1
-    ], new THREE.Vector3(0, -1, 0)),
-    M : new CubeAction([
-        -1, -1, -1, 
+    ], new THREE.Vector3(0, 1, 0)),
+    E_ : new CubeAction([
         -1, -1, -1,
+        5, 14, 23,
         -1, -1, -1,
 
-        15, 12, 9,
-        16, 13, 10,
-        17, 14, 11,
-        
-        -1, -1, -1, 
         -1, -1, -1,
+        4, 13, 22,
+        -1, -1, -1,
+
+        -1, -1, -1,
+        3, 12, 21,
         -1, -1, -1
-    ], new THREE.Vector3( 1, 0, 0 )),
-    M_ : new CubeAction([
+    ], new THREE.Vector3(0, -1, 0)),
+    M : new CubeAction([
         -1, -1, -1, 
         -1, -1, -1,
         -1, -1, -1,
@@ -260,21 +247,21 @@ const ActionGroup = {
         -1, -1, -1, 
         -1, -1, -1,
         -1, -1, -1
+    ], new THREE.Vector3( 1, 0, 0 )),
+    M_ : new CubeAction([
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1,
+
+        15, 12, 9,
+        16, 13, 10,
+        17, 14, 11,
+        
+        -1, -1, -1, 
+        -1, -1, -1,
+        -1, -1, -1
     ], new THREE.Vector3( -1, 0, 0 )),
     S : new CubeAction([
-        -1, 7, -1,
-        -1, 16, -1,
-        -1, 25, -1,
-
-        -1, 4, -1,
-        -1, 13, -1,
-        -1, 22, -1,
-
-        -1, 1, -1,
-        -1, 10, -1,
-        -1, 19, -1
-    ], new THREE.Vector3(0, 0, -1)),
-    S_ : new CubeAction([
         -1, 19, -1,
         -1, 10, -1,
         -1, 1, -1,
@@ -286,6 +273,19 @@ const ActionGroup = {
         -1, 25, -1,
         -1, 16, -1,
         -1, 7, -1
+    ], new THREE.Vector3(0, 0, -1)),
+    S_ : new CubeAction([
+        -1, 7, -1,
+        -1, 16, -1,
+        -1, 25, -1,
+
+        -1, 4, -1,
+        -1, 13, -1,
+        -1, 22, -1,
+
+        -1, 1, -1,
+        -1, 10, -1,
+        -1, 19, -1
     ], new THREE.Vector3(0, 0, 1))
 };
 
@@ -394,16 +394,15 @@ export const rubicCube = {
         // 根据定义的置换, 对cubemap进行置换操作
         for(let act of action){
             let newCubeMap = [];
-            for(let v of this.cubemap){
-                newCubeMap.push(v);
-            }
             let i = 0;
             for(let x = 0; x < this.rank; x++){
                 for(let y = 0; y < this.rank; y++){
                     for(let z = 0; z < this.rank; z++){
-                        let target = act.permutation[i];
-                        if(target >= 0){
-                            newCubeMap[target] = this.cubemap[i];
+                        let source = act.permutation[i];
+                        if(source >= 0){
+                            newCubeMap.push(this.cubemap[source]);
+                        }else{
+                            newCubeMap.push(this.cubemap[i]);
                         }
                         i++;
                     }
