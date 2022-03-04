@@ -2,7 +2,8 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>FrogRubicCube</title>
+		<title>RubikCube</title>
+        <link rel="stylesheet" type="text/css" href="css/colorcube.css">
 		<style>
 			body { margin: 0; }
 		</style>
@@ -39,56 +40,119 @@
         </script>
 	</head>
 	<body>
-        <a action="R" class="action_control" href="javascript:;" >R</a>
-        <a action="R_" class="action_control" href="javascript:;" >R'</a>
-        <a action="R2" class="action_control" href="javascript:;" >R2</a>
-        <a action="U" class="action_control" href="javascript:;" >U</a>
-        <a action="U_" class="action_control" href="javascript:;" >U'</a>
-        <a action="U2" class="action_control" href="javascript:;" >U2</a>
-        <a action="F" class="action_control" href="javascript:;" >F</a>
-        <a action="F_" class="action_control" href="javascript:;" >F'</a>
-        <a action="F2" class="action_control" href="javascript:;" >F2</a>
-        <a action="D" class="action_control" href="javascript:;" >D</a>
-        <a action="D_" class="action_control" href="javascript:;" >D'</a>
-        <a action="D2" class="action_control" href="javascript:;" >D2</a>
-        <a action="L" class="action_control" href="javascript:;" >L</a>
-        <a action="L_" class="action_control" href="javascript:;" >L'</a>
-        <a action="L2" class="action_control" href="javascript:;" >L2</a>
-        <a action="B" class="action_control" href="javascript:;" >B</a>
-        <a action="B_" class="action_control" href="javascript:;" >B'</a>
-        <a action="B2" class="action_control" href="javascript:;" >B2</a>
-        <a action="E" class="action_control" href="javascript:;" >E</a>
-        <a action="E_" class="action_control" href="javascript:;" >E'</a>
-        <a action="E2" class="action_control" href="javascript:;" >E2</a>
-        <a action="M" class="action_control" href="javascript:;" >M</a>
-        <a action="M_" class="action_control" href="javascript:;" >M'</a>
-        <a action="M2" class="action_control" href="javascript:;" >M2</a>
-        <a action="S" class="action_control" href="javascript:;" >S</a>
-        <a action="S_" class="action_control" href="javascript:;" >S'</a>
-        <a action="S2" class="action_control" href="javascript:;" >S2</a>
-        <a action="r" class="action_control" href="javascript:;" >r</a>
-        <a action="r_" class="action_control" href="javascript:;" >r'</a>
-        <a action="r2" class="action_control" href="javascript:;" >r2</a>
-        <a action="u" class="action_control" href="javascript:;" >u</a>
-        <a action="u_" class="action_control" href="javascript:;" >u'</a>
-        <a action="u2" class="action_control" href="javascript:;" >u2</a>
-        <a action="f" class="action_control" href="javascript:;" >f</a>
-        <a action="f_" class="action_control" href="javascript:;" >f'</a>
-        <a action="f2" class="action_control" href="javascript:;" >f2</a>
-        <a action="l" class="action_control" href="javascript:;" >l</a>
-        <a action="l_" class="action_control" href="javascript:;" >l'</a>
-        <a action="l2" class="action_control" href="javascript:;" >l2</a>
-        <a action="d" class="action_control" href="javascript:;" >d</a>
-        <a action="d_" class="action_control" href="javascript:;" >d'</a>
-        <a action="d2" class="action_control" href="javascript:;" >d2</a>
-        <a action="x" class="action_control" href="javascript:;" >x</a>
-        <a action="x_" class="action_control" href="javascript:;" >x'</a>
-        <a action="x2" class="action_control" href="javascript:;" >x2</a>
-        <a action="y" class="action_control" href="javascript:;" >y</a>
-        <a action="y_" class="action_control" href="javascript:;" >y'</a>
-        <a action="y2" class="action_control" href="javascript:;" >y2</a>
-        <a action="z" class="action_control" href="javascript:;" >z</a>
-        <a action="z_" class="action_control" href="javascript:;" >z'</a>
-        <a action="z2" class="action_control" href="javascript:;" >z2</a>
+        <div>
+            <a action="R" class="action_control" href="javascript:;" >R</a>
+            <a action="R_" class="action_control" href="javascript:;" >R'</a>
+            <a action="R2" class="action_control" href="javascript:;" >R2</a>
+            <a action="U" class="action_control" href="javascript:;" >U</a>
+            <a action="U_" class="action_control" href="javascript:;" >U'</a>
+            <a action="U2" class="action_control" href="javascript:;" >U2</a>
+            <a action="F" class="action_control" href="javascript:;" >F</a>
+            <a action="F_" class="action_control" href="javascript:;" >F'</a>
+            <a action="F2" class="action_control" href="javascript:;" >F2</a>
+            <a action="D" class="action_control" href="javascript:;" >D</a>
+            <a action="D_" class="action_control" href="javascript:;" >D'</a>
+            <a action="D2" class="action_control" href="javascript:;" >D2</a>
+            <a action="L" class="action_control" href="javascript:;" >L</a>
+            <a action="L_" class="action_control" href="javascript:;" >L'</a>
+            <a action="L2" class="action_control" href="javascript:;" >L2</a>
+            <a action="B" class="action_control" href="javascript:;" >B</a>
+            <a action="B_" class="action_control" href="javascript:;" >B'</a>
+            <a action="B2" class="action_control" href="javascript:;" >B2</a>
+            <a action="E" class="action_control" href="javascript:;" >E</a>
+            <a action="E_" class="action_control" href="javascript:;" >E'</a>
+            <a action="E2" class="action_control" href="javascript:;" >E2</a>
+            <a action="M" class="action_control" href="javascript:;" >M</a>
+            <a action="M_" class="action_control" href="javascript:;" >M'</a>
+            <a action="M2" class="action_control" href="javascript:;" >M2</a>
+            <a action="S" class="action_control" href="javascript:;" >S</a>
+            <a action="S_" class="action_control" href="javascript:;" >S'</a>
+            <a action="S2" class="action_control" href="javascript:;" >S2</a>
+            <a action="r" class="action_control" href="javascript:;" >r</a>
+            <a action="r_" class="action_control" href="javascript:;" >r'</a>
+            <a action="r2" class="action_control" href="javascript:;" >r2</a>
+            <a action="u" class="action_control" href="javascript:;" >u</a>
+            <a action="u_" class="action_control" href="javascript:;" >u'</a>
+            <a action="u2" class="action_control" href="javascript:;" >u2</a>
+            <a action="f" class="action_control" href="javascript:;" >f</a>
+            <a action="f_" class="action_control" href="javascript:;" >f'</a>
+            <a action="f2" class="action_control" href="javascript:;" >f2</a>
+            <a action="l" class="action_control" href="javascript:;" >l</a>
+            <a action="l_" class="action_control" href="javascript:;" >l'</a>
+            <a action="l2" class="action_control" href="javascript:;" >l2</a>
+            <a action="d" class="action_control" href="javascript:;" >d</a>
+            <a action="d_" class="action_control" href="javascript:;" >d'</a>
+            <a action="d2" class="action_control" href="javascript:;" >d2</a>
+            <a action="x" class="action_control" href="javascript:;" >x</a>
+            <a action="x_" class="action_control" href="javascript:;" >x'</a>
+            <a action="x2" class="action_control" href="javascript:;" >x2</a>
+            <a action="y" class="action_control" href="javascript:;" >y</a>
+            <a action="y_" class="action_control" href="javascript:;" >y'</a>
+            <a action="y2" class="action_control" href="javascript:;" >y2</a>
+            <a action="z" class="action_control" href="javascript:;" >z</a>
+            <a action="z_" class="action_control" href="javascript:;" >z'</a>
+            <a action="z2" class="action_control" href="javascript:;" >z2</a>
+        </div>
+        <div class="cube-box">
+            <div class="cube cube-box-row-0 cube-box-col-3" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-0 cube-box-col-4" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-0 cube-box-col-5" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-1 cube-box-col-3" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-1 cube-box-col-4" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-1 cube-box-col-5" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-2 cube-box-col-3" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-2 cube-box-col-4" style="background-color:#009E60;"></div>
+            <div class="cube cube-box-row-2 cube-box-col-5" style="background-color:#009E60;"></div>
+
+            <div class="cube cube-box-row-3 cube-box-col-0" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-1" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-2" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-0" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-1" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-2" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-0" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-1" style="background-color:#FF5800;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-2" style="background-color:#FF5800;"></div>
+
+            <div class="cube cube-box-row-3 cube-box-col-3" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-4" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-5" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-3" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-4" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-5" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-3" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-4" style="background-color:#FFD500;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-5" style="background-color:#FFD500;"></div>
+
+            <div class="cube cube-box-row-3 cube-box-col-6" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-7" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-8" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-6" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-7" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-8" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-6" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-7" style="background-color:#C41E3A;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-8" style="background-color:#C41E3A;"></div>
+
+            <div class="cube cube-box-row-3 cube-box-col-9" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-10" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-3 cube-box-col-11" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-9" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-10" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-4 cube-box-col-11" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-9" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-10" style="background-color:#FFFFFF;"></div>
+            <div class="cube cube-box-row-5 cube-box-col-11" style="background-color:#FFFFFF;"></div>
+
+            <div class="cube cube-box-row-6 cube-box-col-3" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-6 cube-box-col-4" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-6 cube-box-col-5" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-7 cube-box-col-3" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-7 cube-box-col-4" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-7 cube-box-col-5" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-8 cube-box-col-3" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-8 cube-box-col-4" style="background-color:#0051BA;"></div>
+            <div class="cube cube-box-row-8 cube-box-col-5" style="background-color:#0051BA;"></div>
+        </div>
 	</body>
 </html>
