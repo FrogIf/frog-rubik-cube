@@ -36,13 +36,13 @@ var mouse = new THREE.Vector2();//存储鼠标坐标或者触摸坐标
 
 
 class CubeAction{
-    constructor(permutation, axis){
+    constructor(permutation, axis, colorPermutation){
         this.permutation = permutation;
         this.axis = axis;
+        this.colorPermutation = colorPermutation;
     }
 }
 
-// W - 0, B - 1, Y - 2, G - 3, R - 4, O - 5
 const ColorPermutationGroup = {
     x: [3, 0, 1, 2, 4, 5],
     x_: [1, 2, 3, 0, 4, 5],
@@ -65,7 +65,7 @@ const ActionGroup = {
         24, 21, 18,
         25, 22, 19,
         26, 23, 20
-    ], new THREE.Vector3( -1, 0, 0 )),
+    ], new THREE.Vector3( -1, 0, 0 ), ColorPermutationGroup.x),
     R_ : new CubeAction([
         -1, -1, -1, 
         -1, -1, -1,
@@ -78,7 +78,7 @@ const ActionGroup = {
         20, 23, 26,
         19, 22, 25,
         18, 21, 24
-    ], new THREE.Vector3( 1, 0, 0 )),
+    ], new THREE.Vector3( 1, 0, 0 ), ColorPermutationGroup.x_),
     U: new CubeAction([
         -1, -1, -1,
         -1, -1, -1,
@@ -91,7 +91,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         6, 15, 24
-    ], new THREE.Vector3(0, -1, 0)),
+    ], new THREE.Vector3(0, -1, 0), ColorPermutationGroup.y),
     U_: new CubeAction([
         -1, -1, -1,
         -1, -1, -1,
@@ -104,7 +104,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         26, 17, 8
-    ], new THREE.Vector3(0, 1, 0)),
+    ], new THREE.Vector3(0, 1, 0), ColorPermutationGroup.y_),
     F : new CubeAction([
         -1, -1, 20,
         -1, -1, 11,
@@ -117,7 +117,7 @@ const ActionGroup = {
         -1, -1, 26,
         -1, -1, 17,
         -1, -1, 8
-    ], new THREE.Vector3(0, 0, -1)),
+    ], new THREE.Vector3(0, 0, -1), ColorPermutationGroup.z),
     F_ : new CubeAction([
         -1, -1, 8,
         -1, -1, 17,
@@ -130,7 +130,7 @@ const ActionGroup = {
         -1, -1, 2,
         -1, -1, 11,
         -1, -1, 20
-    ], new THREE.Vector3(0, 0, 1)),
+    ], new THREE.Vector3(0, 0, 1), ColorPermutationGroup.z_),
     D : new CubeAction([
         18, 9, 0,
         -1, -1, -1,
@@ -143,7 +143,7 @@ const ActionGroup = {
         20, 11, 2,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(0, 1, 0)),
+    ], new THREE.Vector3(0, 1, 0), ColorPermutationGroup.y_),
     D_ : new CubeAction([
         2, 11, 20,
         -1, -1, -1,
@@ -156,7 +156,7 @@ const ActionGroup = {
         0, 9, 18,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(0, -1, 0)),
+    ], new THREE.Vector3(0, -1, 0), ColorPermutationGroup.y),
     L : new CubeAction([
         2, 5, 8,
         1, 4, 7,
@@ -169,7 +169,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(1, 0, 0)),
+    ], new THREE.Vector3(1, 0, 0), ColorPermutationGroup.x_),
     L_ : new CubeAction([
         6, 3, 0, 
         7, 4, 1,
@@ -182,7 +182,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(-1, 0, 0)),
+    ], new THREE.Vector3(-1, 0, 0), ColorPermutationGroup.x),
     B : new CubeAction([
         6, -1, -1,
         15, -1, -1,
@@ -195,7 +195,7 @@ const ActionGroup = {
         0, -1, -1,
         9, -1, -1,
         18, -1, -1
-    ], new THREE.Vector3(0, 0, 1)),
+    ], new THREE.Vector3(0, 0, 1), ColorPermutationGroup.z_),
     B_ : new CubeAction([
         18, -1, -1,
         9, -1, -1,
@@ -208,7 +208,7 @@ const ActionGroup = {
         24, -1, -1,
         15, -1, -1,
         6, -1, -1
-    ], new THREE.Vector3(0, 0, -1)),
+    ], new THREE.Vector3(0, 0, -1), ColorPermutationGroup.z),
     E : new CubeAction([
         -1, -1, -1,
         21, 12, 3,
@@ -221,7 +221,7 @@ const ActionGroup = {
         -1, -1, -1,
         23, 14, 5,
         -1, -1, -1
-    ], new THREE.Vector3(0, 1, 0)),
+    ], new THREE.Vector3(0, 1, 0), ColorPermutationGroup.y_),
     E_ : new CubeAction([
         -1, -1, -1,
         5, 14, 23,
@@ -234,7 +234,7 @@ const ActionGroup = {
         -1, -1, -1,
         3, 12, 21,
         -1, -1, -1
-    ], new THREE.Vector3(0, -1, 0)),
+    ], new THREE.Vector3(0, -1, 0), ColorPermutationGroup.y),
     M : new CubeAction([
         -1, -1, -1, 
         -1, -1, -1,
@@ -247,7 +247,7 @@ const ActionGroup = {
         -1, -1, -1, 
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3( 1, 0, 0 )),
+    ], new THREE.Vector3( 1, 0, 0 ), ColorPermutationGroup.x_),
     M_ : new CubeAction([
         -1, -1, -1, 
         -1, -1, -1,
@@ -260,7 +260,7 @@ const ActionGroup = {
         -1, -1, -1, 
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3( -1, 0, 0 )),
+    ], new THREE.Vector3( -1, 0, 0 ), ColorPermutationGroup.x),
     S : new CubeAction([
         -1, 19, -1,
         -1, 10, -1,
@@ -273,7 +273,7 @@ const ActionGroup = {
         -1, 25, -1,
         -1, 16, -1,
         -1, 7, -1
-    ], new THREE.Vector3(0, 0, -1)),
+    ], new THREE.Vector3(0, 0, -1), ColorPermutationGroup.z),
     S_ : new CubeAction([
         -1, 7, -1,
         -1, 16, -1,
@@ -286,10 +286,10 @@ const ActionGroup = {
         -1, 1, -1,
         -1, 10, -1,
         -1, 19, -1
-    ], new THREE.Vector3(0, 0, 1))
+    ], new THREE.Vector3(0, 0, 1), ColorPermutationGroup.z_)
 };
 
-export const rubicCube = {
+export const rubikCube = {
     rank: 3,
     cubemap:[],
     cubes:{},
@@ -394,6 +394,7 @@ export const rubicCube = {
         // 根据定义的置换, 对cubemap进行置换操作
         for(let act of action){
             let newCubeMap = [];
+            let newColorMap = [];
             let i = 0;
             for(let x = 0; x < this.rank; x++){
                 for(let y = 0; y < this.rank; y++){
@@ -401,14 +402,24 @@ export const rubicCube = {
                         let source = act.permutation[i];
                         if(source >= 0){
                             newCubeMap.push(this.cubemap[source]);
+
+                            // 单块颜色置换
+                            let oldColorStatus = this.colorMap[source];
+                            let newColorStatus = [];
+                            for(let c = 0; c < oldColorStatus.length; c++){
+                                newColorStatus.push(oldColorStatus[act.colorPermutation[c]]);
+                            }
+                            newColorMap.push(newColorStatus);
                         }else{
                             newCubeMap.push(this.cubemap[i]);
+                            newColorMap.push(this.colorMap[i]);
                         }
                         i++;
                     }
                 }
             }
             this.cubemap = newCubeMap;
+            this.colorMap = newColorMap;
         }
     },
     move: function(action){
@@ -453,6 +464,7 @@ export const rubicCube = {
         this.cubes.instanceMatrix.needsUpdate = true;
         renderer.render(scene, camera);
     },
+    actionDoneCallback:null,
     animationQueue:[],
     animationSpeed: 20, // 到达指定位置所需帧数量
     animation: function(){
@@ -461,41 +473,95 @@ export const rubicCube = {
             if(top.currentFrameIndex >= this.animationSpeed){
                 this.animationQueue.shift();
                 this.permute(top.action);
+                if(this.actionDoneCallback){
+                    this.actionDoneCallback();
+                }
             }else{
                 top.currentFrameIndex++;
                 this.doMove(top.action);
             }
         }
     },
-    colorFace: [
-        [0,3,5],
-        [0,5],
-        [0,1,5],
-        [3,5],
-        [5],
-        [1,5],
-        [1,2,5],
-        [2,5],
-        [2,3,5],
-        [0,3],
-        [0],
-        [0,1],
-        [3],
-        [],
-        [1],
-        [2,3],
-        [2],
-        [1,2],
-        [0,3,4],
-        [0,4],
-        [0,1,4],
-        [1,4],
-        [4],
-        [3,4],
-        [2,3,4],
-        [2,4],
-        [1,2,4]
-    ]
+    standColorPosition:{ // 数组索引表示标准魔方展开上编号, 数组值表示立体魔方中块的编号
+        "D":[18, 9, 0, 19, 10, 1, 20, 11, 2], // 底面
+        "F":[8, 17, 26, 5, 14, 23, 2, 11, 20], // 前面
+        "U":[6, 15, 24, 7, 16, 25, 8, 17, 26], // 上面
+        "B":[0, 9, 18, 3, 12, 21, 6, 15, 24],// 后面
+        "R":[24, 21, 18, 25, 22, 19, 26, 23, 20], // 右面
+        "L":[0, 3, 6, 1, 4, 7, 2, 5, 8] // 左面
+    },
+    getColorByInfo: function(face /*所在面*/, pos/*在指定面上的编号, 按照标准魔方展开图, 每个面进行编号, 1 -- 9*/){
+        let faceNo = -1;
+        if(face == 'D'){
+            faceNo = 0;
+        }else if(face == 'F'){
+            faceNo = 1;
+        }else if(face == 'U'){
+            faceNo = 2;
+        }else if(face == 'B'){
+            faceNo = 3;
+        }else if(face == 'R'){
+            faceNo = 4;
+        }else if(face == 'L'){
+            faceNo = 5;
+        }else{
+            console.warn("unrecognized face");
+            return "#000000";
+        }
+        if(pos < 1 || pos > 9){
+            console.warn("pos out of range 1 -- 9, real : " + pos);
+            return "#000000";
+        }
+        let cubeNo = this.standColorPosition[face][pos - 1];
+        let color = this.colorMap[cubeNo][faceNo];
+        return CubeColor.properties[color].value;
+    },
+    getColor: function(index){
+        if(index == 0){
+            return CubeColor.properties[CubeColor.WHITE].value;
+        }else if(index == 1){
+            return CubeColor.properties[CubeColor.BLUE].value;
+        }else if(index == 2){
+            return CubeColor.properties[CubeColor.YELLOW].value;
+        }else if(index == 3){
+            return CubeColor.properties[CubeColor.GREEN].value;
+        }else if(index == 4){
+            return CubeColor.properties[CubeColor.RED].value;
+        }else if(index == 5){
+            return CubeColor.properties[CubeColor.ORANGE].value;
+        }else{
+            console.warn("unrecognized color index");
+        }
+    },
+    colorMap:[
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
+        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE]
+    ],
 };
 
 export function init(debug) {
@@ -508,8 +574,8 @@ export function init(debug) {
     orbitControler = new OrbitControls(camera, renderer.domElement);
     orbitControler.rotateSpeed = 0.5;
 
-    rubicCube.init();
-    scene.add(rubicCube.cubes);
+    rubikCube.init();
+    scene.add(rubikCube.cubes);
 
     scene.add(createCoverCube());
     if (isDebug) {
@@ -530,7 +596,7 @@ export function init(debug) {
     function animate() {
         requestAnimationFrame(animate);
         orbitControler.update();
-        rubicCube.animation();
+        rubikCube.animation();
         renderer.render(scene, camera);
     }
     animate();

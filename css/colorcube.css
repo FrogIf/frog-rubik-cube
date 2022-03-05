@@ -75,4 +75,9 @@
     border: 1px solid black; 
     margin: 1px;
     display: inline-block;
+    text-align: center;
+}
+
+.cube-number{
+    display: none;
 }
