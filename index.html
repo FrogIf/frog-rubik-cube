@@ -9,6 +9,15 @@
             .action_control{
                 margin: 10px 3px;
             }
+            .right-control-panel{
+                right: 10px;
+                position: absolute;
+                width: 200px;
+                height: 100px;
+                border: 1px solid blue;
+                background-color: rgba(142, 177, 190, 0.4);
+                padding: 10px 10px;
+            }
 		</style>
         <script type="importmap">
             {
@@ -51,6 +60,10 @@
                 if(action){
                     frog.rubikCube.doAction(action);
                 }
+            }
+
+            document.getElementById("rebaseBtn").onclick = () => {
+                frog.rubikCube.rebase();
             }
         </script>
 	</head>
@@ -168,6 +181,9 @@
             <div class="cube cube-box-row-8 cube-box-col-3" style="background-color:#0051BA;"><span class="cube-number">7</span></div>
             <div class="cube cube-box-row-8 cube-box-col-4" style="background-color:#0051BA;"><span class="cube-number">8</span></div>
             <div class="cube cube-box-row-8 cube-box-col-5" style="background-color:#0051BA;"><span class="cube-number">9</span></div>
+        </div>
+        <div class="right-control-panel">
+            <button id="rebaseBtn" style="color: black">rebase</button>
         </div>
 	</body>
 </html>

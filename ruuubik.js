@@ -2,19 +2,19 @@ import * as THREE from 'three';
 import { OrbitControls } from './js/threejs/jsm/controls/OrbitControls.js';
 
 const CubeColor = {
-    RED: 1,
-    GREEN: 2,
-    BLUE: 3,
-    ORANGE: 4,
-    YELLOW: 5,
-    WHITE: 6,
+    WHITE: 0,
+    BLUE: 1,
+    YELLOW: 2,
+    GREEN: 3,
+    RED: 4,
+    ORANGE: 5,
     properties: {
-        1: { name: "red", value: "#C41E3A" },
-        2: { name: "green", value: "#009E60" },
-        3: { name: "blue", value: "#0051BA" },
-        4: { name: "orange", value: "#FF5800" },
-        5: { name: "yellow", value: "#FFD500" },
-        6: { name: "white", value: "#FFFFFF" }
+        0: { name: "white", value: "#FFFFFF" },
+        1: { name: "blue", value: "#0051BA" },
+        2: { name: "yellow", value: "#FFD500" },
+        3: { name: "green", value: "#009E60" },
+        4: { name: "red", value: "#C41E3A" },
+        5: { name: "orange", value: "#FF5800" }
     }
 };
 const backgroundColor = 0xFFFFFF;
@@ -43,7 +43,12 @@ class CubeAction{
     }
 }
 
-const ColorPermutationGroup = {
+/**
+ * 旋转群
+ * 这是一个有限生成群, 下面列出了该群中的所有生成元
+ * 根据方块颜色推理可知, 该有限生成群共有24个元素
+ */
+const RotatePermutationGroup = {
     x: [3, 0, 1, 2, 4, 5],
     x_: [1, 2, 3, 0, 4, 5],
     y : [0, 4, 2, 5, 3, 1],
@@ -51,6 +56,141 @@ const ColorPermutationGroup = {
     z : [4, 1, 5, 3, 2, 0],
     z_ : [5, 1, 4, 3, 0, 2]
 };
+
+const RotatePermutationIdentity = [0, 1, 2, 3, 4, 5];
+
+/**
+ * 从指定的状态到另一个状态的最短旋转路径
+ * 广度优先搜索, 从程序上看, 有可能执行6^24次搜索, 待优化
+ */
+function getRotatePath(source, target){
+    if(!checkRotateStatus(source)){
+        console.warn("illegal source", source);
+        return null;
+    }
+    if(!checkRotateStatus(target)){
+        console.warn("illegal target", target);
+        return null;
+    }
+    if(source.length != 6){
+        // 确定source的实际值
+        let fullsource = fillRotateStatus(source);
+        if(fullsource == null){
+            console.warn("nonexistent source status : ", source);
+            return null;
+        }
+        source = fullsource;
+    }
+    if(isStartWithForRotatePermutation(target, source)){
+        return [];  // 说明来源状态和目标状态一致, 不需要旋转
+    }
+    let currentStatusPath = [{
+        status : source,
+        path : []
+    }];
+    let nextStatusPath = [];
+    for(let i = 0; i < 24; i++){
+        for(let cursorPath of currentStatusPath){
+            let currentStatus = cursorPath.status;
+            for(let k in RotatePermutationGroup){
+                let v = RotatePermutationGroup[k];
+                let newStatus = multiplyRotatePermutation(currentStatus, v);
+                if(isStartWithForRotatePermutation(target, newStatus)){
+                    cursorPath.path.push({
+                        name: k,
+                        permutation: v
+                    });
+                    return cursorPath.path; 
+                }
+                else{
+                    let newPath = [];
+                    for(let p of cursorPath.path){
+                        newPath.push(p);
+                    }
+                    newPath.push({
+                        name: k,
+                        permutation: v
+                    });
+                    nextStatusPath.push({
+                        status : newStatus,
+                        path : newPath
+                    });
+                }
+            }
+        }
+        currentStatusPath = nextStatusPath;
+        nextStatusPath = [];
+    }
+    return null;
+}
+
+// 补全旋转状态, 旋转状态共有6个值, 但是, 根据两个值就可以确定整个状态
+function fillRotateStatus(rotateStatus){
+    let currentStatusArr = [RotatePermutationIdentity];
+    let nextStatusArr = [];
+    for(let k in RotatePermutationGroup){
+        let p = RotatePermutationGroup[k];
+        if(isStartWithForRotatePermutation(rotateStatus, p)){
+            return p;
+        }
+    }
+    for(let i = 0; i < 24; i++){
+        for(let status of currentStatusArr){
+            for(let k in RotatePermutationGroup){
+                let v = RotatePermutationGroup[k];
+                let newStatus = multiplyRotatePermutation(status, v);
+                if(isStartWithForRotatePermutation(rotateStatus, newStatus)){ 
+                    return newStatus; 
+                }
+                else{
+                    nextStatusArr.push(newStatus);
+                }
+            }
+        }
+        currentStatusArr = nextStatusArr;
+        nextStatusArr = [];
+    }
+    return null;
+}
+
+// 非法的序列
+const illegalSequence = {
+    0 : 2,
+    1 : 3,
+    4 : 5, 
+    2 : 0, 
+    3 : 1, 
+    5 : 4
+};
+// 检查输入的旋转状态是否合法
+function checkRotateStatus(status){
+    if(status.length < 2 || status.length > 6){ return false; }
+    let preV = status[0];
+    for(let i = 1; i < status.length; i++){ // TODO 这个检查不正确, 4,5本身是连续的
+        if(illegalSequence[preV] == status[i]){
+            return false;
+        }
+        preV = status[i];
+    }
+    return illegalSequence[preV] != status[0];
+}
+
+function isStartWithForRotatePermutation(prefix, target){
+    for(let i = 0; i < prefix.length; i++){
+        if(target[i] != prefix[i]){
+            return false;
+        }
+    }
+    return true;
+}
+
+function multiplyRotatePermutation(a, b){
+    let result = [];
+    for(let i of b){
+        result.push(a[i]);
+    }
+    return result;
+}
 
 const ActionGroup = {
     R : new CubeAction([
@@ -65,7 +205,7 @@ const ActionGroup = {
         24, 21, 18,
         25, 22, 19,
         26, 23, 20
-    ], new THREE.Vector3( -1, 0, 0 ), ColorPermutationGroup.x),
+    ], new THREE.Vector3( -1, 0, 0 ), RotatePermutationGroup.x),
     R_ : new CubeAction([
         -1, -1, -1, 
         -1, -1, -1,
@@ -78,7 +218,7 @@ const ActionGroup = {
         20, 23, 26,
         19, 22, 25,
         18, 21, 24
-    ], new THREE.Vector3( 1, 0, 0 ), ColorPermutationGroup.x_),
+    ], new THREE.Vector3( 1, 0, 0 ), RotatePermutationGroup.x_),
     U: new CubeAction([
         -1, -1, -1,
         -1, -1, -1,
@@ -91,7 +231,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         6, 15, 24
-    ], new THREE.Vector3(0, -1, 0), ColorPermutationGroup.y),
+    ], new THREE.Vector3(0, -1, 0), RotatePermutationGroup.y),
     U_: new CubeAction([
         -1, -1, -1,
         -1, -1, -1,
@@ -104,7 +244,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         26, 17, 8
-    ], new THREE.Vector3(0, 1, 0), ColorPermutationGroup.y_),
+    ], new THREE.Vector3(0, 1, 0), RotatePermutationGroup.y_),
     F : new CubeAction([
         -1, -1, 20,
         -1, -1, 11,
@@ -117,7 +257,7 @@ const ActionGroup = {
         -1, -1, 26,
         -1, -1, 17,
         -1, -1, 8
-    ], new THREE.Vector3(0, 0, -1), ColorPermutationGroup.z),
+    ], new THREE.Vector3(0, 0, -1), RotatePermutationGroup.z),
     F_ : new CubeAction([
         -1, -1, 8,
         -1, -1, 17,
@@ -130,7 +270,7 @@ const ActionGroup = {
         -1, -1, 2,
         -1, -1, 11,
         -1, -1, 20
-    ], new THREE.Vector3(0, 0, 1), ColorPermutationGroup.z_),
+    ], new THREE.Vector3(0, 0, 1), RotatePermutationGroup.z_),
     D : new CubeAction([
         18, 9, 0,
         -1, -1, -1,
@@ -143,7 +283,7 @@ const ActionGroup = {
         20, 11, 2,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(0, 1, 0), ColorPermutationGroup.y_),
+    ], new THREE.Vector3(0, 1, 0), RotatePermutationGroup.y_),
     D_ : new CubeAction([
         2, 11, 20,
         -1, -1, -1,
@@ -156,7 +296,7 @@ const ActionGroup = {
         0, 9, 18,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(0, -1, 0), ColorPermutationGroup.y),
+    ], new THREE.Vector3(0, -1, 0), RotatePermutationGroup.y),
     L : new CubeAction([
         2, 5, 8,
         1, 4, 7,
@@ -169,7 +309,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(1, 0, 0), ColorPermutationGroup.x_),
+    ], new THREE.Vector3(1, 0, 0), RotatePermutationGroup.x_),
     L_ : new CubeAction([
         6, 3, 0, 
         7, 4, 1,
@@ -182,7 +322,7 @@ const ActionGroup = {
         -1, -1, -1,
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3(-1, 0, 0), ColorPermutationGroup.x),
+    ], new THREE.Vector3(-1, 0, 0), RotatePermutationGroup.x),
     B : new CubeAction([
         6, -1, -1,
         15, -1, -1,
@@ -195,7 +335,7 @@ const ActionGroup = {
         0, -1, -1,
         9, -1, -1,
         18, -1, -1
-    ], new THREE.Vector3(0, 0, 1), ColorPermutationGroup.z_),
+    ], new THREE.Vector3(0, 0, 1), RotatePermutationGroup.z_),
     B_ : new CubeAction([
         18, -1, -1,
         9, -1, -1,
@@ -208,7 +348,7 @@ const ActionGroup = {
         24, -1, -1,
         15, -1, -1,
         6, -1, -1
-    ], new THREE.Vector3(0, 0, -1), ColorPermutationGroup.z),
+    ], new THREE.Vector3(0, 0, -1), RotatePermutationGroup.z),
     E : new CubeAction([
         -1, -1, -1,
         21, 12, 3,
@@ -221,7 +361,7 @@ const ActionGroup = {
         -1, -1, -1,
         23, 14, 5,
         -1, -1, -1
-    ], new THREE.Vector3(0, 1, 0), ColorPermutationGroup.y_),
+    ], new THREE.Vector3(0, 1, 0), RotatePermutationGroup.y_),
     E_ : new CubeAction([
         -1, -1, -1,
         5, 14, 23,
@@ -234,7 +374,7 @@ const ActionGroup = {
         -1, -1, -1,
         3, 12, 21,
         -1, -1, -1
-    ], new THREE.Vector3(0, -1, 0), ColorPermutationGroup.y),
+    ], new THREE.Vector3(0, -1, 0), RotatePermutationGroup.y),
     M : new CubeAction([
         -1, -1, -1, 
         -1, -1, -1,
@@ -247,7 +387,7 @@ const ActionGroup = {
         -1, -1, -1, 
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3( 1, 0, 0 ), ColorPermutationGroup.x_),
+    ], new THREE.Vector3( 1, 0, 0 ), RotatePermutationGroup.x_),
     M_ : new CubeAction([
         -1, -1, -1, 
         -1, -1, -1,
@@ -260,7 +400,7 @@ const ActionGroup = {
         -1, -1, -1, 
         -1, -1, -1,
         -1, -1, -1
-    ], new THREE.Vector3( -1, 0, 0 ), ColorPermutationGroup.x),
+    ], new THREE.Vector3( -1, 0, 0 ), RotatePermutationGroup.x),
     S : new CubeAction([
         -1, 19, -1,
         -1, 10, -1,
@@ -273,7 +413,7 @@ const ActionGroup = {
         -1, 25, -1,
         -1, 16, -1,
         -1, 7, -1
-    ], new THREE.Vector3(0, 0, -1), ColorPermutationGroup.z),
+    ], new THREE.Vector3(0, 0, -1), RotatePermutationGroup.z),
     S_ : new CubeAction([
         -1, 7, -1,
         -1, 16, -1,
@@ -286,7 +426,7 @@ const ActionGroup = {
         -1, 1, -1,
         -1, 10, -1,
         -1, 19, -1
-    ], new THREE.Vector3(0, 0, 1), ColorPermutationGroup.z_)
+    ], new THREE.Vector3(0, 0, 1), RotatePermutationGroup.z_)
 };
 
 export const rubikCube = {
@@ -405,10 +545,7 @@ export const rubikCube = {
 
                             // 单块颜色置换
                             let oldColorStatus = this.colorMap[source];
-                            let newColorStatus = [];
-                            for(let c = 0; c < oldColorStatus.length; c++){
-                                newColorStatus.push(oldColorStatus[act.colorPermutation[c]]);
-                            }
+                            let newColorStatus = multiplyRotatePermutation(oldColorStatus, act.colorPermutation);
                             newColorMap.push(newColorStatus);
                         }else{
                             newCubeMap.push(this.cubemap[i]);
@@ -429,12 +566,11 @@ export const rubikCube = {
             action: action
         });
     },
-    doMove: function(action){
+    doMove: function(action, angle){
         const matrix = new THREE.Matrix4();
         let v = new THREE.Vector3();
         let q = new THREE.Quaternion();
         let s = new THREE.Vector3();
-        const angle = Math.PI / (2 * this.animationSpeed);
         for(let act of action){
             let i = 0;
             for(let x = 0; x < this.rank; x++){
@@ -467,18 +603,21 @@ export const rubikCube = {
     actionDoneCallback:null,
     animationQueue:[],
     animationSpeed: 20, // 到达指定位置所需帧数量
+    finishMove: function(action){
+        this.animationQueue.shift();
+        this.permute(action);
+        if(this.actionDoneCallback){
+            this.actionDoneCallback();
+        }
+    },
     animation: function(){
         if(this.animationQueue.length > 0){
             let top = this.animationQueue[0];
             if(top.currentFrameIndex >= this.animationSpeed){
-                this.animationQueue.shift();
-                this.permute(top.action);
-                if(this.actionDoneCallback){
-                    this.actionDoneCallback();
-                }
+                this.finishMove(top.action);
             }else{
                 top.currentFrameIndex++;
-                this.doMove(top.action);
+                this.doMove(top.action, Math.PI / (2 * this.animationSpeed));
             }
         }
     },
@@ -490,7 +629,7 @@ export const rubikCube = {
         "R":[24, 21, 18, 25, 22, 19, 26, 23, 20], // 右面
         "L":[0, 3, 6, 1, 4, 7, 2, 5, 8] // 左面
     },
-    getColorByInfo: function(face /*所在面*/, pos/*在指定面上的编号, 按照标准魔方展开图, 每个面进行编号, 1 -- 9*/){
+    getFaceNumber: function(face){
         let faceNo = -1;
         if(face == 'D'){
             faceNo = 0;
@@ -506,8 +645,12 @@ export const rubikCube = {
             faceNo = 5;
         }else{
             console.warn("unrecognized face");
-            return "#000000";
         }
+        return faceNo;
+    },
+    getColorByInfo: function(face /*所在面*/, pos/*在指定面上的编号, 按照标准魔方展开图, 每个面进行编号, 1 -- 9*/){
+        let faceNo = this.getFaceNumber(face);
+        if(faceNo == -1){ return "#000000"; }
         if(pos < 1 || pos > 9){
             console.warn("pos out of range 1 -- 9, real : " + pos);
             return "#000000";
@@ -515,23 +658,6 @@ export const rubikCube = {
         let cubeNo = this.standColorPosition[face][pos - 1];
         let color = this.colorMap[cubeNo][faceNo];
         return CubeColor.properties[color].value;
-    },
-    getColor: function(index){
-        if(index == 0){
-            return CubeColor.properties[CubeColor.WHITE].value;
-        }else if(index == 1){
-            return CubeColor.properties[CubeColor.BLUE].value;
-        }else if(index == 2){
-            return CubeColor.properties[CubeColor.YELLOW].value;
-        }else if(index == 3){
-            return CubeColor.properties[CubeColor.GREEN].value;
-        }else if(index == 4){
-            return CubeColor.properties[CubeColor.RED].value;
-        }else if(index == 5){
-            return CubeColor.properties[CubeColor.ORANGE].value;
-        }else{
-            console.warn("unrecognized color index");
-        }
     },
     colorMap:[
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
@@ -561,7 +687,18 @@ export const rubikCube = {
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE]
-    ]
+    ],
+    baseInfo: [0, 1],   // 默认状态下魔方的摆放
+    rebase : function(){
+        let rotatePath = getRotatePath(this.baseInfo, [3, 5]);
+        if(rotatePath != null && rotatePath.length > 0){
+            for(let rotate of rotatePath){
+                let action = this.action[rotate.name];
+                this.doMove(action, Math.PI / 2);
+                this.finishMove(action);
+            }
+        }
+    }
 };
 
 export function init(debug) {
