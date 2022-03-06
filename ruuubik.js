@@ -696,45 +696,80 @@ export const rubikCube = {
     ],
     baseInfo: RotatePermutationIdentity,   // 默认状态下魔方的摆放
     rebase : function(){
-        // let h = Math.floor((orbitControler.getAzimuthalAngle() + Math.PI / 4) / (Math.PI / 2))
-        // let v = Math.floor((orbitControler.getPolarAngle() + Math.PI / 4) / (Math.PI / 2));
-
-        // let cameraPosition = new THREE.Vector3();
-        // let cameraQuaternion = new THREE.Quaternion();
-        // camera.getWorldPosition(cameraPosition);
-        // camera.getWorldQuaternion(cameraQuaternion);
-        // let cameraEuler = new THREE.Euler();
-        // cameraEuler.setFromQuaternion(cameraQuaternion.normalize());
-        // console.log(cameraPosition);
-        // console.log(cameraQuaternion);
-        // console.log(cameraEuler);
-        // console.log(cameraEuler.x / Math.PI * 180);
-        // let x = Math.round(cameraEuler.x / (Math.PI / 2));
-        // let y = Math.round(cameraEuler.y / (Math.PI / 2));
-        // let z = Math.round(cameraEuler.z / (Math.PI / 2));
-        // console.log(x, y, z);
+        let cameraQuaternion = new THREE.Quaternion();
+        camera.getWorldQuaternion(cameraQuaternion);
+        let cameraEuler = new THREE.Euler();
+        cameraEuler.setFromQuaternion(cameraQuaternion.normalize());
+        let x = Math.round(cameraEuler.x / (Math.PI / 2));
+        let y = Math.round(cameraEuler.y / (Math.PI / 2));
+        let z = Math.round(cameraEuler.z / (Math.PI / 2));
         
-        // let rotateSub = new Array();
-        // for(let i = 0; i < x; i++){
-        //     rotateSub.push('x_');
-        // }
-        // for(let i = 0; i > x; i--){
-        //     rotateSub.push('x');
-        // }
-        // for(let i = 0; i < y; i++){
+        let rotateSub = new Array();
+        let x_axis = new THREE.Vector3(1, 0, 0);
+        for(let i = 0; i < x; i++){
+            rotateSub.push('x');
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromAxisAngle(x_axis, Math.PI / 2);
+            cameraQuaternion.premultiply(quaternion);
+        }
+        for(let i = 0; i > x; i--){
+            rotateSub.push('x_');
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromAxisAngle(x_axis, -Math.PI / 2);
+            cameraQuaternion.premultiply(quaternion);
+        }
 
-        // }
+        let y_axis = new THREE.Vector3(0, 1, 0);
+        for(let i = 0; i < y; i++){
+            rotateSub.push('y');
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromAxisAngle(y_axis, Math.PI / 2);
+            cameraQuaternion.premultiply(quaternion);
+        }
+        for(let i = 0; i > y; i--){
+            rotateSub.push('y_');
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromAxisAngle(y_axis, -Math.PI / 2);
+            cameraQuaternion.premultiply(quaternion);
+        }
 
-        let rotatePath = getRotatePath(this.baseInfo, [0, 3]);
-        if(rotatePath != null && rotatePath.length > 0){
-            let newBaseInfo = this.baseInfo;
-            for(let rotate of rotatePath){
-                let action = this.action[rotate.name];
-                this.doMove(action, Math.PI / 2);
-                this.finishMove(action);
-                newBaseInfo = multiplyRotatePermutation(newBaseInfo, rotate.permutation);
+        let z_axis = new THREE.Vector3(0, 0, -1);
+        for(let i = 0; i < z; i++){
+            rotateSub.push('z');
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromAxisAngle(z_axis, Math.PI / 2);
+            cameraQuaternion.premultiply(quaternion);
+        }
+        for(let i = 0; i > z; i--){
+            rotateSub.push('z_');
+            const quaternion = new THREE.Quaternion();
+            quaternion.setFromAxisAngle(z_axis, -Math.PI / 2);
+            cameraQuaternion.premultiply(quaternion);
+        }
+
+        if(rotateSub.length > 0){
+            let targetBase = this.baseInfo;
+            for(let rotate of rotateSub){
+                targetBase = multiplyRotatePermutation(targetBase, RotatePermutationGroup[rotate]);
             }
-            this.baseInfo = newBaseInfo;
+            let rotatePath = getRotatePath(this.baseInfo, targetBase);
+            if(rotatePath != null && rotatePath.length > 0){
+                let newBaseInfo = this.baseInfo;
+                for(let rotate of rotatePath){
+                    let action = this.action[rotate.name];
+                    this.doMove(action, Math.PI / 2);
+                    this.finishMove(action);
+                    newBaseInfo = multiplyRotatePermutation(newBaseInfo, rotate.permutation);
+                }
+
+                // orbitControler.object.setRotationFromQuaternion(cameraQuaternion.normalize());
+                // orbitControler.enabled = false;
+                // // camera.rotateY(Math.PI / 2);
+                // camera.setRotationFromQuaternion(cameraQuaternion.normalize());
+                // camera.updateProjectionMatrix();
+                // // orbitControler.enabled = true;
+                // this.baseInfo = newBaseInfo;
+            }
         }
     }
 };
