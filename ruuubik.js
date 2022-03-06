@@ -154,10 +154,10 @@ function fillRotateStatus(rotateStatus){
 }
 
 // 非法的序列
-const illegalSequence = {
-    0 : 2,
-    1 : 3,
-    4 : 5, 
+const illegalRotateSequence = {
+    0 : 2,  // 0不可能紧挨着2
+    1 : 3,  // 1不可能紧挨着3
+    4 : 5,  // ...
     2 : 0, 
     3 : 1, 
     5 : 4
@@ -165,14 +165,20 @@ const illegalSequence = {
 // 检查输入的旋转状态是否合法
 function checkRotateStatus(status){
     if(status.length < 2 || status.length > 6){ return false; }
-    let preV = status[0];
-    for(let i = 1; i < status.length; i++){ // TODO 这个检查不正确, 4,5本身是连续的
-        if(illegalSequence[preV] == status[i]){
-            return false;
+    for(let i = 0; i < status.length; i++){
+        let s = status[i];
+        let exceptPosIndex = illegalRotateSequence[i];
+        let illegalValue = illegalRotateSequence[s];
+        for(let j = 0; j < status.length; j++){
+            if(exceptPosIndex == j){
+                continue;
+            }
+            if(status[j] == illegalValue){
+                return false;
+            }
         }
-        preV = status[i];
     }
-    return illegalSequence[preV] != status[0];
+    return true;
 }
 
 function isStartWithForRotatePermutation(prefix, target){
@@ -688,15 +694,47 @@ export const rubikCube = {
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE]
     ],
-    baseInfo: [0, 1],   // 默认状态下魔方的摆放
+    baseInfo: RotatePermutationIdentity,   // 默认状态下魔方的摆放
     rebase : function(){
-        let rotatePath = getRotatePath(this.baseInfo, [3, 5]);
+        // let h = Math.floor((orbitControler.getAzimuthalAngle() + Math.PI / 4) / (Math.PI / 2))
+        // let v = Math.floor((orbitControler.getPolarAngle() + Math.PI / 4) / (Math.PI / 2));
+
+        // let cameraPosition = new THREE.Vector3();
+        // let cameraQuaternion = new THREE.Quaternion();
+        // camera.getWorldPosition(cameraPosition);
+        // camera.getWorldQuaternion(cameraQuaternion);
+        // let cameraEuler = new THREE.Euler();
+        // cameraEuler.setFromQuaternion(cameraQuaternion.normalize());
+        // console.log(cameraPosition);
+        // console.log(cameraQuaternion);
+        // console.log(cameraEuler);
+        // console.log(cameraEuler.x / Math.PI * 180);
+        // let x = Math.round(cameraEuler.x / (Math.PI / 2));
+        // let y = Math.round(cameraEuler.y / (Math.PI / 2));
+        // let z = Math.round(cameraEuler.z / (Math.PI / 2));
+        // console.log(x, y, z);
+        
+        // let rotateSub = new Array();
+        // for(let i = 0; i < x; i++){
+        //     rotateSub.push('x_');
+        // }
+        // for(let i = 0; i > x; i--){
+        //     rotateSub.push('x');
+        // }
+        // for(let i = 0; i < y; i++){
+
+        // }
+
+        let rotatePath = getRotatePath(this.baseInfo, [0, 3]);
         if(rotatePath != null && rotatePath.length > 0){
+            let newBaseInfo = this.baseInfo;
             for(let rotate of rotatePath){
                 let action = this.action[rotate.name];
                 this.doMove(action, Math.PI / 2);
                 this.finishMove(action);
+                newBaseInfo = multiplyRotatePermutation(newBaseInfo, rotate.permutation);
             }
+            this.baseInfo = newBaseInfo;
         }
     }
 };
@@ -727,7 +765,8 @@ export function init(debug) {
     const light = new THREE.AmbientLight(0xFEFEFE);
     scene.add(light);
 
-    camera.position.set(10, 10, 10);
+    camera.position.set(10, 10, 15);
+    // camera.position.set(0, 0, 15);
     orbitControler.update();
 
     function animate() {
