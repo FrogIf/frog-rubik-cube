@@ -65,6 +65,10 @@
             document.getElementById("rebaseBtn").onclick = () => {
                 frog.rubikCube.rebase();
             }
+
+            document.getElementById("resetBtn").onclick = () => {
+                frog.rubikCube.reset();
+            }
         </script>
 	</head>
 	<body>
@@ -184,6 +188,7 @@
         </div>
         <div class="right-control-panel">
             <button id="rebaseBtn" style="color: black">rebase</button>
+            <button id="resetBtn" style="color: black">reset</button>
         </div>
 	</body>
 </html>

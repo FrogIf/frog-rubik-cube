@@ -607,6 +607,7 @@ export const rubikCube = {
         renderer.render(scene, camera);
     },
     actionDoneCallback:null,
+    resetCallback:null,
     animationQueue:[],
     animationSpeed: 20, // 到达指定位置所需帧数量
     finishMove: function(action){
@@ -754,6 +755,41 @@ export const rubikCube = {
                 this.baseInfo = newBaseInfo;
             }
         }
+    },
+    reset: function(){
+        this.baseInfo = [0, 1, 2, 3, 4, 5];
+        let standardColor = [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE];
+        this.colorMap = [];
+        const matrix = new THREE.Matrix4();
+        let i = 0;
+        let v = new THREE.Vector3();
+        let q = new THREE.Quaternion();
+        let s = new THREE.Vector3();
+        this.cubemap = [];
+        for(let x = 0; x < this.rank; x++){
+            for(let y = 0; y < this.rank; y++){
+                for(let z = 0; z < this.rank; z++){
+                    this.cubemap.push(i);
+                    let colors = [];
+                    for(let c of standardColor){
+                        colors.push(c);
+                    }
+                    this.colorMap.push(colors);
+
+                    matrix.decompose(v, q, s);
+                    let coordinate = this.matrixPositionFix(x, y, z);
+                    v.set(coordinate.x, coordinate.y, coordinate.z);
+                    matrix.compose(v, q, s);
+
+                    this.cubes.setMatrixAt(i, matrix);
+                    i++;
+                }
+            }
+        }
+        this.cubes.instanceMatrix.needsUpdate = true;
+        if(this.resetCallback){
+            this.resetCallback();
+        }
     }
 };
 
@@ -784,6 +820,9 @@ export function init(debug) {
     scene.add(light);
 
     camera.position.set(10, 10, 15);
+    rubikCube.resetCallback = () => {
+        camera.position.set(10, 10, 15);
+    };
     // camera.position.set(0, 0, 15);
     orbitControler.update();
 
@@ -794,6 +833,7 @@ export function init(debug) {
         rubikCube.animation();
     }
     animate();
+
 
     // addListener();
 }
