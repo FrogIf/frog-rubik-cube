@@ -33,18 +33,18 @@ const ThreeJsContainer = {
         // 初始化渲染器
         this.renderer.setClearColor(SCENE_BACKGROUND_COLOR, 1);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
-        parentDom.appendChild(renderer.domElement);
+        parentDom.appendChild(this.renderer.domElement);
 
         // 初始化轨道控制器
-        orbitControler = new OrbitControls(this.camera, this.renderer.domElement);
-        orbitControler.rotateSpeed = 0.5;
+        this.orbitControler = new OrbitControls(this.camera, this.renderer.domElement);
+        this.orbitControler.rotateSpeed = 0.5;
 
         // 初始化魔方模型
-        rubikCube.init(this.renderer);
-        scene.add(rubikCube.cubes);
+        rubikCube.init(this);
+        this.scene.add(rubikCube.cubes);
 
         // 创建透明方块, 用于捕捉鼠标位置
-        scene.add(createCoverCube());
+        this.scene.add(createCoverCube());
 
         if (isDebug === true) {
             let helper = new THREE.AxesHelper(20);
@@ -53,25 +53,27 @@ const ThreeJsContainer = {
                 0x00FF00, // y g
                 0x0000FF // z b
             );
-            scene.add(helper);
+            this.scene.add(helper);
         }
 
         // 设置灯光
         const light = new THREE.AmbientLight(0xFEFEFE);
-        scene.add(light);
+        this.scene.add(light);
+
+        var selfObj = this;
 
         // 设置相机位置
-        camera.position.set(10, 10, 15);
+        this.camera.position.set(10, 10, 15);
         rubikCube.resetCallback = () => {
-            camera.position.set(10, 10, 15);
+            selfObj.camera.position.set(10, 10, 15);
         };
-        orbitControler.update();
+        this.orbitControler.update();
 
         // 循环指定的动画回调
         function animate() {
-            renderer.render(scene, camera);
+            selfObj.renderer.render(selfObj.scene, selfObj.camera);
             requestAnimationFrame(animate);
-            orbitControler.update();
+            selfObj.orbitControler.update();
             rubikCube.animation();
         }
         animate();
@@ -233,8 +235,8 @@ function checkRotateStatusForRotatePermutation(status){
     if(status.length < 2 || status.length > 6){ return false; }
     for(let i = 0; i < status.length; i++){
         let s = status[i];
-        let exceptPosIndex = illegalRotateSequence[i];
-        let illegalValue = illegalRotateSequence[s];
+        let exceptPosIndex = RotatePermutationGroup.illegalSequence[i];
+        let illegalValue = RotatePermutationGroup.illegalSequence[s];
         for(let j = 0; j < status.length; j++){
             if(exceptPosIndex == j){
                 continue;
@@ -599,11 +601,6 @@ const StandardCubeAction = {
     z2: [ ActionGroup.F, ActionGroup.S, ActionGroup.B_, ActionGroup.F, ActionGroup.S, ActionGroup.B_ ],
 };
 
-export function doAction(notation){
-    let action = StandardCubeAction[notation];
-    rubikCube.move(action, notation);
-}
-
 const rubikCube = {
     rank: 3,     // 3阶魔方, 不可改动, 代码中StandardCubeAction置换是只针对3阶魔方的
     /**
@@ -642,9 +639,9 @@ const rubikCube = {
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE]
     ],
-    threeJsRender : null,   // 渲染器
-    init : function(render){  // 初始化
-        this.threeJsRender = render;
+    threeJsHolder : null,   // threeJs操作持有者
+    init : function(threeJsHolder){  // 初始化
+        this.threeJsHolder = threeJsHolder;
         const geometry = new THREE.BoxGeometry();
         const m1 = generateMaterial(CubeColor.RED);
         const m2 = generateMaterial(CubeColor.ORANGE);
@@ -659,7 +656,7 @@ const rubikCube = {
         meterials.push(m4);
         meterials.push(m5);
         meterials.push(m6);
-        this.cubes = new THREE.InstancedMesh(geometry, meterials, rank * rank * rank);
+        this.cubes = new THREE.InstancedMesh(geometry, meterials, this.rank * this.rank * this.rank);
         let i = 0;
         const matrix = new THREE.Matrix4();
         for(let x = 0; x < this.rank; x++){
@@ -675,7 +672,7 @@ const rubikCube = {
         }
     },
     matrixPositionFix: function (x, y, z){  // InstancedMesh矩阵位置修正
-        let offset = (rank - 1) / 2;
+        let offset = (this.rank - 1) / 2;
         return {
             x : x - offset,
             y : y - offset,
@@ -683,7 +680,7 @@ const rubikCube = {
         };
     },
     permute: function(action){
-        // 根据定义的置换, 对cubeIndexMap进行置换操作
+        // 根据定义的置换, 对cubeIndexMap, colorMap进行置换操作
         for(let act of action){
             let newCubeMap = [];
             let newColorMap = [];
@@ -750,7 +747,7 @@ const rubikCube = {
             }
         }
         this.cubes.instanceMatrix.needsUpdate = true;
-        this.threeJsRender.render(scene, camera);
+        this.threeJsHolder.renderer.render(this.threeJsHolder.scene, this.threeJsHolder.camera);
     },
     actionDoneCallback:null,    // 一个动作执行完成后, 回调 notation -> { do something }
     animationQueue:[],  // 动作队列
@@ -792,7 +789,7 @@ const rubikCube = {
         "R":[24, 21, 18, 25, 22, 19, 26, 23, 20], // 右面
         "L":[0, 3, 6, 1, 4, 7, 2, 5, 8] // 左面
     },
-    getFaceNumber: function(face){
+    getFaceNumber: function(face){  // 根据面名称, 判断面所属的index, 与RotatePermutationGroup注释所标注的一致
         let faceNo = -1;
         if(face == 'D'){
             faceNo = 0;
@@ -811,7 +808,7 @@ const rubikCube = {
         }
         return faceNo;
     },
-    getColorByInfo: function(face /*所在面*/, pos/*在指定面上的编号, 按照标准魔方展开图, 每个面进行编号, 1 -- 9*/){
+    getColorByPosInfo: function(face /*所在面*/, pos/*在指定面上的编号, 按照标准魔方展开图, 每个面进行编号, 1 -- 9*/){
         let faceNo = this.getFaceNumber(face);
         if(faceNo == -1){ return "#000000"; }
         if(pos < 1 || pos > 9){
@@ -825,7 +822,7 @@ const rubikCube = {
     baseInfo: RotatePermutationGroup.identity,   // 默认状态下魔方的摆放
     rebase : function(){    // 重定义魔方的基准摆放, 默认是白底, 蓝面在前
         let cameraQuaternion = new THREE.Quaternion();
-        camera.getWorldQuaternion(cameraQuaternion);
+        this.threeJsHolder.camera.getWorldQuaternion(cameraQuaternion);
         let cameraEuler = new THREE.Euler();
         cameraEuler.setFromQuaternion(cameraQuaternion.normalize());
         let x = Math.round(cameraEuler.x / (Math.PI / 2));
@@ -870,15 +867,15 @@ const rubikCube = {
                     else if(rotate.name == 'y_'){ yAngle += Math.PI / 2; }
                     else if(rotate.name == 'z'){ zAngle -= Math.PI / 2; }
                     else if(rotate.name == 'z_'){ zAngle += Math.PI / 2; }
-                    let action = this.action[rotate.name];
+                    let action = StandardCubeAction[rotate.name];
                     this.doMove(action, Math.PI / 2);
                     this.finishMove(action);
                     newBaseInfo = multiplyRotatePermutation(newBaseInfo, rotate.permutation);
                 }
-                camera.position.applyAxisAngle(new THREE.Vector3( 1, 0, 0 ), xAngle);
-                camera.position.applyAxisAngle(new THREE.Vector3( 0, 1, 0 ), yAngle);
-                camera.position.applyAxisAngle(new THREE.Vector3( 0, 0, 1 ), zAngle);
-                camera.updateProjectionMatrix();
+                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 1, 0, 0 ), xAngle);
+                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 0, 1, 0 ), yAngle);
+                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 0, 0, 1 ), zAngle);
+                this.threeJsHolder.camera.updateProjectionMatrix();
                 this.baseInfo = newBaseInfo;
             }
         }
@@ -915,28 +912,68 @@ const rubikCube = {
             }
         }
         this.cubes.instanceMatrix.needsUpdate = true;
+        this.actionDoneCallback();
         if(this.resetCallback){
             this.resetCallback();
         }
     }
 };
 
-export function init(domContainer, debug) {
-    ThreeJsContainer.init(domContainer, rubikCube, debug);
-    // addListener();
+// 添加魔方转动动作完成监听
+export function addActionDoneCallback(callback){
+    if(rubikCube.actionDoneCallback == null){
+        rubikCube.actionDoneCallback = callback;
+    }else{
+        let oldCallback = rubikCube.actionDoneCallback;
+        rubikCube.actionDoneCallback = (notation) => {
+            callback(notation);
+            oldCallback(notation);
+        }
+    }
 }
 
+// 获取6个面中指定的面的指定位置的颜色, 面: F, R, U, D, B, L. 位置: 1 -- 9
+export function getFaceColor(face, index){
+    return rubikCube.getColorByPosInfo(face, index);
+}
+
+// 调整魔方基
+export function rebase(){
+    rubikCube.rebase();
+}
+
+// 执行指定的动作
+export function doAction(notation){
+    let action = StandardCubeAction[notation];
+    if(action){
+        rubikCube.move(action, notation);
+    }else{
+        console.warn("unrecognized notation");
+    }
+}
+
+// 重置魔方到初始状态
+export function reset(){
+    rubikCube.reset();
+}
+
+// 初始化魔方
+export function init(domContainer, debug) {
+    ThreeJsContainer.init(domContainer, rubikCube, debug);
+}
+
+// 3d窗体自适应
 export function resize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    ThreeJsContainer.camera.aspect = window.innerWidth / window.innerHeight;
+    ThreeJsContainer.camera.updateProjectionMatrix();
+    ThreeJsContainer.renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 
 function addListener() {
-    renderer.domElement.addEventListener('mousedown', startCube, false);
-    renderer.domElement.addEventListener('mousemove', moveCube, false);
-    renderer.domElement.addEventListener('mouseup', stopCube, false);
+    ThreeJsContainer.renderer.domElement.addEventListener('mousedown', startCube, false);
+    ThreeJsContainer.renderer.domElement.addEventListener('mousemove', moveCube, false);
+    ThreeJsContainer.renderer.domElement.addEventListener('mouseup', stopCube, false);
 }
 
 function startCube(event) {
