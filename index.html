@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>RubikCube</title>
+        <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" >
         <link rel="stylesheet" type="text/css" href="css/colorcube.css">
 		<style>
 			body { margin: 0; }
@@ -31,7 +32,7 @@
 
             const faceArr = ["B", "L", "U", "R", "D", "F"];
             window.onload = function(){
-                frog.init(document.body, true);
+                frog.init(document.body);
 
                 frog.addActionDoneCallback((notation) => {
                     let cubes = document.getElementsByClassName("cube");
