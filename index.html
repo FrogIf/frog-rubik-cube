@@ -6,18 +6,64 @@
         <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" >
         <link rel="stylesheet" type="text/css" href="css/colorcube.css">
 		<style>
-			body { margin: 0; }
-            .action_control{
-                margin: 10px 3px;
+			body {
+                overflow-y: hidden; 
+                margin: 0; 
             }
             .right-control-panel{
                 right: 10px;
                 position: absolute;
                 width: 200px;
                 height: 100px;
-                border: 1px solid blue;
-                background-color: rgba(142, 177, 190, 0.4);
+                border-radius: 5px;
+                background-color: rgb(129 193 217 / 0.4);
                 padding: 10px 10px;
+            }
+            .bottom-control-panel{
+                position: absolute;
+                bottom: 0px;
+                width: 100%;
+                height: 160px;
+                border-radius: 5px;
+                background-color: rgb(129 193 217 / 0.4);
+                box-sizing: border-box;
+            }
+            .bottom-control-panel .command-panel{
+                width: 63%;
+                display: inline-block;
+                padding: 10px 10px;
+                height: 160px;
+                border-right: 1px dotted rgba(41, 41, 219, 0.8);
+                box-sizing: border-box;
+            }
+            .bottom-control-panel .action-panel{
+                display: inline-block; 
+                width: 36%;
+                height: 160px;
+                padding: 10px 10px;
+                box-sizing: border-box;
+                position: absolute;
+                overflow: auto;
+            }
+            .action-control{
+                margin: 3px 3px;
+                border-radius: 12px;
+                background-color: #009E60;
+                cursor: pointer;
+                font-size: 10px;
+            }
+            .action-control-group{
+                border: 1px dotted rgba(41, 41, 219, 0.8);
+                border-radius: 5px;
+                display: inline-block;
+                margin-bottom: 1px;
+            }
+            .command-output{
+                width:98%;
+                height: 100px;
+            }
+            .command-input{
+                width: 90%;
             }
 		</style>
         <script type="importmap">
@@ -42,13 +88,20 @@
                         let color = frog.getFaceColor(face, i % 9 + 1);
                         c.style.backgroundColor = color;
                     }
+                    if(notation && notation != ''){
+                        notation = notation.replace('_', '\'')
+                        let content = document.getElementsByClassName('command-output')[0].value;
+                        document.getElementsByClassName('command-output')[0].value 
+                            = content + " " + notation;
+                    }
+
                 });
             }
             window.onresize = function () {
                 frog.resize();
             };
 
-            var elements = document.getElementsByClassName("action_control");
+            var elements = document.getElementsByClassName("action-control");
             for(let i = 0; i < elements.length; i++){
                 elements[i].onclick = (e) =>{
                     let action = e.target.getAttribute("action");
@@ -67,62 +120,13 @@
             document.getElementById("resetBtn").onclick = () => {
                 frog.reset();
             }
+
+            document.getElementById("runBtn").onclick = () => {
+                alert("开发中");
+            }
         </script>
 	</head>
 	<body>
-        <div>
-            <a action="R" class="action_control" href="javascript:;" >R</a>
-            <a action="R_" class="action_control" href="javascript:;" >R'</a>
-            <a action="R2" class="action_control" href="javascript:;" >R2</a>
-            <a action="U" class="action_control" href="javascript:;" >U</a>
-            <a action="U_" class="action_control" href="javascript:;" >U'</a>
-            <a action="U2" class="action_control" href="javascript:;" >U2</a>
-            <a action="F" class="action_control" href="javascript:;" >F</a>
-            <a action="F_" class="action_control" href="javascript:;" >F'</a>
-            <a action="F2" class="action_control" href="javascript:;" >F2</a>
-            <a action="D" class="action_control" href="javascript:;" >D</a>
-            <a action="D_" class="action_control" href="javascript:;" >D'</a>
-            <a action="D2" class="action_control" href="javascript:;" >D2</a>
-            <a action="L" class="action_control" href="javascript:;" >L</a>
-            <a action="L_" class="action_control" href="javascript:;" >L'</a>
-            <a action="L2" class="action_control" href="javascript:;" >L2</a>
-            <a action="B" class="action_control" href="javascript:;" >B</a>
-            <a action="B_" class="action_control" href="javascript:;" >B'</a>
-            <a action="B2" class="action_control" href="javascript:;" >B2</a>
-            <a action="E" class="action_control" href="javascript:;" >E</a>
-            <a action="E_" class="action_control" href="javascript:;" >E'</a>
-            <a action="E2" class="action_control" href="javascript:;" >E2</a>
-            <a action="M" class="action_control" href="javascript:;" >M</a>
-            <a action="M_" class="action_control" href="javascript:;" >M'</a>
-            <a action="M2" class="action_control" href="javascript:;" >M2</a>
-            <a action="S" class="action_control" href="javascript:;" >S</a>
-            <a action="S_" class="action_control" href="javascript:;" >S'</a>
-            <a action="S2" class="action_control" href="javascript:;" >S2</a>
-            <a action="r" class="action_control" href="javascript:;" >r</a>
-            <a action="r_" class="action_control" href="javascript:;" >r'</a>
-            <a action="r2" class="action_control" href="javascript:;" >r2</a>
-            <a action="u" class="action_control" href="javascript:;" >u</a>
-            <a action="u_" class="action_control" href="javascript:;" >u'</a>
-            <a action="u2" class="action_control" href="javascript:;" >u2</a>
-            <a action="f" class="action_control" href="javascript:;" >f</a>
-            <a action="f_" class="action_control" href="javascript:;" >f'</a>
-            <a action="f2" class="action_control" href="javascript:;" >f2</a>
-            <a action="l" class="action_control" href="javascript:;" >l</a>
-            <a action="l_" class="action_control" href="javascript:;" >l'</a>
-            <a action="l2" class="action_control" href="javascript:;" >l2</a>
-            <a action="d" class="action_control" href="javascript:;" >d</a>
-            <a action="d_" class="action_control" href="javascript:;" >d'</a>
-            <a action="d2" class="action_control" href="javascript:;" >d2</a>
-            <a action="x" class="action_control" href="javascript:;" >x</a>
-            <a action="x_" class="action_control" href="javascript:;" >x'</a>
-            <a action="x2" class="action_control" href="javascript:;" >x2</a>
-            <a action="y" class="action_control" href="javascript:;" >y</a>
-            <a action="y_" class="action_control" href="javascript:;" >y'</a>
-            <a action="y2" class="action_control" href="javascript:;" >y2</a>
-            <a action="z" class="action_control" href="javascript:;" >z</a>
-            <a action="z_" class="action_control" href="javascript:;" >z'</a>
-            <a action="z2" class="action_control" href="javascript:;" >z2</a>
-        </div>
         <div class="cube-box">
             <div class="cube cube-box-row-0 cube-box-col-3" style="background-color:#009E60;"><span class="cube-number">1</span></div>
             <div class="cube cube-box-row-0 cube-box-col-4" style="background-color:#009E60;"><span class="cube-number">2</span></div>
@@ -187,6 +191,104 @@
         <div class="right-control-panel">
             <button id="rebaseBtn" style="color: black">rebase</button>
             <button id="resetBtn" style="color: black">reset</button>
+        </div>
+        <div class="bottom-control-panel">
+            <div class="command-panel">
+                <div>
+                    <textarea readonly class="command-output"></textarea>
+                </div>
+                <div>
+                    <input class="command-input" type="text"/>
+                    <button id="runBtn" >run</button>
+                </div>
+            </div>
+            <div class="action-panel">
+                <div class="action-control-group">
+                    <button action="R" class="action-control"  >R</button>
+                    <button action="R_" class="action-control"  >R'</button>
+                    <button action="R2" class="action-control"  >R2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="U" class="action-control"  >U</button>
+                    <button action="U_" class="action-control"  >U'</button>
+                    <button action="U2" class="action-control"  >U2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="F" class="action-control"  >F</button>
+                    <button action="F_" class="action-control"  >F'</button>
+                    <button action="F2" class="action-control"  >F2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="D" class="action-control"  >D</button>
+                    <button action="D_" class="action-control"  >D'</button>
+                    <button action="D2" class="action-control"  >D2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="L" class="action-control"  >L</button>
+                    <button action="L_" class="action-control"  >L'</button>
+                    <button action="L2" class="action-control"  >L2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="B" class="action-control"  >B</button>
+                    <button action="B_" class="action-control"  >B'</button>
+                    <button action="B2" class="action-control"  >B2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="E" class="action-control"  >E</button>
+                    <button action="E_" class="action-control"  >E'</button>
+                    <button action="E2" class="action-control"  >E2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="M" class="action-control"  >M</button>
+                    <button action="M_" class="action-control"  >M'</a>
+                    <button action="M2" class="action-control"  >M2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="S" class="action-control"  >S</button>
+                    <button action="S_" class="action-control"  >S'</button>
+                    <button action="S2" class="action-control"  >S2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="r" class="action-control"  >r</button>
+                    <button action="r_" class="action-control"  >r'</button>
+                    <button action="r2" class="action-control"  >r2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="u" class="action-control"  >u</button>
+                    <button action="u_" class="action-control"  >u'</button>
+                    <button action="u2" class="action-control"  >u2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="f" class="action-control"  >f</button>
+                    <button action="f_" class="action-control"  >f'</button>
+                    <button action="f2" class="action-control"  >f2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="l" class="action-control"  >l</button>
+                    <button action="l_" class="action-control"  >l'</button>
+                    <button action="l2" class="action-control"  >l2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="d" class="action-control"  >d</button>
+                    <button action="d_" class="action-control"  >d'</button>
+                    <button action="d2" class="action-control"  >d2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="x" class="action-control"  >x</button>
+                    <button action="x_" class="action-control"  >x'</button>
+                    <button action="x2" class="action-control"  >x2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="y" class="action-control"  >y</button>
+                    <button action="y_" class="action-control"  >y'</button>
+                    <button action="y2" class="action-control"  >y2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="z" class="action-control"  >z</button>
+                    <button action="z_" class="action-control"  >z'</button>
+                    <button action="z2" class="action-control"  >z2</button>
+                </div>
+            </div>
         </div>
 	</body>
 </html>
