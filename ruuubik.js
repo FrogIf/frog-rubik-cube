@@ -705,46 +705,23 @@ export const rubikCube = {
         let z = Math.round(cameraEuler.z / (Math.PI / 2));
         
         let rotateSub = new Array();
-        let x_axis = new THREE.Vector3(1, 0, 0);
         for(let i = 0; i < x; i++){
             rotateSub.push('x');
-            const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(x_axis, Math.PI / 2);
-            cameraQuaternion.premultiply(quaternion);
         }
         for(let i = 0; i > x; i--){
             rotateSub.push('x_');
-            const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(x_axis, -Math.PI / 2);
-            cameraQuaternion.premultiply(quaternion);
         }
-
-        let y_axis = new THREE.Vector3(0, 1, 0);
         for(let i = 0; i < y; i++){
             rotateSub.push('y');
-            const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(y_axis, Math.PI / 2);
-            cameraQuaternion.premultiply(quaternion);
         }
         for(let i = 0; i > y; i--){
             rotateSub.push('y_');
-            const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(y_axis, -Math.PI / 2);
-            cameraQuaternion.premultiply(quaternion);
         }
-
-        let z_axis = new THREE.Vector3(0, 0, -1);
         for(let i = 0; i < z; i++){
             rotateSub.push('z');
-            const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(z_axis, Math.PI / 2);
-            cameraQuaternion.premultiply(quaternion);
         }
         for(let i = 0; i > z; i--){
             rotateSub.push('z_');
-            const quaternion = new THREE.Quaternion();
-            quaternion.setFromAxisAngle(z_axis, -Math.PI / 2);
-            cameraQuaternion.premultiply(quaternion);
         }
 
         if(rotateSub.length > 0){
@@ -755,20 +732,26 @@ export const rubikCube = {
             let rotatePath = getRotatePath(this.baseInfo, targetBase);
             if(rotatePath != null && rotatePath.length > 0){
                 let newBaseInfo = this.baseInfo;
+                let xAngle = 0;
+                let yAngle = 0;
+                let zAngle = 0;
                 for(let rotate of rotatePath){
+                    if(rotate.name == 'x'){ xAngle -= Math.PI / 2; }
+                    else if(rotate.name == 'x_'){ xAngle += Math.PI / 2; }
+                    else if(rotate.name == 'y'){ yAngle -= Math.PI / 2; }
+                    else if(rotate.name == 'y_'){ yAngle += Math.PI / 2; }
+                    else if(rotate.name == 'z'){ zAngle -= Math.PI / 2; }
+                    else if(rotate.name == 'z_'){ zAngle += Math.PI / 2; }
                     let action = this.action[rotate.name];
                     this.doMove(action, Math.PI / 2);
                     this.finishMove(action);
                     newBaseInfo = multiplyRotatePermutation(newBaseInfo, rotate.permutation);
                 }
-
-                // orbitControler.object.setRotationFromQuaternion(cameraQuaternion.normalize());
-                // orbitControler.enabled = false;
-                // // camera.rotateY(Math.PI / 2);
-                // camera.setRotationFromQuaternion(cameraQuaternion.normalize());
-                // camera.updateProjectionMatrix();
-                // // orbitControler.enabled = true;
-                // this.baseInfo = newBaseInfo;
+                camera.position.applyAxisAngle(new THREE.Vector3( 1, 0, 0 ), xAngle);
+                camera.position.applyAxisAngle(new THREE.Vector3( 0, 1, 0 ), yAngle);
+                camera.position.applyAxisAngle(new THREE.Vector3( 0, 0, 1 ), zAngle);
+                camera.updateProjectionMatrix();
+                this.baseInfo = newBaseInfo;
             }
         }
     }
@@ -805,10 +788,10 @@ export function init(debug) {
     orbitControler.update();
 
     function animate() {
+        renderer.render(scene, camera);
         requestAnimationFrame(animate);
         orbitControler.update();
         rubikCube.animation();
-        renderer.render(scene, camera);
     }
     animate();
 
