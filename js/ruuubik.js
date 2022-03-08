@@ -33,6 +33,9 @@ const ThreeJsContainer = {
     renderer : new THREE.WebGLRenderer({  // 渲染器
         antialias: true    // 抗锯齿
     }),
+    cameraResetDefault: function(){ // 相机回到默认视角
+        this.camera.position.set(10, 10, 15);
+    },
     init : function(parentDom, rubikCube, isDebug){
         // 初始化渲染器
         this.renderer.setClearColor(SCENE_BACKGROUND_COLOR, 1);
@@ -68,9 +71,6 @@ const ThreeJsContainer = {
 
         // 设置相机位置
         this.camera.position.set(10, 10, 15);
-        rubikCube.resetCallback = () => {
-            selfObj.camera.position.set(10, 10, 15);
-        };
         this.orbitControler.update();
 
         // 循环指定的动画回调
@@ -920,7 +920,6 @@ const rubikCube = {
             }
         }
     },
-    resetCallback:null,     // 重置完成后回调
     reset: function(){
         this.baseInfo = RotatePermutationGroup.identity;
         let standardColor = [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE];
@@ -953,9 +952,7 @@ const rubikCube = {
         }
         this.cubes.instanceMatrix.needsUpdate = true;
         this.actionDoneCallback();
-        if(this.resetCallback){
-            this.resetCallback();
-        }
+        ThreeJsContainer.cameraResetDefault();
     }
 };
 
@@ -995,6 +992,11 @@ export function doAction(notation){
 // 重置魔方到初始状态
 export function reset(){
     rubikCube.reset();
+}
+
+// 相机恢复至初始视角
+export function back(){
+    ThreeJsContainer.cameraResetDefault();
 }
 
 // 初始化魔方

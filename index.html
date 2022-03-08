@@ -91,6 +91,10 @@
                 frog.reset();
             }
 
+            document.getElementById("backBtn").onclick = () => {
+                frog.back();
+            }
+
             document.getElementById("runBtn").onclick = () => {
                 executeActionLine(document.getElementById("commandInput"));
             }
@@ -203,8 +207,9 @@
             <span></span>
         </div>
         <div id="rightControlPanel" class="right-control-panel">
-            <button id="rebaseBtn" style="color: black">rebase</button>
-            <button id="resetBtn" style="color: black">reset</button>
+            <button id="rebaseBtn">rebase</button>
+            <button id="resetBtn">reset</button>
+            <button id="backBtn">back</button>
         </div>
         <div id="bottomControlPanel" class="bottom-control-panel">
             <div class="command-panel">
