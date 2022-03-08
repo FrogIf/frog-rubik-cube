@@ -65,6 +65,61 @@
             .command-input{
                 width: 90%;
             }
+            .eye-button{
+                width: 15px;
+                height: 15px;
+                cursor: pointer;
+            }
+            .eye-button span{
+                width: 2px;
+                height: 2px;
+                position: absolute;
+            }
+            .eye-button span:nth-of-type(1){
+                right: 20%;
+                top: 20%;
+                background-color: #009E60;
+            }
+            .eye-button span:nth-of-type(2){
+                right: 50%;
+                top: 20%;
+                background-color: #FF5800;
+            }
+            .eye-button span:nth-of-type(3){
+                right: 80%;
+                top: 20%;
+                background-color: #FFD500;
+            }
+            .eye-button span:nth-of-type(4){
+                right: 20%;
+                top: 50%;
+                background-color: #C41E3A;
+            }
+            .eye-button span:nth-of-type(5){
+                right: 50%;
+                top: 50%;
+                background-color: #FFFFFF;
+            }
+            .eye-button span:nth-of-type(6){
+                right: 80%;
+                top: 50%;
+                background-color: #0051BA;
+            }
+            .eye-button span:nth-of-type(7){
+                right: 20%;
+                top: 80%;
+                background-color: #FFD500;
+            }
+            .eye-button span:nth-of-type(8){
+                right: 50%;
+                top: 80%;
+                background-color: #FF5800;
+            }
+            .eye-button span:nth-of-type(9){
+                right: 80%;
+                top: 80%;
+                background-color: #009E60;
+            }
 		</style>
         <script type="importmap">
             {
@@ -124,10 +179,40 @@
             document.getElementById("runBtn").onclick = () => {
                 alert("开发中");
             }
+
+            function panelDisplayToggle(panel){
+                if(panel.style.display == "none"){
+                    panel.style.display = "block";
+                }else{
+                    panel.style.display = "none";
+                }
+            }
+            document.getElementById("bottomPanelClose").onclick = (e) => {
+                panelDisplayToggle(document.getElementById("bottomControlPanel"));
+            }
+
+            document.getElementById("rightPanelClose").onclick = (e) => {
+                panelDisplayToggle(document.getElementById("rightControlPanel"));
+            }
+
+            document.getElementById("cubeBoxPanelClose").onclick = (e) => {
+                panelDisplayToggle(document.getElementById("cubeBoxPanel"));
+            }
         </script>
 	</head>
 	<body>
-        <div class="cube-box">
+        <div id="cubeBoxPanelClose" class="eye-button" style="position:absolute;left:0px;top:0px;">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="cubeBoxPanel" class="cube-box">
             <div class="cube cube-box-row-0 cube-box-col-3" style="background-color:#009E60;"><span class="cube-number">1</span></div>
             <div class="cube cube-box-row-0 cube-box-col-4" style="background-color:#009E60;"><span class="cube-number">2</span></div>
             <div class="cube cube-box-row-0 cube-box-col-5" style="background-color:#009E60;"><span class="cube-number">3</span></div>
@@ -188,11 +273,22 @@
             <div class="cube cube-box-row-8 cube-box-col-4" style="background-color:#0051BA;"><span class="cube-number">8</span></div>
             <div class="cube cube-box-row-8 cube-box-col-5" style="background-color:#0051BA;"><span class="cube-number">9</span></div>
         </div>
-        <div class="right-control-panel">
+        <div id="rightPanelClose" class="eye-button" style="position:absolute;right:0px;top:0px;">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="rightControlPanel" class="right-control-panel">
             <button id="rebaseBtn" style="color: black">rebase</button>
             <button id="resetBtn" style="color: black">reset</button>
         </div>
-        <div class="bottom-control-panel">
+        <div id="bottomControlPanel" class="bottom-control-panel">
             <div class="command-panel">
                 <div>
                     <textarea readonly class="command-output"></textarea>
@@ -289,6 +385,17 @@
                     <button action="z2" class="action-control"  >z2</button>
                 </div>
             </div>
+        </div>
+        <div id="bottomPanelClose" class="eye-button" style="position:absolute;bottom:0px;right:0px;">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
 	</body>
 </html>
