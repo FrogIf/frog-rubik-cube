@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import * as THREE from './js/threejs/three.module.js';
 import { OrbitControls } from './js/threejs/jsm/controls/OrbitControls.js';
 
 // 场景背景色
