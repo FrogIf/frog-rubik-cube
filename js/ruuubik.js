@@ -21,6 +21,10 @@ const CubeColor = {
     }
 };
 
+// 鼠标控制相关
+const raycaster = new THREE.Raycaster();//光线碰撞检测器
+var mouse = new THREE.Vector2();//存储鼠标坐标或者触摸坐标
+
 // 3d图像相关
 const ThreeJsContainer = {
     camera : new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000), // 相机
@@ -80,9 +84,45 @@ const ThreeJsContainer = {
     }
 };
 
-// 鼠标控制相关
-const raycaster = new THREE.Raycaster();//光线碰撞检测器
-var mouse = new THREE.Vector2();//存储鼠标坐标或者触摸坐标
+function createCoverCube() {
+    //透明正方体
+    var cubegeo = new THREE.BoxGeometry(4, 4, 4);
+    var cubemat = new THREE.MeshBasicMaterial({ color: 0x00FF00, opacity: 0, transparent: true });
+    var cube = new THREE.Mesh(cubegeo, cubemat);
+    cube.cubeType = 'coverCube';
+    return cube;
+}
+
+function generateMaterial(cubeColor) {
+    var texture = new THREE.Texture(face(CubeColor.properties[cubeColor].value));
+    texture.needsUpdate = true;
+    return new THREE.MeshLambertMaterial({ map: texture });
+}
+
+
+//生成canvas素材
+function face(rgbaColor) {
+    var canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    var context = canvas.getContext('2d');
+    if (context) {
+        //画一个宽高都是256的黑色正方形
+        context.fillStyle = 'rgba(0,0,0,1)';
+        context.fillRect(0, 0, 256, 256);
+        //在内部用某颜色的16px宽的线再画一个宽高为224的圆角正方形并用改颜色填充
+        context.rect(16, 16, 224, 224);
+        context.lineJoin = 'round';
+        context.lineWidth = 16;
+        context.fillStyle = rgbaColor;
+        context.strokeStyle = rgbaColor;
+        context.stroke();
+        context.fill();
+    } else {
+        console.warn('canvas failed.');
+    }
+    return canvas;
+}
 
 /**
  * 用于表示单个方块的旋转, 方块位置顺序如下:
@@ -1015,44 +1055,4 @@ function getIntersects(event) {
             //nothing
         }
     }
-}
-
-function createCoverCube() {
-    //透明正方体
-    var cubegeo = new THREE.BoxGeometry(4, 4, 4);
-    var cubemat = new THREE.MeshBasicMaterial({ color: 0x00FF00, opacity: 0, transparent: true });
-    var cube = new THREE.Mesh(cubegeo, cubemat);
-    cube.cubeType = 'coverCube';
-    return cube;
-}
-
-function generateMaterial(cubeColor) {
-    var texture = new THREE.Texture(face(CubeColor.properties[cubeColor].value));
-    texture.needsUpdate = true;
-    return new THREE.MeshLambertMaterial({ map: texture });
-}
-
-
-//生成canvas素材
-function face(rgbaColor) {
-    var canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
-    var context = canvas.getContext('2d');
-    if (context) {
-        //画一个宽高都是256的黑色正方形
-        context.fillStyle = 'rgba(0,0,0,1)';
-        context.fillRect(0, 0, 256, 256);
-        //在内部用某颜色的16px宽的线再画一个宽高为224的圆角正方形并用改颜色填充
-        context.rect(16, 16, 224, 224);
-        context.lineJoin = 'round';
-        context.lineWidth = 16;
-        context.fillStyle = rgbaColor;
-        context.strokeStyle = rgbaColor;
-        context.stroke();
-        context.fill();
-    } else {
-        console.warn('canvas failed.');
-    }
-    return canvas;
 }
