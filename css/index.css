@@ -50,13 +50,19 @@ body {
     display: inline-block;
     margin-bottom: 1px;
 }
-.command-output{
-    width:98%;
+.log-output{
+    width:92%;
     height: 100px;
 }
+
 .command-input{
     width: 90%;
 }
+
+#textCleanBtn{
+    vertical-align:top;
+}
+
 .eye-button{
     width: 15px;
     height: 15px;

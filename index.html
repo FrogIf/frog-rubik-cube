@@ -10,11 +10,6 @@
             import * as frog from './js/ruuubik.js';
             import * as lexer from './js/cube-lexer.js';
 
-            function logOutputAppend(msg){
-                let content = document.getElementsByClassName('command-output')[0].value;
-                document.getElementsByClassName('command-output')[0].value = content + msg;
-            }
-
             const faceArr = ["B", "L", "U", "R", "D", "F"];
             window.onload = function(){
                 frog.init(document.body);
@@ -39,7 +34,6 @@
             };
 
             function doAction(actions){
-                console.log(actions);
                 if(!actions || !actions.length){
                     logOutputAppend("\n");
                 }else{
@@ -59,6 +53,18 @@
                 if(success){
                     inputDom.value = "";
                 }
+            }
+
+            function logOutputAppend(msg){
+                let textarea = document.getElementById('logTextarea');
+                let content = textarea.value;
+                textarea.value = content + msg;
+                textarea.scrollTop = textarea.scrollHeight;
+            }
+
+            function cleanOutput(){
+                let textarea = document.getElementById('logTextarea');
+                textarea.value = "";
             }
 
             var elements = document.getElementsByClassName("action-control");
@@ -106,6 +112,9 @@
 
             document.getElementById("cubeBoxPanelClose").onclick = (e) => {
                 panelDisplayToggle(document.getElementById("cubeBoxPanel"));
+            }
+            document.getElementById("textCleanBtn").onclick = (e) => {
+                cleanOutput();
             }
         </script>
 	</head>
@@ -199,8 +208,9 @@
         </div>
         <div id="bottomControlPanel" class="bottom-control-panel">
             <div class="command-panel">
-                <div>
-                    <textarea readonly class="command-output"></textarea>
+                <div class="log-ouput-panel">
+                    <textarea id="logTextarea" readonly class="log-output"></textarea>
+                    <button id="textCleanBtn">C</button>
                 </div>
                 <div>
                     <input id="commandInput" class="command-input" type="text"/>
