@@ -7,7 +7,13 @@
         <link rel="stylesheet" type="text/css" href="css/colorcube.css">
         <link rel="stylesheet" type="text/css" href="css/index.css">
         <script type="module">
-            import * as frog from './ruuubik.js';
+            import * as frog from './js/ruuubik.js';
+            import * as lexer from './js/cube-lexer.js';
+
+            function logOutputAppend(msg){
+                let content = document.getElementsByClassName('command-output')[0].value;
+                document.getElementsByClassName('command-output')[0].value = content + msg;
+            }
 
             const faceArr = ["B", "L", "U", "R", "D", "F"];
             window.onload = function(){
@@ -22,10 +28,8 @@
                         c.style.backgroundColor = color;
                     }
                     if(notation && notation != ''){
-                        notation = notation.replace('_', '\'')
-                        let content = document.getElementsByClassName('command-output')[0].value;
-                        document.getElementsByClassName('command-output')[0].value 
-                            = content + " " + notation;
+                        notation = notation.replace('_', '\'');
+                        logOutputAppend(" " + notation);
                     }
 
                 });
@@ -34,16 +38,43 @@
                 frog.resize();
             };
 
+            function doAction(actions){
+                console.log(actions);
+                if(!actions || !actions.length){
+                    logOutputAppend("\n");
+                }else{
+                    for(let action of actions){
+                        frog.doAction(action);
+                    }
+                }
+            }
+
+            function executeActionLine(inputDom){
+                let success = true;
+                let actions = lexer.parse(inputDom.value, (msg) => {
+                    logOutputAppend(msg);
+                    success = false;
+                });
+                doAction(actions);
+                if(success){
+                    inputDom.value = "";
+                }
+            }
+
             var elements = document.getElementsByClassName("action-control");
             for(let i = 0; i < elements.length; i++){
                 elements[i].onclick = (e) =>{
                     let action = e.target.getAttribute("action");
-                    frog.doAction(action);
+                    doAction([action])
                 }
             }
 
             document.onkeydown = (e) => {
-                frog.doAction(e.key);
+                if(e.target != document.getElementById("commandInput")){
+                    frog.doAction(e.key);
+                }else if(e.key == 'Enter'){
+                    executeActionLine(e.target);
+                }
             }
 
             document.getElementById("rebaseBtn").onclick = () => {
@@ -55,7 +86,7 @@
             }
 
             document.getElementById("runBtn").onclick = () => {
-                alert("开发中");
+                executeActionLine(document.getElementById("commandInput"));
             }
 
             function panelDisplayToggle(panel){
@@ -172,7 +203,7 @@
                     <textarea readonly class="command-output"></textarea>
                 </div>
                 <div>
-                    <input class="command-input" type="text"/>
+                    <input id="commandInput" class="command-input" type="text"/>
                     <button id="runBtn" >run</button>
                 </div>
             </div>
@@ -238,14 +269,19 @@
                     <button action="f2" class="action-control"  >f2</button>
                 </div>
                 <div class="action-control-group">
+                    <button action="d" class="action-control"  >d</button>
+                    <button action="d_" class="action-control"  >d'</button>
+                    <button action="d2" class="action-control"  >d2</button>
+                </div>
+                <div class="action-control-group">
                     <button action="l" class="action-control"  >l</button>
                     <button action="l_" class="action-control"  >l'</button>
                     <button action="l2" class="action-control"  >l2</button>
                 </div>
                 <div class="action-control-group">
-                    <button action="d" class="action-control"  >d</button>
-                    <button action="d_" class="action-control"  >d'</button>
-                    <button action="d2" class="action-control"  >d2</button>
+                    <button action="b" class="action-control"  >b</button>
+                    <button action="b_" class="action-control"  >b'</button>
+                    <button action="b2" class="action-control"  >b2</button>
                 </div>
                 <div class="action-control-group">
                     <button action="x" class="action-control"  >x</button>

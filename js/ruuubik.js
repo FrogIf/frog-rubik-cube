@@ -1,5 +1,5 @@
-import * as THREE from './js/threejs/three.module.js';
-import { OrbitControls } from './js/threejs/jsm/controls/OrbitControls.js';
+import * as THREE from './threejs/three.module.js';
+import { OrbitControls } from './threejs/jsm/controls/OrbitControls.js';
 
 // 场景背景色
 const SCENE_BACKGROUND_COLOR = 0xFFFFFF;
