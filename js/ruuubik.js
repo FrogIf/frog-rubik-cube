@@ -21,15 +21,15 @@ const CubeColor = {
     }
 };
 
-// 鼠标控制相关
-const raycaster = new THREE.Raycaster();//光线碰撞检测器
-var mouse = new THREE.Vector2();//存储鼠标坐标或者触摸坐标
-
 // 3d图像相关
 const ThreeJsContainer = {
     camera : new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1000), // 相机
     scene : new THREE.Scene(), // 场景
     orbitControler : null, // 轨道控制器, 用于鼠标拖动时, 控制相机进行角度切换
+    raycaster: new THREE.Raycaster(), //光线碰撞检测器
+    mouse: new THREE.Vector2(), // 存储鼠标坐标
+    width: 0,
+    height: 0,
     renderer : new THREE.WebGLRenderer({  // 渲染器
         antialias: true    // 抗锯齿
     }),
@@ -40,6 +40,8 @@ const ThreeJsContainer = {
         // 初始化渲染器
         this.renderer.setClearColor(SCENE_BACKGROUND_COLOR, 1);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
         parentDom.appendChild(this.renderer.domElement);
 
         // 初始化轨道控制器
@@ -49,9 +51,6 @@ const ThreeJsContainer = {
         // 初始化魔方模型
         rubikCube.init(this);
         this.scene.add(rubikCube.cubes);
-
-        // 创建透明方块, 用于捕捉鼠标位置
-        this.scene.add(createCoverCube());
 
         if (isDebug === true) {
             let helper = new THREE.AxesHelper(20);
@@ -83,15 +82,6 @@ const ThreeJsContainer = {
         animate();
     }
 };
-
-function createCoverCube() {
-    //透明正方体
-    var cubegeo = new THREE.BoxGeometry(4, 4, 4);
-    var cubemat = new THREE.MeshBasicMaterial({ color: 0x00FF00, opacity: 0, transparent: true });
-    var cube = new THREE.Mesh(cubegeo, cubemat);
-    cube.cubeType = 'coverCube';
-    return cube;
-}
 
 function generateMaterial(cubeColor) {
     var texture = new THREE.Texture(face(CubeColor.properties[cubeColor].value));
@@ -953,8 +943,26 @@ const rubikCube = {
         this.cubes.instanceMatrix.needsUpdate = true;
         this.actionDoneCallback();
         ThreeJsContainer.cameraResetDefault();
+    },
+    isRotating: function(){
+        return this.animationQueue.length > 0;
     }
 };
+
+/**
+ * 根据块位置索引, 确定其相对坐标
+ */
+function decomposeCubeIndexToCoordinate(index){
+    let x = Math.floor(index / 9);
+    let yz = index % 9;
+    let y = Math.floor(yz / 3);
+    let z = Math.floor(yz % 3);
+    return {
+        x : x,
+        y : y,
+        z : z
+    };
+}
 
 // 添加魔方转动动作完成监听
 export function addActionDoneCallback(callback){
@@ -1002,6 +1010,7 @@ export function back(){
 // 初始化魔方
 export function init(domContainer, debug) {
     ThreeJsContainer.init(domContainer, rubikCube, debug);
+    addListener();
 }
 
 // 3d窗体自适应
@@ -1012,49 +1021,140 @@ export function resize() {
 }
 
 
+// -- 鼠标交互相关 --
 function addListener() {
     ThreeJsContainer.renderer.domElement.addEventListener('mousedown', startCube, false);
     ThreeJsContainer.renderer.domElement.addEventListener('mousemove', moveCube, false);
     ThreeJsContainer.renderer.domElement.addEventListener('mouseup', stopCube, false);
+
+    ThreeJsContainer.renderer.domElement.addEventListener('touchstart', startCube, false);
+    ThreeJsContainer.renderer.domElement.addEventListener('touchmove', moveCube, false);
+    ThreeJsContainer.renderer.domElement.addEventListener('touchend', stopCube, false);
 }
 
+const mouseMonitor = {
+    startPoint: null,
+    endPoint: null
+};
+
 function startCube(event) {
-    console.log("start");
+    if(rubikCube.isRotating()){
+        return;
+    }
+    mouseMonitor.startPoint = getIntersect(event);
+    if(mouseMonitor.startPoint){
+        ThreeJsContainer.orbitControler.enabled = false;
+    }else{
+        ThreeJsContainer.orbitControler.enabled = true;
+    }
 }
 
 function moveCube(event) {
-    console.log("move");
+    if(!mouseMonitor.startPoint || rubikCube.isRotating()){
+        return;
+    }
+    if(!mouseMonitor.endPoint){
+        let point = getIntersect(event);
+        if(point.instanceIndex != mouseMonitor.startPoint.instanceIndex){
+            mouseMonitor.endPoint = point;
+        }
+    }
 }
 
 function stopCube(event) {
-    console.log("stop");
-}
-
-//获取操作焦点以及该焦点所在平面的法向量
-function getIntersects(event) {
-    //触摸事件和鼠标事件获得坐标的方式有点区别
-    if (event.touches) {
-        var touch = event.touches[0];
-        mouse.x = (touch.clientX / width) * 2 - 1;
-        mouse.y = -(touch.clientY / height) * 2 + 1;
-    } else {
-        mouse.x = (event.clientX / width) * 2 - 1;
-        mouse.y = -(event.clientY / height) * 2 + 1;
-    }
-    raycaster.setFromCamera(mouse, camera);
-    //Raycaster方式定位选取元素，可能会选取多个，以第一个为准
-    var intersects = raycaster.intersectObjects(scene.children);
-    if (intersects.length) {
-        try {
-            if (intersects[0].object.cubeType === 'coverCube') {
-                intersect = intersects[1];
-                normalize = intersects[0].face.normal;
-            } else {
-                intersect = intersects[0];
-                normalize = intersects[1].face.normal;
+    ThreeJsContainer.orbitControler.enabled = true;
+    if(mouseMonitor.startPoint && mouseMonitor.endPoint){
+        // 确定经过的块位置
+        let startPos = -1;
+        let endPos = -1;
+        for(let pos = 0; pos < rubikCube.cubeIndexMap.length; pos++){
+            if(rubikCube.cubeIndexMap[pos] == mouseMonitor.startPoint.instanceIndex){
+                startPos = pos;
+            }else if(rubikCube.cubeIndexMap[pos] == mouseMonitor.endPoint.instanceIndex){
+                endPos = pos;
             }
-        } catch (err) {
-            //nothing
+        }
+
+        let startFacePos = -1;
+        let endFacePos = -1;
+
+        // 确定滑动的面
+        let startCubeStatus = rubikCube.colorMap[startPos];
+        for(let i = 0; i < startCubeStatus.length; i++){
+            if(mouseMonitor.startPoint.face == startCubeStatus[i]){
+                startFacePos = i;
+                break;
+            }
+        }
+        let endCubeStatus = rubikCube.colorMap[endPos];
+        for(let i = 0; i < endCubeStatus.length; i++){
+            if(mouseMonitor.endPoint.face == endCubeStatus[i]){
+                endFacePos = i;
+                break;
+            }
+        }
+
+        // 确定最终要执行的动作
+        if(startFacePos >= 0 && startFacePos == endFacePos && startPos >= 0 && endPos >= 0){
+            let moveAction = [];
+            let startCoordinate = decomposeCubeIndexToCoordinate(startPos);
+            let endCoordinate = decomposeCubeIndexToCoordinate(endPos);
+            let direction = new THREE.Vector3(endCoordinate.x - startCoordinate.x, endCoordinate.y - startCoordinate.y, endCoordinate.z - startCoordinate.z);
+            for(let k in ActionGroup){
+                let v = ActionGroup[k];
+                if(v.permutation[startPos] > -1 && v.permutation[endPos] > -1
+                    && v.colorPermutation[startFacePos] != startFacePos && v.colorPermutation[endFacePos] != endFacePos){
+
+                    let fixedPoint = -1;
+                    for(let i = 0; i < v.permutation.length; i++){
+                        if(i == v.permutation[i]){
+                            fixedPoint = i;
+                            break;
+                        }
+                    }
+                    let fixCoordinate = decomposeCubeIndexToCoordinate(fixedPoint);
+                    let armV = new THREE.Vector3(startCoordinate.x - fixCoordinate.x, startCoordinate.y - fixCoordinate.y, startCoordinate.z - fixCoordinate.z);
+                    // 求取叉集, 即满足右手定则的法向量, 并进行归一化
+                    let axis = armV.cross(direction).normalize();
+                    if(axis.x == v.axis.x && axis.y == v.axis.y && axis.z == v.axis.z){
+                        moveAction = {
+                            name: k,
+                            action: v
+                        };
+                        break;
+                    }
+                }
+            }
+            
+            if(moveAction){
+                rubikCube.move([moveAction.action], moveAction.name);
+            }
         }
     }
+    mouseMonitor.startPoint = null;
+    mouseMonitor.endPoint = null;
+}
+
+// 面索引, 每一个BoxGeometry都是由12个三角形面组成, 每个面由两个三角形构成, 这个数组功能, faceMap[faceIndex/2]可以确定所属的面
+const faceMap = ["R", "L", "U", "D", "F", "B"];
+
+//获取操作焦点以及该焦点所在平面
+function getIntersect(event) {
+    //触摸事件和鼠标事件获得坐标的方式有点区别
+    var hand = event;
+    if (event.touches) {
+        hand = event.touches[0];
+    }
+    ThreeJsContainer.mouse.x = (hand.clientX / ThreeJsContainer.width) * 2 - 1;
+    ThreeJsContainer.mouse.y = -(hand.clientY / ThreeJsContainer.height) * 2 + 1;
+    ThreeJsContainer.raycaster.setFromCamera(ThreeJsContainer.mouse, ThreeJsContainer.camera);
+    //Raycaster方式定位选取元素，可能会选取多个，以第一个为准
+    var intersects = ThreeJsContainer.raycaster.intersectObjects(ThreeJsContainer.scene.children);
+    if (intersects.length && intersects[0].object instanceof THREE.InstancedMesh) {
+        return {
+            instanceIndex : intersects[0].instanceId,
+            face : rubikCube.getFaceNumber(faceMap[Math.floor(intersects[0].faceIndex / 2)])
+        };
+    }
+    return null;
 }
