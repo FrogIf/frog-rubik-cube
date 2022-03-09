@@ -1055,7 +1055,7 @@ function moveCube(event) {
     }
     if(!mouseMonitor.endPoint){
         let point = getIntersect(event);
-        if(point.instanceIndex != mouseMonitor.startPoint.instanceIndex){
+        if(point && point.instanceIndex != mouseMonitor.startPoint.instanceIndex){
             mouseMonitor.endPoint = point;
         }
     }
