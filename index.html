@@ -9,10 +9,27 @@
         <script type="module">
             import * as frog from './js/ruuubik.js';
             import * as lexer from './js/cube-lexer.js';
+            import * as trans from './js/translater.js';
+
+            var lang = window.navigator.language.slice(0, 2);
+            function translatePage(){
+                if(lang == 'en'){
+                    lang = 'zh';
+                }else{
+                    lang = 'en';
+                }
+                let elements = document.getElementsByClassName("trans-lang");
+                for(let item of elements){
+                    let key = item.getAttribute("data-lang-key");
+                    item.innerHTML = trans.translate(key, lang);
+                }
+            }
 
             const faceArr = ["B", "L", "U", "R", "D", "F"];
             window.onload = function(){
                 frog.init(document.body);
+
+                translatePage();
 
                 frog.addActionDoneCallback((notation) => {
                     let cubes = document.getElementsByClassName("cube");
@@ -91,7 +108,7 @@
                 frog.reset();
             }
 
-            document.getElementById("backBtn").onclick = () => {
+            document.getElementById("homeBtn").onclick = () => {
                 frog.back();
             }
 
@@ -119,6 +136,9 @@
             }
             document.getElementById("textCleanBtn").onclick = (e) => {
                 cleanOutput();
+            }
+            document.getElementById("translateBtn").onclick = () => {
+                translatePage();
             }
         </script>
 	</head>
@@ -207,9 +227,12 @@
             <span></span>
         </div>
         <div id="rightControlPanel" class="right-control-panel">
-            <button id="rebaseBtn">rebase</button>
-            <button id="resetBtn">reset</button>
-            <button id="backBtn">back</button>
+            <button class="trans-lang" data-lang-key="rebase" id="rebaseBtn">rebase</button>
+            <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
+            <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
+            <span class="trans-button">
+                <a href="javascript:;" id="translateBtn">中/EN</a>
+            </span>
         </div>
         <div id="bottomControlPanel" class="bottom-control-panel">
             <div class="command-panel">
@@ -219,7 +242,7 @@
                 </div>
                 <div>
                     <input id="commandInput" class="command-input" type="text"/>
-                    <button id="runBtn" >run</button>
+                    <button class="trans-lang" data-lang-key="run" id="runBtn" >run</button>
                 </div>
             </div>
             <div class="action-panel">

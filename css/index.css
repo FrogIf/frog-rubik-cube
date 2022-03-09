@@ -11,6 +11,17 @@ body {
     background-color: rgba(191,191,191,0.4);
     padding: 10px 10px;
 }
+.right-control-panel .trans-button{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+}
+
+.right-control-panel .trans-button a{
+    text-decoration:none;
+    color:gray;
+}
+
 .bottom-control-panel{
     position: absolute;
     bottom: 0px;
