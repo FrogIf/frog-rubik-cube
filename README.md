@@ -1,6 +1,6 @@
-# rubic-cube
+# rubik-cube
 
-a rubic cube game
+a rubik's cube game
 
 ## deploy
 
@@ -21,6 +21,13 @@ nginx:
             autoindex on;
         }
 ```
+
+## Demo
+
+address : [rubik-cube](https://frogif.github.io/rubik-cube/)
+
+![image](./_doc/img/rubik-demo.png)
+
 ## Reference
 
 * https://github.com/liuxinyu95/unplugged
