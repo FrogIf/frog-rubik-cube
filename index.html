@@ -25,20 +25,25 @@
                 }
             }
 
-            const faceArr = ["B", "L", "U", "R", "D", "F"];
-            window.onload = function(){
-                frog.init(document.body);
-
-                translatePage();
-
-                frog.addActionDoneCallback((notation) => {
-                    let cubes = document.getElementsByClassName("cube");
+            const faceArr = ["U", "L", "F", "R", "B", "D"];
+            function faceColorRefresh(){
+                let cubes = document.getElementsByClassName("cube");
                     for(let i = 0; i < cubes.length; i++){
                         let c = cubes[i];
                         let face = faceArr[Math.floor(i / 9)];
                         let color = frog.getFaceColor(face, i % 9 + 1);
                         c.style.backgroundColor = color;
                     }
+            }
+
+            window.onload = function(){
+                frog.init(document.body);
+                faceColorRefresh();
+
+                translatePage();
+
+                frog.addActionDoneCallback((notation) => {
+                    faceColorRefresh();
                     if(notation && notation != ''){
                         notation = notation.replace('_', '\'');
                         logOutputAppend(" " + notation);
@@ -155,65 +160,65 @@
             <span></span>
         </div>
         <div id="cubeBoxPanel" class="cube-box">
-            <div class="cube cube-box-row-0 cube-box-col-3" style="background-color:#009E60;"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-0 cube-box-col-4" style="background-color:#009E60;"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-0 cube-box-col-5" style="background-color:#009E60;"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-3" style="background-color:#009E60;"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-4" style="background-color:#009E60;"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-5" style="background-color:#009E60;"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-3" style="background-color:#009E60;"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-4" style="background-color:#009E60;"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-5" style="background-color:#009E60;"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-3" ><span class="cube-number">1</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-4" ><span class="cube-number">2</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-5"><span class="cube-number">3</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-3"><span class="cube-number">4</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-4"><span class="cube-number">5</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-5"><span class="cube-number">6</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-3"><span class="cube-number">7</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-4"><span class="cube-number">8</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-5"><span class="cube-number">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-0" style="background-color:#FF5800;"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-1" style="background-color:#FF5800;"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-2" style="background-color:#FF5800;"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-0" style="background-color:#FF5800;"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-1" style="background-color:#FF5800;"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-2" style="background-color:#FF5800;"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-0" style="background-color:#FF5800;"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-1" style="background-color:#FF5800;"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-2" style="background-color:#FF5800;"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-0"><span class="cube-number">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-1"><span class="cube-number">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-2"><span class="cube-number">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-0"><span class="cube-number">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-1"><span class="cube-number">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-2"><span class="cube-number">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-0"><span class="cube-number">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-1"><span class="cube-number">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-2"><span class="cube-number">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-3" style="background-color:#FFD500;"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-4" style="background-color:#FFD500;"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-5" style="background-color:#FFD500;"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-3" style="background-color:#FFD500;"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-4" style="background-color:#FFD500;"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-5" style="background-color:#FFD500;"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-3" style="background-color:#FFD500;"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-4" style="background-color:#FFD500;"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-5" style="background-color:#FFD500;"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-3"><span class="cube-number">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-4"><span class="cube-number">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-5"><span class="cube-number">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-3"><span class="cube-number">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-4"><span class="cube-number">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-5"><span class="cube-number">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-3"><span class="cube-number">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-4"><span class="cube-number">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-5"><span class="cube-number">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-6" style="background-color:#C41E3A;"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-7" style="background-color:#C41E3A;"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-8" style="background-color:#C41E3A;"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-6" style="background-color:#C41E3A;"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-7" style="background-color:#C41E3A;"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-8" style="background-color:#C41E3A;"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-6" style="background-color:#C41E3A;"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-7" style="background-color:#C41E3A;"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-8" style="background-color:#C41E3A;"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-6"><span class="cube-number">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-7"><span class="cube-number">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-8"><span class="cube-number">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-6"><span class="cube-number">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-7"><span class="cube-number">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-8"><span class="cube-number">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-6"><span class="cube-number">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-7"><span class="cube-number">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-8"><span class="cube-number">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-9" style="background-color:#FFFFFF;"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-10" style="background-color:#FFFFFF;"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-11" style="background-color:#FFFFFF;"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-9" style="background-color:#FFFFFF;"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-10" style="background-color:#FFFFFF;"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-11" style="background-color:#FFFFFF;"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-9" style="background-color:#FFFFFF;"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-10" style="background-color:#FFFFFF;"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-11" style="background-color:#FFFFFF;"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-9"><span class="cube-number">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-10"><span class="cube-number">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-11"><span class="cube-number">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-9"><span class="cube-number">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-10"><span class="cube-number">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-11"><span class="cube-number">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-9"><span class="cube-number">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-10"><span class="cube-number">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-11"><span class="cube-number">9</span></div>
 
-            <div class="cube cube-box-row-6 cube-box-col-3" style="background-color:#0051BA;"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-6 cube-box-col-4" style="background-color:#0051BA;"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-6 cube-box-col-5" style="background-color:#0051BA;"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-3" style="background-color:#0051BA;"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-4" style="background-color:#0051BA;"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-5" style="background-color:#0051BA;"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-3" style="background-color:#0051BA;"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-4" style="background-color:#0051BA;"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-5" style="background-color:#0051BA;"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-3"><span class="cube-number">1</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-4"><span class="cube-number">2</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-5"><span class="cube-number">3</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-3"><span class="cube-number">4</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-4"><span class="cube-number">5</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-5"><span class="cube-number">6</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-3"><span class="cube-number">7</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-4"><span class="cube-number">8</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-5"><span class="cube-number">9</span></div>
         </div>
         <div id="rightPanelClose" class="eye-button" style="position:absolute;right:0px;top:0px;">
             <span></span>
