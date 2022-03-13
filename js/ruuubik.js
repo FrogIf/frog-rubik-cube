@@ -1032,6 +1032,45 @@ export function getColorSchemes(){
     return colors;
 }
 
+export function applyColorMap(colorMap, failedCallback){
+    for(let k in colorMap){
+        let v = colorMap[k];
+        for(let i = 0; i < v.length; i++){
+            let color = v[i];
+            if(color.startsWith('#')){
+                v[i] = color.toUpperCase();
+            }else{
+                v[i] = colorHex(color);
+            }
+        }
+    }
+    // TODO 魔方可解性校验, 颜色应用
+    if(failedCallback){
+        failedCallback();
+    }
+}
+
+function colorHex(color){
+    // RGB颜色值的正则
+    var reg = /^(rgb|RGB)/;
+    if (reg.test(color)) {
+      var strHex = "#";
+      // 把RGB的3个数值变成数组
+      var colorArr = color.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
+      // 转成16进制
+      for (var i = 0; i < colorArr.length; i++) {
+        var hex = Number(colorArr[i]).toString(16);
+        if (hex === "0") {
+          hex += hex;
+        }
+        strHex += hex;
+      }
+      return strHex.toUpperCase();
+    } else {
+      return String(color);
+    }
+}
+
 
 // -- 鼠标交互相关 --
 function addListener() {

@@ -169,7 +169,23 @@
                         cube.classList.remove('cube-editable');
                         cube.onclick = null;
                     }
+                    frog.applyColorMap(convertToStandardColorInfo());
                 }
+            }
+
+            // 转换为标准的颜色分布
+            function convertToStandardColorInfo(){
+                let cubes = document.getElementsByClassName("cube");
+                let colorMap = {};
+                for(let i = 0; i < cubes.length; i++){
+                    let c = cubes[i];
+                    let face = faceArr[Math.floor(i / 9)];
+                    if(!colorMap[face]){
+                        colorMap[face] = [];
+                    }
+                    colorMap[face].push(c.style.backgroundColor);
+                }
+                return colorMap;
             }
 
             // 色盘
