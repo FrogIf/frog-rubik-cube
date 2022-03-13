@@ -192,7 +192,7 @@
                         let cube = cubes[i];
                         cube.classList.add('cube-editable');
                         cube.onclick = (e) => {
-                            e.target.classList.add('cube-selected');
+                            cube.classList.add('cube-selected');
                             colourDisc.openDisc(i);
                         }
                     }
@@ -242,6 +242,9 @@
                 closeDisc: function(){
                     var over = document.querySelector('#over');
                     over.style.display = 'none';
+                    let cubes = document.getElementsByClassName("cube");
+                    let cube = cubes[this.activeIndex];
+                    cube.classList.remove('cube-selected');
                 },
                 // 刷新颜色可选值dom
                 refreshColorOptional: function (colors){
@@ -272,8 +275,8 @@
                     let cube = cubes[this.activeIndex];
                     cube.style.backgroundColor = this.selectColor;
                     cube.classList.add('cube-changed');
-                    this.closeDisc();
                     cube.classList.remove('cube-selected');
+                    this.closeDisc();
                 }
             };
         </script>

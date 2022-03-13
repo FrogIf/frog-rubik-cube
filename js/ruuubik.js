@@ -18,8 +18,43 @@ const CubeColor = {
         3: { name: "green", value: "#009E60" },
         4: { name: "red", value: "#C41E3A" },
         5: { name: "orange", value: "#FF5800" }
+    },
+    getCubeColorByColorValue: function(color){
+        if(color.startsWith('#')){
+            color = color.toUpperCase();
+        }else{
+            color = colorHex(color);
+        }
+        for(let k in this.properties){
+            let vObj = this.properties[k];
+            if(vObj.value == color){
+                return k;
+            }
+        }
+        return -1;
     }
 };
+
+function colorHex(color){
+    // RGB颜色值的正则
+    var reg = /^(rgb|RGB)/;
+    if (reg.test(color)) {
+      var strHex = "#";
+      // 把RGB的3个数值变成数组
+      var colorArr = color.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
+      // 转成16进制
+      for (let c of colorArr) {
+        var hex = Number(c).toString(16);
+        if (hex === "0") {
+          hex += hex;
+        }
+        strHex += hex;
+      }
+      return strHex.toUpperCase();
+    } else {
+      return String(color);
+    }
+}
 
 // 3d图像相关
 const ThreeJsContainer = {
@@ -148,6 +183,14 @@ const RotatePermutationGroup = {
         2 : 0, 
         3 : 1, 
         5 : 4
+    },
+    rotateAxis:{
+        x: new THREE.Vector3(-1, 0, 0),
+        x_: new THREE.Vector3(1, 0, 0),
+        y: new THREE.Vector3(0, -1, 0),
+        y_: new THREE.Vector3(0, 1, 0),
+        z: new THREE.Vector3(0, 0, -1),
+        z_: new THREE.Vector3(0, 0, 1)
     }
 };
 
@@ -303,6 +346,14 @@ function intersection(a, b){
         if(b.indexOf(ai) >= 0){
             result.push(ai);
         }
+    }
+    return result;
+}
+
+function copyArray(array){
+    let result = [];
+    for(let a of array){
+        result.push(a);
     }
     return result;
 }
@@ -1072,12 +1123,43 @@ const rubikCube = {
             }
         }
 
-        // 平移+旋转
+        let q = new THREE.Quaternion();
+        let s = new THREE.Vector3();
+        let v = new THREE.Vector3();
+        const matrix = new THREE.Matrix4();
         for(let i = 0; i < permutation.length; i++){
             let translation = permutation[i];
             let rotate = cubeRotates[i];
-            console.log(translation, rotate);
+            let coordinate = decomposeCubeIndexToCoordinate(i);
+            coordinate = this.matrixPositionFix(coordinate.x, coordinate.y, coordinate.z);
+            this.cubes.getMatrixAt(translation, matrix);
+            matrix.decompose(v, q, s);
+            v.set(coordinate.x, coordinate.y, coordinate.z);
+            if(rotate.length > 0){
+                for(let r of rotate){
+                    const quaternion = new THREE.Quaternion();
+                    quaternion.setFromAxisAngle(RotatePermutationGroup.rotateAxis[r.name], Math.PI / 2);     
+                    q.premultiply(quaternion);
+                }
+            }
+            matrix.compose(v, q, s);
+            this.cubes.setMatrixAt(translation, matrix);
         }
+        let newColorMap = [];
+        for(let rotate of cubeRotates){
+            if(rotate.length == 0){
+                newColorMap.push(copyArray(RotatePermutationGroup.identity));
+            }else{
+                let colorStatus = RotatePermutationGroup.identity;
+                for(let r of rotate){
+                    colorStatus = multiplyRotatePermutation(colorStatus, r.permutation);
+                }
+                newColorMap.push(colorStatus);
+            }
+        }
+        this.cubeIndexMap = permutation;
+        this.colorMap = newColorMap;
+        this.cubes.instanceMatrix.needsUpdate = true;
 
         successCallback();
     },
@@ -1096,19 +1178,7 @@ const rubikCube = {
 };
 
 export function debug(){
-    rubikCube.reassembly({
-        "F":[CubeColor.BLUE, CubeColor.ORANGE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE],
-        "U":[CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW],
-        "B":[CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN],
-        "R":[CubeColor.RED, CubeColor.RED, CubeColor.BLUE, CubeColor.RED, CubeColor.RED, CubeColor.RED, CubeColor.RED, CubeColor.RED, CubeColor.RED],
-        "L":[CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.RED, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE],
-        "D":[CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE]
-    }, () => {
-        alert("failed");
-    }, () => {
-        alert("success");
-    })
-    // console.log(rubikCube.getCubeNumber([CubeColor.RED]));
+    // nothing
 }
 
 /**
@@ -1193,42 +1263,22 @@ export function getColorSchemes(){
 }
 
 export function applyColorMap(colorMap, failedCallback){
+    let realColorMap = {};
     for(let k in colorMap){
         let v = colorMap[k];
-        for(let i = 0; i < v.length; i++){
-            let color = v[i];
-            if(color.startsWith('#')){
-                v[i] = color.toUpperCase();
-            }else{
-                v[i] = colorHex(color);
-            }
+        let faceColors = [];
+        realColorMap[k] = faceColors;
+        for(let color of v){
+            faceColors.push(CubeColor.getCubeColorByColorValue(color));
         }
     }
-    // TODO 魔方可解性校验, 颜色应用
-    if(failedCallback){
-        failedCallback();
-    }
-}
-
-function colorHex(color){
-    // RGB颜色值的正则
-    var reg = /^(rgb|RGB)/;
-    if (reg.test(color)) {
-      var strHex = "#";
-      // 把RGB的3个数值变成数组
-      var colorArr = color.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
-      // 转成16进制
-      for (var i = 0; i < colorArr.length; i++) {
-        var hex = Number(colorArr[i]).toString(16);
-        if (hex === "0") {
-          hex += hex;
+    rubikCube.reassembly(realColorMap, () => {
+        if(failedCallback){
+            failedCallback();
         }
-        strHex += hex;
-      }
-      return strHex.toUpperCase();
-    } else {
-      return String(color);
-    }
+    }, () => {
+        alert("success");
+    });
 }
 
 
