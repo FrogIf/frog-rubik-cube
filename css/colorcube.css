@@ -81,3 +81,10 @@
 .cube-number{
     display: none;
 }
+
+.cube-editable{
+    border-width: 1px;
+    border-style: dotted;
+    border-color: blue;
+    cursor: pointer;
+}

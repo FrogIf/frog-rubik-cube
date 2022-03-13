@@ -5,12 +5,12 @@ import { OrbitControls } from './threejs/jsm/controls/OrbitControls.js';
 const SCENE_BACKGROUND_COLOR = 0xFFFFFF;
 // 魔方颜色
 const CubeColor = {
-    WHITE: 0,
-    BLUE: 1,
-    YELLOW: 2,
-    GREEN: 3,
-    RED: 4,
-    ORANGE: 5,
+    D: 0,
+    F: 1,
+    U: 2,
+    B: 3,
+    R: 4,
+    L: 5,
     properties: {
         0: { name: "white", value: "#FFFFFF" },
         1: { name: "blue", value: "#0051BA" },
@@ -641,44 +641,44 @@ const rubikCube = {
     cubes:{},   // threejs THREE.InstancedMesh对象
     // 颜色状态地图, 共27个元素的数组, 索引值与方块索引(即cubeIndexMap的值)一一对应(注意, 不是与位置编号对应)
     colorMap:[
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE]
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L]
     ],
     threeJsHolder : null,   // threeJs操作持有者
     init : function(threeJsHolder){  // 初始化
         this.threeJsHolder = threeJsHolder;
         const geometry = new THREE.BoxGeometry();
-        const m1 = generateMaterial(CubeColor.RED);
-        const m2 = generateMaterial(CubeColor.ORANGE);
-        const m3 = generateMaterial(CubeColor.YELLOW);
-        const m4 = generateMaterial(CubeColor.WHITE);
-        const m5 = generateMaterial(CubeColor.BLUE);
-        const m6 = generateMaterial(CubeColor.GREEN);
+        const m1 = generateMaterial(CubeColor.R);
+        const m2 = generateMaterial(CubeColor.L);
+        const m3 = generateMaterial(CubeColor.U);
+        const m4 = generateMaterial(CubeColor.D);
+        const m5 = generateMaterial(CubeColor.F);
+        const m6 = generateMaterial(CubeColor.B);
         const meterials = new Array();
         meterials.push(m1);
         meterials.push(m2);
@@ -820,22 +820,12 @@ const rubikCube = {
         "L":[6, 7, 8, 3, 4, 5, 0, 1, 2] // 左面
     },
     getFaceNumber: function(face){  // 根据面名称, 判断面所属的index, 与RotatePermutationGroup注释所标注的一致
-        let faceNo = -1;
-        if(face == 'D'){
-            faceNo = 0;
-        }else if(face == 'F'){
-            faceNo = 1;
-        }else if(face == 'U'){
-            faceNo = 2;
-        }else if(face == 'B'){
-            faceNo = 3;
-        }else if(face == 'R'){
-            faceNo = 4;
-        }else if(face == 'L'){
-            faceNo = 5;
-        }else{
-            console.warn("unrecognized face");
+        for(let k in CubeColor){
+            if(face == k){
+                return CubeColor[k];
+            }
         }
+        console.warn("unrecognized face");
         return faceNo;
     },
     getColorByPosInfo: function(face /*所在面*/, pos/*在指定面上的编号, 按照标准魔方展开图, 每个面进行编号, 1 -- 9*/){
@@ -912,7 +902,7 @@ const rubikCube = {
     },
     reset: function(){
         this.baseInfo = RotatePermutationGroup.identity;
-        let standardColor = [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE];
+        let standardColor = [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L];
         this.colorMap = [];
         const matrix = new THREE.Matrix4();
         let i = 0;
@@ -1030,6 +1020,16 @@ export function resize() {
     ThreeJsContainer.camera.aspect = window.innerWidth / window.innerHeight;
     ThreeJsContainer.camera.updateProjectionMatrix();
     ThreeJsContainer.renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+export function getColorSchemes(){
+    let colors = [];
+    for(let k in CubeColor){
+        if(CubeColor.properties[CubeColor[k]]){
+            colors.push(CubeColor.properties[CubeColor[k]].value);
+        }
+    }
+    return colors;
 }
 
 
