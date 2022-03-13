@@ -129,6 +129,25 @@ body {
     top: 80%;
     background-color: #009E60;
 }
+
 .debug-clz{
     display: none;
+}
+
+#over {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(145,152, 159, 0.5);
+}
+
+#over>div {
+    width: 300px;
+    height: 200px;
+    margin: 0 auto;
+    margin-top: 200px;
+    text-align: center;
+    padding: 1px;
+    background-color: white;
+    border-radius: 10px;
 }

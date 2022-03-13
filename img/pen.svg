@@ -1,0 +1,12 @@
+<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <g>
+  <title>pen</title>
+  <line fill="none" stroke="#000000" stroke-width="5" x1="66.17392" y1="11.67827" x2="21.17392" y2="71.67827" id="svg_1"/>
+  <line fill="none" stroke="#000000" stroke-width="5" x1="21.17392" y1="67.67827" x2="41.17392" y2="83.67827" id="svg_2"/>
+  <line fill="none" stroke="#000000" stroke-width="5" x1="65.17392" y1="10.67827" x2="83.17392" y2="24.67827" id="svg_3"/>
+  <line fill="none" stroke="#000000" stroke-width="5" x1="40.17392" y1="81.67827" x2="83.17392" y2="24.67827" id="svg_4"/>
+  <line fill="none" stroke-width="5" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="23.17392" y1="70.67827" x2="15.17392" y2="94.67827" id="svg_6" stroke="#000000"/>
+  <line fill="none" stroke="#000000" stroke-width="5" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="39.17392" y1="79.67827" x2="15.17392" y2="95.67827" id="svg_7"/>
+  <line fill="none" stroke-width="5" stroke-dasharray="null" stroke-linejoin="null" stroke-linecap="null" x1="35.17392" y1="65.67827" x2="63.17392" y2="28.67827" id="svg_8" stroke="#7f7f7f"/>
+ </g>
+</svg>

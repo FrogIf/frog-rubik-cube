@@ -48,6 +48,8 @@
             window.onload = function(){
                 frog.init(document.body, isDebug);
                 faceColorRefresh();
+                colourDisc.refreshColorOptional(frog.getColorSchemes());
+                colourDisc.init();
 
                 if(isDebug){
                     debug();
@@ -161,6 +163,119 @@
             document.getElementById("debugBtn").onclick = () => {
                 frog.debug();
             }
+
+
+
+
+            function overCubeColorEdit(){
+                document.getElementById("beginEditCubeColor").style.display = 'block';
+                    document.getElementById("finishEditCubeColor").style.display = 'none';
+                    document.getElementById("cancelEditCubeColor").style.display = 'none';
+
+                    let cubes = document.getElementsByClassName("cube");
+                    for(let cube of cubes){
+                        cube.classList.remove('cube-editable');
+                        cube.classList.remove('cube-selected');
+                        cube.classList.remove('cube-changed');
+                        cube.onclick = null;
+                    }
+            }
+
+            document.getElementById("editCubeBoxColor").onclick = () => {
+                if(document.getElementById("finishEditCubeColor").style.display == 'none'){   // 开始编辑
+                    document.getElementById("finishEditCubeColor").style.display = 'block';
+                    document.getElementById("beginEditCubeColor").style.display = 'none';
+                    document.getElementById("cancelEditCubeColor").style.display = 'block';
+
+                    let cubes = document.getElementsByClassName("cube");
+                    for(let i = 0; i < cubes.length; i++){
+                        let cube = cubes[i];
+                        cube.classList.add('cube-editable');
+                        cube.onclick = (e) => {
+                            e.target.classList.add('cube-selected');
+                            colourDisc.openDisc(i);
+                        }
+                    }
+                }else{ // 完成编辑
+                    overCubeColorEdit();
+                    frog.applyColorMap(convertToStandardColorInfo());
+                }
+            }
+
+            document.getElementById("cancelEditCubeColor").onclick = () => {
+                faceColorRefresh();
+                overCubeColorEdit();
+            };
+
+            // 转换为标准的颜色分布
+            function convertToStandardColorInfo(){
+                let cubes = document.getElementsByClassName("cube");
+                let colorMap = {};
+                for(let i = 0; i < cubes.length; i++){
+                    let c = cubes[i];
+                    let face = faceArr[Math.floor(i / 9)];
+                    if(!colorMap[face]){
+                        colorMap[face] = [];
+                    }
+                    colorMap[face].push(c.style.backgroundColor);
+                }
+                return colorMap;
+            }
+
+            // 色盘
+            const colourDisc = {
+                activeIndex: -1,
+                selectColor: "#FFFFFF",
+                init: function(){
+                    document.getElementById("colorDiscConfirm").onclick = () => {
+                        this.confirm();
+                    };
+                    document.getElementById("colorDiscCancel").onclick = () => {
+                        this.closeDisc();
+                    };
+                },
+                openDisc: function(index){                    
+                    this.activeIndex = index;
+                    var over = document.querySelector('#over');
+                    over.style.display = 'block';
+                },
+                closeDisc: function(){
+                    var over = document.querySelector('#over');
+                    over.style.display = 'none';
+                },
+                // 刷新颜色可选值dom
+                refreshColorOptional: function (colors){
+                    let dom = document.getElementById("colorOptional");
+                    dom.innerHTML = '';
+                    let line = Math.floor(Math.sqrt(colors.length));
+                    for(let i = 0; i < colors.length; i++){
+                        let color = colors[i];
+                        let ele = document.createElement('div');
+                        ele.style.margin = '2px 10px';
+                        ele.style.height = '20px';
+                        ele.style.cursor = 'pointer';
+                        ele.style.position = 'relative';
+                        ele.style.backgroundColor = color;
+                        ele.style.border = '1px solid black';
+                        ele.onclick = () => {
+                            this.selectColor = color;
+                        };
+                        ele.ondblclick = () => {
+                            this.selectColor = color;
+                            this.confirm();
+                        };
+                        dom.appendChild(ele);
+                    }
+                },
+                confirm: function(){
+                    let cubes = document.getElementsByClassName("cube");
+                    let cube = cubes[this.activeIndex];
+                    cube.style.backgroundColor = this.selectColor;
+                    cube.classList.add('cube-changed');
+                    this.closeDisc();
+                    cube.classList.remove('cube-selected');
+                }
+            };
         </script>
 	</head>
 	<body>
@@ -176,6 +291,15 @@
             <span></span>
         </div>
         <div id="cubeBoxPanel" class="cube-box">
+            <div style="position:absolute;top:0px;left:270px;">
+                <div id="cancelEditCubeColor" style="display: none;" class="eye-button">
+                    <img src="img/error.svg" alt="right" width="15" height="15"/>
+                </div>
+                <div id="editCubeBoxColor" class="eye-button">
+                    <img src="img/pen.svg" style="display: block;" id="beginEditCubeColor" alt="edit" width="15" height="15"/>
+                    <img src="img/right.svg" style="display: none;" id="finishEditCubeColor" alt="right" width="15" height="15"/>
+                </div>
+            </div>
             <div class="cube cube-box-row-0 cube-box-col-3" ><span class="debug-clz">1</span></div>
             <div class="cube cube-box-row-0 cube-box-col-4" ><span class="debug-clz">2</span></div>
             <div class="cube cube-box-row-0 cube-box-col-5"><span class="debug-clz">3</span></div>
@@ -370,6 +494,15 @@
             <span></span>
             <span></span>
             <span></span>
+        </div>
+        <div id="over" style="display:none;">
+            <div style="padding: 20px 20px;">
+                <div id="colorOptional"></div>
+                <div style="padding: 20px 20px;">
+                    <button type="button" id="colorDiscConfirm" >确定</button>
+                    <button type="button" id="colorDiscCancel" >取消</button>
+                </div>
+            </div>
         </div>
 	</body>
 </html>

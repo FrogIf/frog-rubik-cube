@@ -5,12 +5,12 @@ import { OrbitControls } from './threejs/jsm/controls/OrbitControls.js';
 const SCENE_BACKGROUND_COLOR = 0xFFFFFF;
 // 魔方颜色
 const CubeColor = {
-    WHITE: 0,
-    BLUE: 1,
-    YELLOW: 2,
-    GREEN: 3,
-    RED: 4,
-    ORANGE: 5,
+    D: 0,
+    F: 1,
+    U: 2,
+    B: 3,
+    R: 4,
+    L: 5,
     properties: {
         0: { name: "white", value: "#FFFFFF" },
         1: { name: "blue", value: "#0051BA" },
@@ -657,33 +657,33 @@ const rubikCube = {
     cubes:{},   // threejs THREE.InstancedMesh对象
     // 颜色状态地图, 共27个元素的数组, 索引值与方块索引(即cubeIndexMap的值)一一对应(注意, 不是与位置编号对应)
     colorMap:[
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
-        [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE]
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L],
+        [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L]
     ],
     corner:[0, 2, 6, 8, 18, 20, 24, 26],    // 所有角块编号集合
     edge:[1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25], // 所有棱块
@@ -692,12 +692,12 @@ const rubikCube = {
     init : function(threeJsHolder){  // 初始化
         this.threeJsHolder = threeJsHolder;
         const geometry = new THREE.BoxGeometry();
-        const m1 = generateMaterial(CubeColor.RED);
-        const m2 = generateMaterial(CubeColor.ORANGE);
-        const m3 = generateMaterial(CubeColor.YELLOW);
-        const m4 = generateMaterial(CubeColor.WHITE);
-        const m5 = generateMaterial(CubeColor.BLUE);
-        const m6 = generateMaterial(CubeColor.GREEN);
+        const m1 = generateMaterial(CubeColor.R);
+        const m2 = generateMaterial(CubeColor.L);
+        const m3 = generateMaterial(CubeColor.U);
+        const m4 = generateMaterial(CubeColor.D);
+        const m5 = generateMaterial(CubeColor.F);
+        const m6 = generateMaterial(CubeColor.B);
         const meterials = new Array();
         meterials.push(m1);
         meterials.push(m2);
@@ -823,38 +823,28 @@ const rubikCube = {
         /**
          * 数组索引表示标准魔方展开上编号, 数组值表示立体魔方中块的位置, 以D为例, 分布如下:
          * ┌──┬──┬──┐
-         * │18│9 │0 │
+         * │ 2│11│20│
          * ├──┼──┼──┤
-         * │19│10│1 │
+         * │ 1│10│19│
          * ├──┼──┼──┤
-         * │20│11│2 │
+         * │ 0│ 9│18│
          * └──┴──┴──┘
          * 如果输入(D, 0), 即底面的第一个块, 根据上图, 可以确定在立方体中编号为18, 再根据CubeAction注释图, 可以确定位置在(x, y, z) = (3, 0, 0)位置
          */
-        "D":[18, 9, 0, 19, 10, 1, 20, 11, 2], // 底面
+        "D":[2, 11, 20, 1, 10, 19, 0, 9, 18], // 底面
         "F":[8, 17, 26, 5, 14, 23, 2, 11, 20], // 前面
         "U":[6, 15, 24, 7, 16, 25, 8, 17, 26], // 上面
-        "B":[0, 9, 18, 3, 12, 21, 6, 15, 24],// 后面
-        "R":[24, 21, 18, 25, 22, 19, 26, 23, 20], // 右面
-        "L":[0, 3, 6, 1, 4, 7, 2, 5, 8] // 左面
+        "B":[24, 15, 6, 21, 12, 3, 18, 9, 0],// 后面
+        "R":[26, 25, 24, 23, 22, 21, 20, 19, 18], // 右面
+        "L":[6, 7, 8, 3, 4, 5, 0, 1, 2] // 左面
     },
     getFaceNumber: function(face){  // 根据面名称, 判断面所属的index, 与RotatePermutationGroup注释所标注的一致
-        let faceNo = -1;
-        if(face == 'D'){
-            faceNo = 0;
-        }else if(face == 'F'){
-            faceNo = 1;
-        }else if(face == 'U'){
-            faceNo = 2;
-        }else if(face == 'B'){
-            faceNo = 3;
-        }else if(face == 'R'){
-            faceNo = 4;
-        }else if(face == 'L'){
-            faceNo = 5;
-        }else{
-            console.warn("unrecognized face");
+        for(let k in CubeColor){
+            if(face == k){
+                return CubeColor[k];
+            }
         }
+        console.warn("unrecognized face");
         return faceNo;
     },
     getFaceByFaceNumber: function(faceNumber){
@@ -948,7 +938,7 @@ const rubikCube = {
     },
     reset: function(){
         this.baseInfo = RotatePermutationGroup.identity;
-        let standardColor = [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE];
+        let standardColor = [CubeColor.D, CubeColor.F, CubeColor.U, CubeColor.B, CubeColor.R, CubeColor.L];
         this.colorMap = [];
         const matrix = new THREE.Matrix4();
         let i = 0;
@@ -1090,6 +1080,18 @@ const rubikCube = {
         }
 
         successCallback();
+    },
+    isSolvable: function(){
+        /**
+         * 判断是否是正确的状态, 是否可解(https://math.stackexchange.com/a/127627)
+         * 1. 置换的奇偶性:
+         *      所有角块和棱块当前位置信息和初始位置信息之间可以通过一个置换来表示, 这个置换一定是偶置换, 否则是不可解的;
+         *      假如魔方转动一个面90度, 那么对于这个面上的角块和棱块来说, 形成两个4循环置换, 所以是偶置换.
+         * 2. 角块的奇偶性:
+         *      
+         * 3. 棱块的奇偶性:
+         * 
+         */
     }
 };
 
@@ -1178,6 +1180,55 @@ export function resize() {
     ThreeJsContainer.camera.aspect = window.innerWidth / window.innerHeight;
     ThreeJsContainer.camera.updateProjectionMatrix();
     ThreeJsContainer.renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+export function getColorSchemes(){
+    let colors = [];
+    for(let k in CubeColor){
+        if(CubeColor.properties[CubeColor[k]]){
+            colors.push(CubeColor.properties[CubeColor[k]].value);
+        }
+    }
+    return colors;
+}
+
+export function applyColorMap(colorMap, failedCallback){
+    for(let k in colorMap){
+        let v = colorMap[k];
+        for(let i = 0; i < v.length; i++){
+            let color = v[i];
+            if(color.startsWith('#')){
+                v[i] = color.toUpperCase();
+            }else{
+                v[i] = colorHex(color);
+            }
+        }
+    }
+    // TODO 魔方可解性校验, 颜色应用
+    if(failedCallback){
+        failedCallback();
+    }
+}
+
+function colorHex(color){
+    // RGB颜色值的正则
+    var reg = /^(rgb|RGB)/;
+    if (reg.test(color)) {
+      var strHex = "#";
+      // 把RGB的3个数值变成数组
+      var colorArr = color.replace(/(?:\(|\)|rgb|RGB)*/g, "").split(",");
+      // 转成16进制
+      for (var i = 0; i < colorArr.length; i++) {
+        var hex = Number(colorArr[i]).toString(16);
+        if (hex === "0") {
+          hex += hex;
+        }
+        strHex += hex;
+      }
+      return strHex.toUpperCase();
+    } else {
+      return String(color);
+    }
 }
 
 
