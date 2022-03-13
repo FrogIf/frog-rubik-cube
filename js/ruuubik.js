@@ -184,7 +184,7 @@ function getRotatePathForRotatePermutationGroup(source, target){
         }
         source = fullsource;
     }
-    if(isStartWith(source, target)){
+    if(specialMatch(source, target)){
         return [];  // 说明来源状态和目标状态一致, 不需要旋转
     }
     let currentStatusPath = [{
@@ -198,7 +198,7 @@ function getRotatePathForRotatePermutationGroup(source, target){
             for(let k in RotatePermutationGroup.generateElement){
                 let v = RotatePermutationGroup.generateElement[k];
                 let newStatus = multiplyRotatePermutation(currentStatus, v);
-                if(isStartWith(newStatus, target)){
+                if(specialMatch(newStatus, target)){
                     cursorPath.path.push({
                         name: k,
                         permutation: v
@@ -233,7 +233,7 @@ function fillRotateStatusForRotatePermutation(rotateStatus){
     let nextStatusArr = [];
     for(let k in RotatePermutationGroup.generateElement){
         let p = RotatePermutationGroup.generateElement[k];
-        if(isStartWith(p, rotateStatus)){
+        if(specialMatch(p, rotateStatus)){
             return p;
         }
     }
@@ -242,7 +242,7 @@ function fillRotateStatusForRotatePermutation(rotateStatus){
             for(let k in RotatePermutationGroup.generateElement){
                 let v = RotatePermutationGroup.generateElement[k];
                 let newStatus = multiplyRotatePermutation(status, v);
-                if(isStartWith(newStatus, rotateStatus)){ 
+                if(specialMatch(newStatus, rotateStatus)){ 
                     return newStatus; 
                 }
                 else{
@@ -265,6 +265,7 @@ function checkRotateStatusForRotatePermutation(status){
     if(status.length < 2 || status.length > 6){ return false; }
     for(let i = 0; i < status.length; i++){
         let s = status[i];
+        if(s < 0){ continue; }  // 表示这个状态未指定
         let exceptPosIndex = RotatePermutationGroup.illegalSequence[i];
         let illegalValue = RotatePermutationGroup.illegalSequence[s];
         for(let j = 0; j < status.length; j++){
@@ -280,15 +281,30 @@ function checkRotateStatusForRotatePermutation(status){
 }
 
 /*
- * 判断一个数组是否以某一个子数组开头
+ * 判断一个数组是否与另一个数组匹配, 如果值是-1, 表示跳过该位置
  */
-function isStartWith(array, subArray){
+function specialMatch(array, subArray){
     for(let i = 0; i < subArray.length; i++){
+        if(array[i] == -1 || subArray[i] == -1){ continue; }
         if(array[i] != subArray[i]){
             return false;
         }
     }
     return true;
+}
+
+/**
+ * 求两个数组的交集
+ */
+function intersection(a, b){
+    if(a.length == 0 || b.length == 0){ return []; }
+    let result = [];
+    for(let ai of a){
+        if(b.indexOf(ai) >= 0){
+            result.push(ai);
+        }
+    }
+    return result;
 }
 
 /**
@@ -669,6 +685,9 @@ const rubikCube = {
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE],
         [CubeColor.WHITE, CubeColor.BLUE, CubeColor.YELLOW, CubeColor.GREEN, CubeColor.RED, CubeColor.ORANGE]
     ],
+    corner:[0, 2, 6, 8, 18, 20, 24, 26],    // 所有角块编号集合
+    edge:[1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25], // 所有棱块
+    center: [4, 10, 12, 14, 16, 22], // 所有中心块
     threeJsHolder : null,   // threeJs操作持有者
     init : function(threeJsHolder){  // 初始化
         this.threeJsHolder = threeJsHolder;
@@ -838,6 +857,23 @@ const rubikCube = {
         }
         return faceNo;
     },
+    getFaceByFaceNumber: function(faceNumber){
+        let face = null;
+        if(faceNumber == 0){
+            face = 'D';
+        }else if(faceNumber == 1){
+            face = 'F';
+        }else if(faceNumber == 2){
+            face = 'U';
+        }else if(faceNumber == 3){
+            face = 'B';
+        }else if(faceNumber == 4){
+            face = 'R';
+        }else if(faceNumber == 5){
+            face = 'L';
+        }
+        return face;
+    },
     getColorByPosInfo: function(face /*所在面*/, pos/*在指定面上的编号, 按照标准魔方展开图, 每个面进行编号, 1 -- 9*/){
         let faceNo = this.getFaceNumber(face);
         if(faceNo == -1){ return "#000000"; }
@@ -946,8 +982,132 @@ const rubikCube = {
     },
     isRotating: function(){
         return this.animationQueue.length > 0;
+    }, 
+    // 根据颜色数组, 给出该方块的编号, 如果是棱块, colors.length = 2, 如果是角块, colors.length = 3...
+    getCubeNumber: function(colors){
+        if(colors.length < 1 ||colors.length > 3){
+            console.warn("illegal colors length", colors);
+            return -1;
+        }
+        let potentialCubes = this.standardColorPosition[this.getFaceByFaceNumber(colors[0])];
+        for(let i = 1; i < colors.length; i++){
+            let face = this.getFaceByFaceNumber(colors[i]);
+            let cubeNums = this.standardColorPosition[face];
+            potentialCubes = intersection(cubeNums, potentialCubes);
+        }
+        if(potentialCubes.length == 0){ return -1; }
+        else if(potentialCubes.length == 1){ return potentialCubes[0]; }
+        else if(colors.length == 1){ // 中心块
+            potentialCubes = intersection(potentialCubes, this.center);
+        }else if(colors.length == 2){ // 棱块
+            potentialCubes = intersection(potentialCubes, this.edge);
+        }
+
+        if(potentialCubes.length == 1){
+            return potentialCubes[0];
+        }else {
+            return -1;
+        }
+    },
+    // 重新组装魔方
+    /**
+     * 输入参数格式:
+     * {
+     *     "F": [color0, ... color5],
+     *     "U": [...],
+     *     ...
+     *     "D": [color0, ... color5]
+     * }
+     */
+    reassembly: function(colorStatus, checkFailedCallback, successCallback){
+        // 记录27个块的颜色状态
+        let cubesColors = [
+            [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -1]
+        ];
+        let count = 0;
+        for(let k in colorStatus){
+            count++;
+            let colors = colorStatus[k];
+            let faceMap = this.standardColorPosition[k];
+            let faceNumber = this.getFaceNumber(k);
+            if(colors.length != 9){
+                if(checkFailedCallback){
+                    checkFailedCallback();
+                }
+                return;
+            }
+            for(let i = 0; i < 9; i++){
+                let cubeNumber = faceMap[i];
+                cubesColors[cubeNumber][faceNumber] = colors[i];
+            }
+        }
+        if(count != 6){
+            checkFailedCallback();
+            return;
+        }
+
+        let permutation = [];
+        let cubeRotates = [];
+        for(let cc of cubesColors){
+            let validColors = [];
+            for(let c of cc){
+                if(c >= 0){
+                    validColors.push(c);
+                }
+            }
+            let cubeNumber = -1;
+            if(validColors.length > 0){    // 最中心的块, 未定义
+                cubeNumber = this.getCubeNumber(validColors);
+                cubeRotates.push(getRotatePathForRotatePermutationGroup(RotatePermutationGroup.identity, cc));
+                if(cubeNumber < 0){
+                    if(checkFailedCallback){
+                        checkFailedCallback();
+                    }
+                    return;
+                }
+            }else{
+                cubeRotates.push([]);
+            }
+            if(cubeNumber < 0){ // 未定义的块, 不动
+                permutation.push(permutation.length);
+            }else if(permutation.indexOf(cubeNumber) < 0){
+                permutation.push(cubeNumber);
+            }else{
+                if(checkFailedCallback){
+                    checkFailedCallback();
+                }
+                return;
+            }
+        }
+
+        // 平移+旋转
+        for(let i = 0; i < permutation.length; i++){
+            let translation = permutation[i];
+            let rotate = cubeRotates[i];
+            console.log(translation, rotate);
+        }
+
+        successCallback();
     }
 };
+
+export function debug(){
+    rubikCube.reassembly({
+        "F":[CubeColor.BLUE, CubeColor.ORANGE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE, CubeColor.BLUE],
+        "U":[CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW, CubeColor.YELLOW],
+        "B":[CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN, CubeColor.GREEN],
+        "R":[CubeColor.RED, CubeColor.RED, CubeColor.BLUE, CubeColor.RED, CubeColor.RED, CubeColor.RED, CubeColor.RED, CubeColor.RED, CubeColor.RED],
+        "L":[CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.RED, CubeColor.ORANGE, CubeColor.ORANGE, CubeColor.ORANGE],
+        "D":[CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE, CubeColor.WHITE]
+    }, () => {
+        alert("failed");
+    }, () => {
+        alert("success");
+    })
+    // console.log(rubikCube.getCubeNumber([CubeColor.RED]));
+}
 
 /**
  * 根据块位置索引, 确定其相对坐标

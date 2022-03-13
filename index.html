@@ -11,6 +11,8 @@
             import * as lexer from './js/cube-lexer.js';
             import * as trans from './js/translater.js';
 
+            const isDebug = true;
+
             var lang = window.navigator.language.slice(0, 2);
             function translatePage(){
                 if(lang == 'en'){
@@ -36,9 +38,20 @@
                     }
             }
 
+            function debug(){
+                let debugDoms = document.getElementsByClassName('debug-clz');
+                for(let d of debugDoms){
+                    d.style.display = 'block';
+                }
+            }
+
             window.onload = function(){
-                frog.init(document.body);
+                frog.init(document.body, isDebug);
                 faceColorRefresh();
+
+                if(isDebug){
+                    debug();
+                }
 
                 translatePage();
 
@@ -145,6 +158,9 @@
             document.getElementById("translateBtn").onclick = () => {
                 translatePage();
             }
+            document.getElementById("debugBtn").onclick = () => {
+                frog.debug();
+            }
         </script>
 	</head>
 	<body>
@@ -160,65 +176,65 @@
             <span></span>
         </div>
         <div id="cubeBoxPanel" class="cube-box">
-            <div class="cube cube-box-row-0 cube-box-col-3" ><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-0 cube-box-col-4" ><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-0 cube-box-col-5"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-3"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-4"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-5"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-3"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-4"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-5"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-3" ><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-4" ><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-5"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-3"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-4"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-5"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-3"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-4"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-5"><span class="debug-clz">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-0"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-1"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-2"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-0"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-1"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-2"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-0"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-1"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-2"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-0"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-1"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-2"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-0"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-1"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-2"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-0"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-1"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-2"><span class="debug-clz">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-3"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-4"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-5"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-3"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-4"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-5"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-3"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-4"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-5"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-3"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-4"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-5"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-3"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-4"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-5"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-3"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-4"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-5"><span class="debug-clz">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-6"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-7"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-8"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-6"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-7"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-8"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-6"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-7"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-8"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-6"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-7"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-8"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-6"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-7"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-8"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-6"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-7"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-8"><span class="debug-clz">9</span></div>
 
-            <div class="cube cube-box-row-3 cube-box-col-9"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-10"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-11"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-9"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-10"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-11"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-9"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-10"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-11"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-9"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-10"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-11"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-9"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-10"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-11"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-9"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-10"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-11"><span class="debug-clz">9</span></div>
 
-            <div class="cube cube-box-row-6 cube-box-col-3"><span class="cube-number">1</span></div>
-            <div class="cube cube-box-row-6 cube-box-col-4"><span class="cube-number">2</span></div>
-            <div class="cube cube-box-row-6 cube-box-col-5"><span class="cube-number">3</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-3"><span class="cube-number">4</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-4"><span class="cube-number">5</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-5"><span class="cube-number">6</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-3"><span class="cube-number">7</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-4"><span class="cube-number">8</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-5"><span class="cube-number">9</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-3"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-4"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-5"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-3"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-4"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-5"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-3"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-4"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-5"><span class="debug-clz">9</span></div>
         </div>
         <div id="rightPanelClose" class="eye-button" style="position:absolute;right:0px;top:0px;">
             <span></span>
@@ -235,6 +251,7 @@
             <button class="trans-lang" data-lang-key="rebase" id="rebaseBtn">rebase</button>
             <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
             <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
+            <button class="debug-clz" id="debugBtn">debug</button>
             <span class="trans-button">
                 <a href="javascript:;" id="translateBtn">中/EN</a>
             </span>
