@@ -88,3 +88,38 @@
     border-color: blue;
     cursor: pointer;
 }
+
+.cube-selected {
+    border: 1px solid rgb(0, 255, 0);
+}
+
+.cube-selected::after{
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    border-bottom: 12px solid rgb(0, 255, 0);
+    border-left: 12px solid transparent;
+}
+.cube-selected::before{
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 2px;
+    background: transparent;
+    bottom: 2px;
+    right: 0px;
+    border: 2px solid white;
+    border-top: none;
+    border-right: none;
+    -webkit-transform: rotate(-50deg);
+    -ms-transform: rotate(-50deg);
+    transform: rotate(-50deg);
+    z-index: 9;
+}
+
+.cube-changed{
+    border-color: rgb(0, 255, 0);
+    border-style: solid;
+    border-width: 2px;
+}

@@ -147,31 +147,49 @@
             document.getElementById("translateBtn").onclick = () => {
                 translatePage();
             }
+
+
+
+
+            function overCubeColorEdit(){
+                document.getElementById("beginEditCubeColor").style.display = 'block';
+                    document.getElementById("finishEditCubeColor").style.display = 'none';
+                    document.getElementById("cancelEditCubeColor").style.display = 'none';
+
+                    let cubes = document.getElementsByClassName("cube");
+                    for(let cube of cubes){
+                        cube.classList.remove('cube-editable');
+                        cube.classList.remove('cube-selected');
+                        cube.classList.remove('cube-changed');
+                        cube.onclick = null;
+                    }
+            }
+
             document.getElementById("editCubeBoxColor").onclick = () => {
                 if(document.getElementById("finishEditCubeColor").style.display == 'none'){   // 开始编辑
                     document.getElementById("finishEditCubeColor").style.display = 'block';
                     document.getElementById("beginEditCubeColor").style.display = 'none';
+                    document.getElementById("cancelEditCubeColor").style.display = 'block';
 
                     let cubes = document.getElementsByClassName("cube");
                     for(let i = 0; i < cubes.length; i++){
                         let cube = cubes[i];
                         cube.classList.add('cube-editable');
-                        cube.onclick = () => {
+                        cube.onclick = (e) => {
+                            e.target.classList.add('cube-selected');
                             colourDisc.openDisc(i);
                         }
                     }
                 }else{ // 完成编辑
-                    document.getElementById("beginEditCubeColor").style.display = 'block';
-                    document.getElementById("finishEditCubeColor").style.display = 'none';
-
-                    let cubes = document.getElementsByClassName("cube");
-                    for(let cube of cubes){
-                        cube.classList.remove('cube-editable');
-                        cube.onclick = null;
-                    }
+                    overCubeColorEdit();
                     frog.applyColorMap(convertToStandardColorInfo());
                 }
             }
+
+            document.getElementById("cancelEditCubeColor").onclick = () => {
+                faceColorRefresh();
+                overCubeColorEdit();
+            };
 
             // 转换为标准的颜色分布
             function convertToStandardColorInfo(){
@@ -226,6 +244,10 @@
                         ele.onclick = () => {
                             this.selectColor = color;
                         };
+                        ele.ondblclick = () => {
+                            this.selectColor = color;
+                            this.confirm();
+                        };
                         dom.appendChild(ele);
                     }
                 },
@@ -233,7 +255,9 @@
                     let cubes = document.getElementsByClassName("cube");
                     let cube = cubes[this.activeIndex];
                     cube.style.backgroundColor = this.selectColor;
+                    cube.classList.add('cube-changed');
                     this.closeDisc();
+                    cube.classList.remove('cube-selected');
                 }
             };
         </script>
@@ -250,11 +274,16 @@
             <span></span>
             <span></span>
         </div>
-        <div id="editCubeBoxColor" class="eye-button" style="position:absolute;top:0px;left:270px;">
-            <img src="img/pen.svg" style="display: block;" id="beginEditCubeColor" alt="edit" width="15" height="15"/>
-            <img src="img/right.svg" style="display: none;" id="finishEditCubeColor" alt="right" width="15" height="15"/>
-        </div>
         <div id="cubeBoxPanel" class="cube-box">
+            <div style="position:absolute;top:0px;left:270px;">
+                <div id="cancelEditCubeColor" style="display: none;" class="eye-button">
+                    <img src="img/error.svg" alt="right" width="15" height="15"/>
+                </div>
+                <div id="editCubeBoxColor" class="eye-button">
+                    <img src="img/pen.svg" style="display: block;" id="beginEditCubeColor" alt="edit" width="15" height="15"/>
+                    <img src="img/right.svg" style="display: none;" id="finishEditCubeColor" alt="right" width="15" height="15"/>
+                </div>
+            </div>
             <div class="cube cube-box-row-0 cube-box-col-3" ><span class="cube-number">1</span></div>
             <div class="cube cube-box-row-0 cube-box-col-4" ><span class="cube-number">2</span></div>
             <div class="cube cube-box-row-0 cube-box-col-5"><span class="cube-number">3</span></div>
