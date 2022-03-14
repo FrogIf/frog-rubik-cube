@@ -171,6 +171,8 @@
                 document.getElementById("beginEditCubeColor").style.display = 'block';
                     document.getElementById("finishEditCubeColor").style.display = 'none';
                     document.getElementById("cancelEditCubeColor").style.display = 'none';
+                    document.getElementById("clampColor").style.display = 'none';
+                    document.getElementById("colorEditTip").style.display = 'none';
 
                     let cubes = document.getElementsByClassName("cube");
                     for(let cube of cubes){
@@ -186,19 +188,28 @@
                     document.getElementById("finishEditCubeColor").style.display = 'block';
                     document.getElementById("beginEditCubeColor").style.display = 'none';
                     document.getElementById("cancelEditCubeColor").style.display = 'block';
+                    document.getElementById("colorEditTip").style.display = 'block';
 
                     let cubes = document.getElementsByClassName("cube");
                     for(let i = 0; i < cubes.length; i++){
                         let cube = cubes[i];
                         cube.classList.add('cube-editable');
                         cube.onclick = (e) => {
-                            cube.classList.add('cube-selected');
-                            // if(window.event.ctrlKey){
-                            //     colourDisc.addSelected(i);
-                            // }else{
-                                colourDisc.addSelected(i);
-                                colourDisc.openDisc();
-                            // }
+                            if(cube.classList.contains('cube-selected')){
+                                cube.classList.remove('cube-selected');
+                            }else{
+                                if(!window.event.ctrlKey){
+                                    document.getElementById("clampColor").style.display = 'none';
+                                    for(let c of cubes){
+                                        c.classList.remove('cube-selected');
+                                    }
+                                    cube.classList.add('cube-selected');
+                                    colourDisc.openDisc();
+                                }else{
+                                    document.getElementById("clampColor").style.display = 'block';
+                                    cube.classList.add('cube-selected');
+                                }
+                            }
                         }
                     }
                 }else{ // 完成编辑
@@ -210,6 +221,10 @@
             document.getElementById("cancelEditCubeColor").onclick = () => {
                 faceColorRefresh();
                 overCubeColorEdit();
+            };
+
+            document.getElementById("clampColor").onclick = () => {
+                colourDisc.openDisc();
             };
 
             // 转换为标准的颜色分布
@@ -229,7 +244,6 @@
 
             // 色盘
             const colourDisc = {
-                activeIndex: [],
                 selectColor: "#FFFFFF",
                 init: function(){
                     document.getElementById("colorDiscConfirm").onclick = () => {
@@ -239,9 +253,6 @@
                         this.closeDisc();
                     };
                 },
-                addSelected: function(index){
-                    this.activeIndex.push(index);
-                },
                 openDisc: function(){
                     var over = document.querySelector('#over');
                     over.style.display = 'block';
@@ -250,11 +261,9 @@
                     var over = document.querySelector('#over');
                     over.style.display = 'none';
                     let cubes = document.getElementsByClassName("cube");
-                    for(let index of this.activeIndex){
-                        let cube = cubes[index];
+                    for(let cube of cubes){
                         cube.classList.remove('cube-selected');
                     }
-                    this.activeIndex = [];
                 },
                 // 刷新颜色可选值dom
                 refreshColorOptional: function (colors){
@@ -281,12 +290,10 @@
                     }
                 },
                 confirm: function(){
-                    let cubes = document.getElementsByClassName("cube");
-                    for(let index of this.activeIndex){
-                        let cube = cubes[index];
+                    let cubes = document.getElementsByClassName("cube-selected");
+                    for(let cube of cubes){
                         cube.style.backgroundColor = this.selectColor;
                         cube.classList.add('cube-changed');
-                        cube.classList.remove('cube-selected');
                     }
                     this.closeDisc();
                 }
@@ -314,6 +321,12 @@
                     <img src="img/pen.svg" style="display: block;" id="beginEditCubeColor" alt="edit" width="15" height="15"/>
                     <img src="img/right.svg" style="display: none;" id="finishEditCubeColor" alt="right" width="15" height="15"/>
                 </div>
+                <div id="clampColor" class="eye-button" style="display: none;">
+                    <img src="img/chopsticks.svg" alt="chopsticks" width="15" height="15"/>
+                </div>
+            </div>
+            <div id="colorEditTip" class="trans-lang" data-lang-key="color.edit.tip" style="display:none;position:absolute;top:0px;left:150px;width: 100px;color: grey;font-size: 10px;">
+                press 'ctrl' to multi-select
             </div>
             <div class="cube cube-box-row-0 cube-box-col-3" ><span class="debug-clz">1</span></div>
             <div class="cube cube-box-row-0 cube-box-col-4" ><span class="debug-clz">2</span></div>

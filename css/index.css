@@ -139,6 +139,7 @@ body {
     height: 100%;
     position: absolute;
     background-color: rgba(145,152, 159, 0.5);
+    z-index: 20;
 }
 
 #over>div {
