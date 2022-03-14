@@ -11,7 +11,7 @@
             import * as lexer from './js/cube-lexer.js';
             import * as trans from './js/translater.js';
 
-            const isDebug = true;
+            const isDebug = false;
 
             var lang = window.navigator.language.slice(0, 2);
             function translatePage(){
@@ -193,7 +193,12 @@
                         cube.classList.add('cube-editable');
                         cube.onclick = (e) => {
                             cube.classList.add('cube-selected');
-                            colourDisc.openDisc(i);
+                            // if(window.event.ctrlKey){
+                            //     colourDisc.addSelected(i);
+                            // }else{
+                                colourDisc.addSelected(i);
+                                colourDisc.openDisc();
+                            // }
                         }
                     }
                 }else{ // 完成编辑
@@ -224,7 +229,7 @@
 
             // 色盘
             const colourDisc = {
-                activeIndex: -1,
+                activeIndex: [],
                 selectColor: "#FFFFFF",
                 init: function(){
                     document.getElementById("colorDiscConfirm").onclick = () => {
@@ -234,8 +239,10 @@
                         this.closeDisc();
                     };
                 },
-                openDisc: function(index){                    
-                    this.activeIndex = index;
+                addSelected: function(index){
+                    this.activeIndex.push(index);
+                },
+                openDisc: function(){
                     var over = document.querySelector('#over');
                     over.style.display = 'block';
                 },
@@ -243,8 +250,11 @@
                     var over = document.querySelector('#over');
                     over.style.display = 'none';
                     let cubes = document.getElementsByClassName("cube");
-                    let cube = cubes[this.activeIndex];
-                    cube.classList.remove('cube-selected');
+                    for(let index of this.activeIndex){
+                        let cube = cubes[index];
+                        cube.classList.remove('cube-selected');
+                    }
+                    this.activeIndex = [];
                 },
                 // 刷新颜色可选值dom
                 refreshColorOptional: function (colors){
@@ -272,10 +282,12 @@
                 },
                 confirm: function(){
                     let cubes = document.getElementsByClassName("cube");
-                    let cube = cubes[this.activeIndex];
-                    cube.style.backgroundColor = this.selectColor;
-                    cube.classList.add('cube-changed');
-                    cube.classList.remove('cube-selected');
+                    for(let index of this.activeIndex){
+                        let cube = cubes[index];
+                        cube.style.backgroundColor = this.selectColor;
+                        cube.classList.add('cube-changed');
+                        cube.classList.remove('cube-selected');
+                    }
                     this.closeDisc();
                 }
             };

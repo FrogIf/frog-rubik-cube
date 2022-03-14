@@ -191,6 +191,14 @@ const RotatePermutationGroup = {
         y_: new THREE.Vector3(0, 1, 0),
         z: new THREE.Vector3(0, 0, -1),
         z_: new THREE.Vector3(0, 0, 1)
+    },
+    applyRotate: function(rotateName, eulerAngle){
+        if(rotateName == 'x'){ eulerAngle.x -= Math.PI / 2; }
+        else if(rotateName == 'x_'){ eulerAngle.x += Math.PI / 2; }
+        else if(rotateName == 'y'){ eulerAngle.y -= Math.PI / 2; }
+        else if(rotateName == 'y_'){ eulerAngle.y += Math.PI / 2; }
+        else if(rotateName == 'z'){ eulerAngle.z -= Math.PI / 2; }
+        else if(rotateName == 'z_'){ eulerAngle.z += Math.PI / 2; }
     }
 };
 
@@ -964,24 +972,17 @@ const rubikCube = {
             let rotatePath = getRotatePathForRotatePermutationGroup(this.baseInfo, targetBase);
             if(rotatePath != null && rotatePath.length > 0){
                 let newBaseInfo = this.baseInfo;
-                let xAngle = 0;
-                let yAngle = 0;
-                let zAngle = 0;
+                let rotateEular = new THREE.Euler( 0, 0, 0, 'XYZ');
                 for(let rotate of rotatePath){
-                    if(rotate.name == 'x'){ xAngle -= Math.PI / 2; }
-                    else if(rotate.name == 'x_'){ xAngle += Math.PI / 2; }
-                    else if(rotate.name == 'y'){ yAngle -= Math.PI / 2; }
-                    else if(rotate.name == 'y_'){ yAngle += Math.PI / 2; }
-                    else if(rotate.name == 'z'){ zAngle -= Math.PI / 2; }
-                    else if(rotate.name == 'z_'){ zAngle += Math.PI / 2; }
+                    RotatePermutationGroup.applyRotate(rotate.name, rotateEular);
                     let action = StandardCubeAction[rotate.name];
                     this.doMove(action, Math.PI / 2);
                     this.finishMove(action);
                     newBaseInfo = multiplyRotatePermutation(newBaseInfo, rotate.permutation);
                 }
-                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 1, 0, 0 ), xAngle);
-                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 0, 1, 0 ), yAngle);
-                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 0, 0, 1 ), zAngle);
+                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 1, 0, 0 ), rotateEular.x);
+                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 0, 1, 0 ), rotateEular.y);
+                this.threeJsHolder.camera.position.applyAxisAngle(new THREE.Vector3( 0, 0, 1 ), rotateEular.z);
                 this.threeJsHolder.camera.updateProjectionMatrix();
                 this.baseInfo = newBaseInfo;
             }
@@ -1101,13 +1102,13 @@ const rubikCube = {
             let cubeNumber = -1;
             if(validColors.length > 0){    // 最中心的块, 未定义
                 cubeNumber = this.getCubeNumber(validColors);
-                cubeRotates.push(getRotatePathForRotatePermutationGroup(RotatePermutationGroup.identity, cc));
                 if(cubeNumber < 0){
                     if(checkFailedCallback){
                         checkFailedCallback();
                     }
                     return;
                 }
+                cubeRotates.push(getRotatePathForRotatePermutationGroup(RotatePermutationGroup.identity, cc));
             }else{
                 cubeRotates.push([]);
             }
@@ -1127,36 +1128,40 @@ const rubikCube = {
         let s = new THREE.Vector3();
         let v = new THREE.Vector3();
         const matrix = new THREE.Matrix4();
+        let newColorMap = [];
         for(let i = 0; i < permutation.length; i++){
             let translation = permutation[i];
-            let rotate = cubeRotates[i];
-            let coordinate = decomposeCubeIndexToCoordinate(i);
-            coordinate = this.matrixPositionFix(coordinate.x, coordinate.y, coordinate.z);
             this.cubes.getMatrixAt(translation, matrix);
             matrix.decompose(v, q, s);
+
+            // 平移
+            let coordinate = decomposeCubeIndexToCoordinate(i);
+            coordinate = this.matrixPositionFix(coordinate.x, coordinate.y, coordinate.z);
             v.set(coordinate.x, coordinate.y, coordinate.z);
+            q.set(0, 0, 0, 1);
+            
+            // 旋转
+            let rotate = cubeRotates[i];
             if(rotate.length > 0){
                 for(let r of rotate){
                     const quaternion = new THREE.Quaternion();
                     quaternion.setFromAxisAngle(RotatePermutationGroup.rotateAxis[r.name], Math.PI / 2);     
                     q.premultiply(quaternion);
                 }
-            }
-            matrix.compose(v, q, s);
-            this.cubes.setMatrixAt(translation, matrix);
-        }
-        let newColorMap = [];
-        for(let rotate of cubeRotates){
-            if(rotate.length == 0){
-                newColorMap.push(copyArray(RotatePermutationGroup.identity));
-            }else{
+
                 let colorStatus = RotatePermutationGroup.identity;
                 for(let r of rotate){
                     colorStatus = multiplyRotatePermutation(colorStatus, r.permutation);
                 }
                 newColorMap.push(colorStatus);
+            }else{
+                newColorMap.push(copyArray(RotatePermutationGroup.identity));
             }
+            
+            matrix.compose(v, q, s);
+            this.cubes.setMatrixAt(translation, matrix);
         }
+        
         this.cubeIndexMap = permutation;
         this.colorMap = newColorMap;
         this.cubes.instanceMatrix.needsUpdate = true;
@@ -1277,7 +1282,7 @@ export function applyColorMap(colorMap, failedCallback){
             failedCallback();
         }
     }, () => {
-        alert("success");
+        console.log("success");
     });
 }
 
