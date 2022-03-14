@@ -213,8 +213,11 @@
                         }
                     }
                 }else{ // 完成编辑
-                    overCubeColorEdit();
-                    frog.applyColorMap(convertToStandardColorInfo());
+                    frog.applyColorMap(convertToStandardColorInfo(), () => {
+                        alert("color not right.");
+                    }, () => {
+                        overCubeColorEdit();
+                    });
                 }
             }
 

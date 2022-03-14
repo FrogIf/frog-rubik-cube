@@ -1267,7 +1267,7 @@ export function getColorSchemes(){
     return colors;
 }
 
-export function applyColorMap(colorMap, failedCallback){
+export function applyColorMap(colorMap, failedCallback, successCallback){
     let realColorMap = {};
     for(let k in colorMap){
         let v = colorMap[k];
@@ -1282,7 +1282,9 @@ export function applyColorMap(colorMap, failedCallback){
             failedCallback();
         }
     }, () => {
-        console.log("success");
+        if(successCallback){
+            successCallback();
+        }
     });
 }
 
