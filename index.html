@@ -61,7 +61,7 @@
                     faceColorRefresh();
                     if(notation && notation != ''){
                         notation = notation.replace('_', '\'');
-                        logOutputAppend(" " + notation);
+                        OutputConsole.print(" " + notation);
                     }
 
                 });
@@ -72,7 +72,7 @@
 
             function doAction(actions){
                 if(!actions || !actions.length){
-                    logOutputAppend("\n");
+                    OutputConsole.println();
                 }else{
                     for(let action of actions){
                         frog.doAction(action);
@@ -83,7 +83,8 @@
             function executeActionLine(inputDom){
                 let success = true;
                 let actions = lexer.parse(inputDom.value, (msg) => {
-                    logOutputAppend(msg);
+                    OutputConsole.println();
+                    OutputConsole.println(msg);
                     success = false;
                 });
                 doAction(actions);
@@ -92,12 +93,23 @@
                 }
             }
 
-            function logOutputAppend(msg){
-                let textarea = document.getElementById('logTextarea');
-                let content = textarea.value;
-                textarea.value = content + msg;
-                textarea.scrollTop = textarea.scrollHeight;
-            }
+            const OutputConsole = {
+                println: function(msg){
+                    this.print(msg);
+                    this.print("\n");                   
+                },
+                print: function(msg){
+                    if(msg){
+                        let textarea = document.getElementById('logTextarea');
+                        let content = textarea.value;
+                        if(msg == "\n" && content.length == 0){
+                            return;
+                        }
+                        textarea.value = content + msg;
+                        textarea.scrollTop = textarea.scrollHeight;   
+                    }
+                }
+            };
 
             function cleanOutput(){
                 let textarea = document.getElementById('logTextarea');
@@ -163,9 +175,6 @@
             document.getElementById("debugBtn").onclick = () => {
                 frog.debug();
             }
-
-
-
 
             function overCubeColorEdit(){
                 document.getElementById("beginEditCubeColor").style.display = 'block';
@@ -301,6 +310,11 @@
                     this.closeDisc();
                 }
             };
+
+            document.getElementById("scrambleBtn").onclick = () => {
+                OutputConsole.println();
+                doAction(frog.scramble());
+            }
         </script>
 	</head>
 	<body>
@@ -406,6 +420,7 @@
             <button class="trans-lang" data-lang-key="rebase" id="rebaseBtn">rebase</button>
             <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
             <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
+            <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
             <button class="debug-clz" id="debugBtn">debug</button>
             <span class="trans-button">
                 <a href="javascript:;" id="translateBtn">中/EN</a>

@@ -1179,11 +1179,39 @@ const rubikCube = {
          * 3. 棱块的奇偶性:
          * 
          */
+    },
+    /**
+     * 简单的打乱, 不保证满足WCA的打乱要求, 返回打乱后的公式数组
+     */
+    scramble: function(){
+        let step = 10 + Math.ceil(Math.random() * 10);  // 生成的总步数, 最小10步, 最大20步
+        let exclude;
+        let result = [];
+        let actions = Object.keys(ActionGroup);
+        for(let i = 0; i < step; i++){
+            let index = Math.floor(Math.random() * actions.length);
+            while(actions[index] == exclude){
+                index = Math.floor(Math.random() * actions.length);
+            }
+            let notation = actions[index];
+            if(notation.endsWith('_')){
+                exclude = notation.replace('_', '');
+            }else{
+                exclude = notation + "_";
+            }
+            result.push(notation);
+        }
+
+        return result;
     }
 };
 
 export function debug(){
     // nothing
+}
+
+export function scramble(){
+    return rubikCube.scramble();
 }
 
 /**
