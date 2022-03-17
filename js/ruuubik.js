@@ -904,7 +904,7 @@ const rubikCube = {
             }
         }
         console.warn("unrecognized face");
-        return faceNo;
+        return -1;
     },
     getFaceByFaceNumber: function(faceNumber){
         let face = null;
@@ -1092,6 +1092,7 @@ const rubikCube = {
 
         let permutation = [];
         let cubeRotates = [];
+        let newColorMap = [];
         for(let cc of cubesColors){
             let validColors = [];
             for(let c of cc){
@@ -1099,6 +1100,7 @@ const rubikCube = {
                     validColors.push(c);
                 }
             }
+            newColorMap.push(copyArray(RotatePermutationGroup.identity));
             let cubeNumber = -1;
             if(validColors.length > 0){    // 最中心的块, 未定义
                 cubeNumber = this.getCubeNumber(validColors);
@@ -1108,7 +1110,15 @@ const rubikCube = {
                     }
                     return;
                 }
-                cubeRotates.push(getRotatePathForRotatePermutationGroup(RotatePermutationGroup.identity, cc));
+                let path = getRotatePathForRotatePermutationGroup(RotatePermutationGroup.identity, cc);
+                if(path.length > 0){
+                    let colorStatus = RotatePermutationGroup.identity;
+                    for(let p of path){
+                        colorStatus = multiplyRotatePermutation(colorStatus, p.permutation);
+                    }
+                    newColorMap[newColorMap.length - 1] =  colorStatus;
+                }
+                cubeRotates.push(path);
             }else{
                 cubeRotates.push([]);
             }
@@ -1124,11 +1134,15 @@ const rubikCube = {
             }
         }
 
+        if(!this.isSolvable(permutation, newColorMap)){
+            checkFailedCallback();
+            return;
+        }
+
         let q = new THREE.Quaternion();
         let s = new THREE.Vector3();
         let v = new THREE.Vector3();
         const matrix = new THREE.Matrix4();
-        let newColorMap = [];
         for(let i = 0; i < permutation.length; i++){
             let translation = permutation[i];
             this.cubes.getMatrixAt(translation, matrix);
@@ -1148,14 +1162,6 @@ const rubikCube = {
                     quaternion.setFromAxisAngle(RotatePermutationGroup.rotateAxis[r.name], Math.PI / 2);     
                     q.premultiply(quaternion);
                 }
-
-                let colorStatus = RotatePermutationGroup.identity;
-                for(let r of rotate){
-                    colorStatus = multiplyRotatePermutation(colorStatus, r.permutation);
-                }
-                newColorMap.push(colorStatus);
-            }else{
-                newColorMap.push(copyArray(RotatePermutationGroup.identity));
             }
             
             matrix.compose(v, q, s);
@@ -1168,17 +1174,112 @@ const rubikCube = {
 
         successCallback();
     },
-    isSolvable: function(){
+    getExposeColor: function(cubeNumber){
+        let expose = [];
+        for(let k in this.standardColorPosition){
+            if(this.standardColorPosition[k].indexOf(cubeNumber) >= 0){
+                expose.push(CubeColor[k]);
+            }
+        }
+        return expose;
+    },
+    getCubeInfo: function(posDistribution, colorStatus, cubeNumber){
+        let expose = this.getExposeColor(cubeNumber); // 该块的颜色
+        let selfColorStatus = colorStatus[cubeNumber]; // 该快的颜色置换状态
+        if(selfColorStatus == null || selfColorStatus.length == 0){
+            selfColorStatus = RotatePermutationGroup.identity;
+        }
+        let result = {
+            colorInfo: {}
+        };
+        for(let e of expose){
+            let faceNo = selfColorStatus.indexOf(e);
+            result.colorInfo[this.getFaceByFaceNumber(faceNo)] = e;
+        }
+
+        return result;
+    },
+    isSolvable: function(permutation, colorMap){
         /**
-         * 判断是否是正确的状态, 是否可解(https://math.stackexchange.com/a/127627)
-         * 1. 置换的奇偶性:
+         * 判断是否是正确的状态, 是否可解(https://math.stackexchange.com/a/127627, https://www.zhihu.com/question/322875785/answer/672641077)
+         * 1. 奇偶校验:
          *      所有角块和棱块当前位置信息和初始位置信息之间可以通过一个置换来表示, 这个置换一定是偶置换, 否则是不可解的;
          *      假如魔方转动一个面90度, 那么对于这个面上的角块和棱块来说, 形成两个4循环置换, 所以是偶置换.
-         * 2. 角块的奇偶性:
-         *      
-         * 3. 棱块的奇偶性:
-         * 
+         * 2. 棱块色相:
+         *      定义: 上下 -- 高级面; 前后 -- 中级面; 左右 -- 低级面
+         *      棱块中较高级的颜色位于较高级的面上, 称为朝向正确
+         *      -- 正确的棱块个数必须是偶数
+         * 3. 角块色相:
+         *      定义: 白色 和 黄色 面为基准面
+         *      白色或者黄色角块位于基准面上, 则视为朝向正确(白色可以位于黄色面, 黄色可以位于白色面)
+         *      顺时针120度旋转所有角块, 使所有棱块朝向正确, 总共旋转次数必须为3的倍数
          */
+
+        // 奇偶校验
+        let inversion = 0; // 逆序数
+        for(let i = 1; i < permutation.length; i++){
+            for(let j = 0; j < i; j++){
+                if(permutation[i] < permutation[j]){
+                    inversion++;
+                }
+            }
+        }
+        if(inversion % 2 != 0){
+            return false;
+        }
+
+        // 棱块色相
+        let correctEdge = 0;
+        // 给面和色块分为高级/中级/低级 进行打分
+        function markColorFace(number){
+            if(number == 0 || number == 2){ // 底面和上面为高级面
+                return 3;
+            }else if(number == 1 || number == 3){ // 前面和后面为中级面
+                return 2;
+            }else { // 左面后右面为低级面
+                return 1;
+            } 
+        }
+        for(let e of this.edge){
+            let cubeInfo = this.getCubeInfo(permutation, colorMap, e);
+            let orientationMark = 1;
+            for(let f in cubeInfo.colorInfo){
+                orientationMark *= ((markColorFace(this.getFaceNumber(f)) - markColorFace(cubeInfo.colorInfo[f])) >= 0 ? 1 : -1);
+            }
+            if(orientationMark > 0){
+                correctEdge++;
+            }
+        }
+        if(correctEdge % 2 != 0){
+            return false;
+        }
+
+        // 角块色相
+        let rotatePermutation = [
+            [5, 2, 4, 0, 1, 3], // 0号角块顺时针120度旋转的置换表示
+            [1, 5, 3, 4, 2, 0], // 1号角块顺时针120度旋转的置换表示
+            [1, 4, 3, 5, 0, 2], // ...
+            [4, 2, 5, 0, 3, 1],
+            [3, 5, 1, 4, 0, 2], 
+            [4, 0, 5, 2, 1, 3],
+            [5, 0, 4, 2, 3, 1],
+            [3, 4, 1, 5, 2, 0]
+        ];
+        let rotateCount = 0;
+        let rotateIndex = 0;
+        for(let c of this.corner){
+            let colorStatus = colorMap[c];
+            while(colorStatus[2] != CubeColor.U && colorStatus[2] != CubeColor.D){
+                colorStatus = multiplyRotatePermutation(colorStatus, rotatePermutation[rotateIndex]);
+                rotateCount++;
+            }
+            rotateIndex++;
+        }
+        if(rotateCount % 3 != 0){
+            return false;
+        }
+
+        return true;
     },
     /**
      * 简单的打乱, 不保证满足WCA的打乱要求, 返回打乱后的公式数组
