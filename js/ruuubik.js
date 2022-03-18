@@ -1183,9 +1183,16 @@ const rubikCube = {
         }
         return expose;
     },
+    /**
+     * 获取指定编号的魔方块的信息
+     * posDistribution -- 魔方块分布信息
+     * colorStatus -- 魔方颜色状态
+     * cubeNumber -- 块的编号(即初始位置信息)
+     */
     getCubeInfo: function(posDistribution, colorStatus, cubeNumber){
         let expose = this.getExposeColor(cubeNumber); // 该块的颜色
-        let selfColorStatus = colorStatus[cubeNumber]; // 该快的颜色置换状态
+        let currentPosition = posDistribution.indexOf(cubeNumber);
+        let selfColorStatus = colorStatus[currentPosition]; // 该块的颜色置换状态
         if(selfColorStatus == null || selfColorStatus.length == 0){
             selfColorStatus = RotatePermutationGroup.identity;
         }
@@ -1242,11 +1249,10 @@ const rubikCube = {
         }
         for(let e of this.edge){
             let cubeInfo = this.getCubeInfo(permutation, colorMap, e);
-            let orientationMark = 1;
-            for(let f in cubeInfo.colorInfo){
-                orientationMark *= ((markColorFace(this.getFaceNumber(f)) - markColorFace(cubeInfo.colorInfo[f])) >= 0 ? 1 : -1);
-            }
-            if(orientationMark > 0){
+            let faces = Object.keys(cubeInfo.colorInfo);
+            let faceCheck = markColorFace(this.getFaceNumber(faces[0])) > markColorFace(this.getFaceNumber(faces[1]));
+            let colorCheck = markColorFace(cubeInfo.colorInfo[faces[0]]) > markColorFace(cubeInfo.colorInfo[faces[1]]);
+            if(!(faceCheck ^ colorCheck)){
                 correctEdge++;
             }
         }
