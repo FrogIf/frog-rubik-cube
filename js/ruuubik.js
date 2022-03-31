@@ -1134,6 +1134,12 @@ const rubikCube = {
             }
         }
 
+        // 由于定义的结构, 这里需要校验防止角块安装到棱块位置上, 棱块安装到角块位置上等等
+        if(this.isMismatch(permutation)){
+            checkFailedCallback();
+            return;
+        }
+
         if(!this.isSolvable(permutation, newColorMap)){
             checkFailedCallback();
             return;
@@ -1205,6 +1211,28 @@ const rubikCube = {
         }
 
         return result;
+    },
+    // 判断是否错位: 角块放到棱块位置, 棱块放到中心块位置...
+    isMismatch: function(permutation){
+        for(let n of this.corner){
+            if(this.corner.indexOf(permutation[n]) < 0){
+                return true;
+            }
+        }
+
+        for(let n of this.edge){
+            if(this.edge.indexOf(permutation[n]) < 0){
+                return true;
+            }
+        }
+
+        for(let n of this.center){
+            if(this.center.indexOf(permutation[n]) < 0){
+                return true;
+            }
+        }
+
+        return false;
     },
     isSolvable: function(permutation, colorMap){
         /**
