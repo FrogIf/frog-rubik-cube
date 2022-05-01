@@ -1,3 +1,0 @@
-/**
- * Human Thistlethwaite Method
- */

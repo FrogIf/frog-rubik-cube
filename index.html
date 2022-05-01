@@ -6,10 +6,12 @@
         <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" >
         <link rel="stylesheet" type="text/css" href="css/colorcube.css">
         <link rel="stylesheet" type="text/css" href="css/index.css">
+        <!-- <script src="js/two-phase.js"></script> -->
         <script type="module">
             import * as frog from './js/ruuubik.js';
             import * as lexer from './js/cube-lexer.js';
             import * as trans from './js/translater.js';
+            import * as twoPhase from './js/twophase.js';
 
             const isDebug = false;
 
@@ -50,7 +52,6 @@
                 faceColorRefresh();
                 colourDisc.refreshColorOptional(frog.getColorSchemes());
                 colourDisc.init();
-
                 if(isDebug){
                     debug();
                 }
@@ -173,7 +174,16 @@
                 translatePage();
             }
             document.getElementById("debugBtn").onclick = () => {
-                frog.debug();
+                console.log(twoPhase.getCornerPermtationCoordinate([
+                    {c: 4, o: 2},
+                    {c: 1, o: 0},
+                    {c: 2, o: 0},
+                    {c: 0, o: 1},
+                    {c: 7, o: 1},
+                    {c: 5, o: 0},
+                    {c: 6, o: 0},
+                    {c: 3, o: 2}
+                ]));
             }
 
             function overCubeColorEdit(){

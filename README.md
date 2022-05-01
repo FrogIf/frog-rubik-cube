@@ -33,3 +33,6 @@ address : [rubik-cube](https://frogif.github.io/rubik-cube/)
 * https://github.com/liuxinyu95/unplugged
 * https://github.com/newbieYoung/Threejs_rubik
 * https://github.com/joews/rubik-js
+* https://github.com/thewca/tnoodle-lib
+* http://kociemba.org/cube.htm
+* https://github.com/hkociemba/CubeExplorer

@@ -1315,6 +1315,10 @@ const rubikCube = {
 
 export function debug(){
     // nothing
+    return {
+        position: rubikCube.cubeIndexMap,
+        direction: rubikCube.colorMap
+    };
 }
 
 export function scramble(){
