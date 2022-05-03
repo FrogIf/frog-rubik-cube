@@ -36,3 +36,4 @@ address : [rubik-cube](https://frogif.github.io/rubik-cube/)
 * https://github.com/thewca/tnoodle-lib
 * http://kociemba.org/cube.htm
 * https://github.com/hkociemba/CubeExplorer
+* https://zhuanlan.zhihu.com/p/386717204
