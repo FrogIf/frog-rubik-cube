@@ -13,7 +13,7 @@
             import * as trans from './js/translater.js';
             import * as twoPhase from './js/twophase.js';
 
-            const isDebug = false;
+            const isDebug = true;
 
             var lang = window.navigator.language.slice(0, 2);
             function translatePage(){
@@ -32,12 +32,12 @@
             const faceArr = ["U", "L", "F", "R", "B", "D"];
             function faceColorRefresh(){
                 let cubes = document.getElementsByClassName("cube");
-                    for(let i = 0; i < cubes.length; i++){
-                        let c = cubes[i];
-                        let face = faceArr[Math.floor(i / 9)];
-                        let color = frog.getFaceColor(face, i % 9 + 1);
-                        c.style.backgroundColor = color;
-                    }
+                for(let i = 0; i < cubes.length; i++){
+                    let c = cubes[i];
+                    let face = faceArr[Math.floor(i / 9)];
+                    let color = frog.getFaceColor(face, i % 9 + 1);
+                    c.style.backgroundColor = color;
+                }
             }
 
             function debug(){
@@ -173,17 +173,26 @@
             document.getElementById("translateBtn").onclick = () => {
                 translatePage();
             }
+
+            const FACES = ["U", "R", "F", "D", "L", "B"];
             document.getElementById("debugBtn").onclick = () => {
-                console.log(twoPhase.getCornerPermtationCoordinate([
-                    {c: 4, o: 2},
-                    {c: 1, o: 0},
-                    {c: 2, o: 0},
-                    {c: 0, o: 1},
-                    {c: 7, o: 1},
-                    {c: 5, o: 0},
-                    {c: 6, o: 0},
-                    {c: 3, o: 2}
-                ]));
+                frog.debug();
+                let colorMap = new Map();
+                colorMap.set(frog.getFaceColor("U", 5), 0);
+                colorMap.set(frog.getFaceColor("R", 5), 1);
+                colorMap.set(frog.getFaceColor("F", 5), 2);
+                colorMap.set(frog.getFaceColor("D", 5), 3);
+                colorMap.set(frog.getFaceColor("L", 5), 4);
+                colorMap.set(frog.getFaceColor("B", 5), 5);
+
+                let cubeStatus = [];
+                for(let i = 0; i < 6; i++){
+                    let face = FACES[i];
+                    for(let i = 0; i < 9; i++){
+                        cubeStatus.push(colorMap.get(frog.getFaceColor(face, i + 1)));
+                    }
+                }
+                twoPhase.debug(cubeStatus);
             }
 
             function overCubeColorEdit(){
