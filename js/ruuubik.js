@@ -87,15 +87,15 @@ const ThreeJsContainer = {
         rubikCube.init(this);
         this.scene.add(rubikCube.cubes);
 
-        if (isDebug === true) {
-            let helper = new THREE.AxesHelper(20);
-            helper.setColors(
-                0xFF0000, // x r
-                0x00FF00, // y g
-                0x0000FF // z b
-            );
-            this.scene.add(helper);
-        }
+        // if (isDebug === true) {
+        //     let helper = new THREE.AxesHelper(20);
+        //     helper.setColors(
+        //         0xFF0000, // x r
+        //         0x00FF00, // y g
+        //         0x0000FF // z b
+        //     );
+        //     this.scene.add(helper);
+        // }
 
         // 设置灯光
         const light = new THREE.AmbientLight(0xFEFEFE);
