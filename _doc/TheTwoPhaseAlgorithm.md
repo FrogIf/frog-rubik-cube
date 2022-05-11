@@ -911,8 +911,6 @@ Huge Optimal Solver|UDSliceSorted(等价类个数:788)|棱块翻转坐标(filp)(
 
 阶段一剪枝表的索引计算公式是:```2187*y + x'```, 阶段二剪枝表的索引计算公式是:```2768*x'+y```(为什么我没有使用```40320*y + x'```?), HugeSolver阶段剪枝表索引计算公式是:```(2048*y+x1')*2187+x2```.
 
-> 译注: 关于"为什么我没有使用```40320*y + x'```", 难道是因为```2768*40320+2768=111608528 < 40320*2768+40320=111646080```?
-
 原始索引的转换参见源码[CordCube.pas](https://github.com/hkociemba/CubeExplorer/blob/master/CordCube.pas):
 
 * TwistConjugate: array[0..2187-1,0..15] of Word;
