@@ -78,12 +78,15 @@ function cornerMultiply(a, b, result){
         result[i].c = a[b[i].c].c;
         oriA = a[b[i].c].o;
         oriB = b[i].o;
-        if(oriA < 3 && oriB < 3){
+        if(oriA == 6 || oriB == 6){ // 非法朝向
+            ori = 6;
+            console.log("illegal ori");
+        }else if(oriA < 3 && oriB < 3){
             ori = (oriA + oriB) % 3;
-        }else if(oriA >= 3 && oriB < 3){    // 考虑到镜像对称的情况
+        }else if(oriA < 3 && oriB >= 3){
             ori = oriA + oriB;
             if(ori >= 6){ ori = ori - 3; }
-        }else if(oriA < 3 && oriB >= 3){
+        }else if(oriA >= 3 && oriB < 3){    // 考虑到镜像对称的情况
             ori = oriA - oriB;
             if(ori < 3){ ori = ori + 3; }
         }else{
