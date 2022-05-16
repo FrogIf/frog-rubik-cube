@@ -4,7 +4,10 @@ const zh = {
     "home": "归位",
     "run": "运行",
     "color.edit.tip":"按'ctrl'多选",
-    "scramble":"打乱"
+    "scramble":"打乱",
+    "solve": "还原",
+    "two-phase": "两阶段算法",
+    "not-exec": "不执行"
 };
 
 const en = {
@@ -13,13 +16,21 @@ const en = {
     "home": "home",
     "run": "run",
     "color.edit.tip":"press 'ctrl' to multi-select",
-    "scramble": "scramble"
+    "scramble": "scramble",
+    "solve": "solve",
+    "two-phase": "Two-Phase Algorithm",
+    "not-exec":"not execute"
 };
 
 export function translate(key, lang){
+    let t;
     if(lang == 'zh'){
-        return zh[key];
+        t = zh[key];
     }else{
-        return en[key];
+        t = en[key];
     }
+    if(!t){
+        t = key;
+    }
+    return t;
 }

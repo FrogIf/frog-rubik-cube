@@ -81,16 +81,16 @@
                 }
             }
 
-            function executeActionLine(inputDom){
+            function executeActionLine(commandStr, successCallback){
                 let success = true;
-                let actions = lexer.parse(inputDom.value, (msg) => {
+                let actions = lexer.parse(commandStr, (msg) => {
                     OutputConsole.println();
                     OutputConsole.println(msg);
                     success = false;
                 });
                 doAction(actions);
-                if(success){
-                    inputDom.value = "";
+                if(success && successCallback){
+                    successCallback();
                 }
             }
 
@@ -129,7 +129,9 @@
                 if(e.target != document.getElementById("commandInput")){
                     frog.doAction(e.key);
                 }else if(e.key == 'Enter'){
-                    executeActionLine(e.target);
+                    executeActionLine(e.target.value, () => {
+                        e.target.value = "";
+                    });
                 }
             }
 
@@ -146,7 +148,9 @@
             }
 
             document.getElementById("runBtn").onclick = () => {
-                executeActionLine(document.getElementById("commandInput"));
+                executeActionLine(document.getElementById("commandInput").value, () => {
+                    document.getElementById("commandInput").value = "";
+                });
             }
 
             function panelDisplayToggle(panel){
@@ -177,22 +181,6 @@
             const FACES = ["U", "R", "F", "D", "L", "B"];
             document.getElementById("debugBtn").onclick = () => {
                 frog.debug();
-                let colorMap = new Map();
-                colorMap.set(frog.getFaceColor("U", 5), 0);
-                colorMap.set(frog.getFaceColor("R", 5), 1);
-                colorMap.set(frog.getFaceColor("F", 5), 2);
-                colorMap.set(frog.getFaceColor("D", 5), 3);
-                colorMap.set(frog.getFaceColor("L", 5), 4);
-                colorMap.set(frog.getFaceColor("B", 5), 5);
-
-                let cubeStatus = [];
-                for(let i = 0; i < 6; i++){
-                    let face = FACES[i];
-                    for(let i = 0; i < 9; i++){
-                        cubeStatus.push(colorMap.get(frog.getFaceColor(face, i + 1)));
-                    }
-                }
-                twoPhase.debug(cubeStatus);
             }
 
             function overCubeColorEdit(){
@@ -334,6 +322,51 @@
                 OutputConsole.println();
                 doAction(frog.scramble());
             }
+
+            document.getElementById("solveBtn").onclick = () => {
+                let colorMap = new Map();
+                colorMap.set(frog.getFaceColor("U", 5), 0);
+                colorMap.set(frog.getFaceColor("R", 5), 1);
+                colorMap.set(frog.getFaceColor("F", 5), 2);
+                colorMap.set(frog.getFaceColor("D", 5), 3);
+                colorMap.set(frog.getFaceColor("L", 5), 4);
+                colorMap.set(frog.getFaceColor("B", 5), 5);
+
+                let cubeStatus = [];
+                for(let i = 0; i < 6; i++){
+                    let face = FACES[i];
+                    for(let i = 0; i < 9; i++){
+                        cubeStatus.push(colorMap.get(frog.getFaceColor(face, i + 1)));
+                    }
+                }
+
+                let alg = document.getElementById("solveAlg").value;
+                let notexec = document.getElementById("execSolution").checked;
+                let path = null;
+                if(alg == 1){   // 使用两阶段算法还原
+                    path = twoPhase.solve(cubeStatus);
+                    if(path && path.length > 0){
+                        let commandStr = '';
+                        for(let p of path){
+                            commandStr += p + ' ';
+                        }
+                        if(!notexec){
+                            executeActionLine(commandStr, () => {
+                                OutputConsole.println();
+                                OutputConsole.println("finish");
+                            });
+                        }else{
+                            OutputConsole.println();
+                            OutputConsole.println("solution : " + commandStr);
+                        }
+                    }else{
+                        OutputConsole.println();
+                        OutputConsole.println("no move");
+                    }
+                }else{
+                    alert("开发中...");
+                }
+            }
         </script>
 	</head>
 	<body>
@@ -436,11 +469,24 @@
             <span></span>
         </div>
         <div id="rightControlPanel" class="right-control-panel">
-            <button class="trans-lang" data-lang-key="rebase" id="rebaseBtn">rebase</button>
-            <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
-            <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
-            <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
-            <button class="debug-clz" id="debugBtn">debug</button>
+            <div style="margin-bottom: 10px;">
+                <button class="trans-lang" data-lang-key="rebase" id="rebaseBtn">rebase</button>
+                <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
+                <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
+                <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
+                <button class="debug-clz" id="debugBtn">debug</button>
+            </div>
+
+            <div style="border: 1px solid gray; border-radius: 5px; padding: 5px;">
+                <select id="solveAlg" style="border: 1px solid gray; border-radius: 3px;background-color:darkgray;">
+                    <option value="1" class="trans-lang" data-lang-key="two-phase">Two-Phase Algorithm</option>
+                    <option value="2">CFOP</option>
+                </select>
+                <div>
+                    <button class="trans-lang" data-lang-key="solve" id="solveBtn">solve</button>
+                    <input id="execSolution" type="checkbox" /><span class="trans-lang" data-lang-key="not-exec">not execute<span>
+                </div>
+            </div>
             <span class="trans-button">
                 <a href="javascript:;" id="translateBtn">中/EN</a>
             </span>

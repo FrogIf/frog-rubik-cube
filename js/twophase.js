@@ -77,6 +77,17 @@ class CubieCube{
         this.edges = [{e:UR,o:0},{e:UF,o:0},{e:UL,o:0},{e:UB,o:0},{e:DR,o:0},{e:DF,o:0},{e:DL,o:0},{e:DB,o:0},{e:FR,o:0},{e:FL,o:0},{e:BL,o:0},{e:BR,o:0}];
     }
 
+    copy(that){
+        for(let i = 0; i < 12; i++){
+            this.edges[i].o = that.edges[i].o;
+            this.edges[i].e = that.edges[i].e;
+        }
+        for(let i = 0; i < 8; i++){
+            this.corners[i].o = that.corners[i].o;
+            this.corners[i].e = that.corners[i].e;
+        }
+    }
+
     symMult(sym){
         this.cornerMult(sym.corner);
         this.edgeMult(sym.edge);
@@ -108,46 +119,19 @@ class CubieCube{
     }
 
     setEdgesByEdgeOrientationCoordinate(coordinate){
-        let edgeOriSum = 0;
-        let o = 0;
-        for(let i = 10; i >= 0; i--){
-            o = coordinate & 1;
-            this.edges[i].o = o;
-            edgeOriSum = edgeOriSum + o;
-            coordinate = coordinate >> 1;
-        }
-        // 所有角块朝向之和一定能被2整除
-        this.edges[BR].o = edgeOriSum & 1;
+        EdgeOrientationRawCoordinate._invEdgeOrientationCoordinate(this.edges, coordinate);
     }
 
     getEdgeOrientationCoordinate(){
-        let result = 0;
-        for(let i = 0; i < 11; i++){    // 最后一个不用计算, 前面11个确定之后, 最后一个也就确定了 
-            result = 2 * result + this.edges[i].o;
-        }
-        return result;
+        return EdgeOrientationRawCoordinate._edgeOrientationCoordinate(this.edges);
     }
 
     setCornersByCornerOrientationCoordinate(coordinate){
-        let cornerOriSum = 0;
-        let o = 0;
-        for(let i = 6; i >= 0; i--){
-            o = coordinate % 3;
-            this.corners[i].o = o;
-            cornerOriSum = cornerOriSum + o;
-            coordinate = Math.floor(coordinate / 3);
-        }
-        // 所有角块朝向之和一定能被3整除
-        cornerOriSum = cornerOriSum % 3;
-        this.corners[DRB].o = cornerOriSum ? (3 - cornerOriSum) : 0;
+        CornerOrientationRawCoordinate._invCornerOrientationCoordinate(this.corners, coordinate);
     }
 
     getCornerOrientationCoordinate(){
-        let result = 0;
-        for(let i = 0; i < 7; i++){ // 最后一个不用计算, 前7个确定之后, 最后一个也就确定了
-            result = 3 * result + this.corners[i].o;
-        }
-        return result;
+        return CornerOrientationRawCoordinate._cornerOrientationCoordinate(this.corners);
     }
 
     getCornerPermtationCoordinate(){
@@ -238,8 +222,6 @@ const Symmetries = {
     edgeSymmetries: [],
     cornerSymmetries: [],
     invIdx: [], // 对称 -- 逆对称
-    symMove: [],
-    symMult: [],
     cubieLevel:{
         S_URF3: {
             edge: [{e:UF,o:1},{e:FR,o:0},{e:DF,o:1},{e:FL,o:0},{e:UB,o:1},{e:BR,o:0},{e:DB,o:1},{e:BL,o:0},{e:UR,o:1},{e:DR,o:1},{e:DL,o:1},{e:UL,o:1}],
@@ -261,8 +243,6 @@ const Symmetries = {
     init: function(){
         this.initSymGroup();
         this.initInvTable();
-        this.initSymMove();
-        this.initSymMult();
     },
     initSymGroup: function(){
         let cube = new CubieCube();
@@ -312,105 +292,122 @@ const Symmetries = {
                 }
             }
         }
-    },
-    initSymMove: function(){ // 生成基本移动的共轭移动
-        let startCubie = new CubieCube();
-        let resultCubie = new CubieCube();
-        let midProd = [{},{},{},{},{},{},{},{}];
-        this.symMove = new Array(48).fill(null);
-        for(let m = U; m <= B; m++){
-            for(let r = 0; r < 3; r++){
-                startCubie.cornerMult(CornerCubieMove[m]);
-                for(let s = 0; s < 48; s++){
-                    cornerMultiply(this.cornerSymmetries[s], startCubie.corners, midProd);
-                    cornerMultiply(midProd, this.cornerSymmetries[this.invIdx[s]], resultCubie.corners);
-                    for(let m2 = U; m2 <= B; m2++){
-                        for(let r2 = 0; r2 < 3; r2++){
-                            resultCubie.cornerMult(CornerCubieMove[m2]);
-                            if(resultCubie.isCornerClean()){
-                                if(this.symMove[s] == null){
-                                    this.symMove[s] = new Array(18).fill(0);
-                                }
-                                this.symMove[s][3 * m + r] = 3 * m2 + (2 - r2);
-                            }
-                        }
-                        resultCubie.cornerMult(CornerCubieMove[m2]);
-                    }
-                }
-            }
-            startCubie.cornerMult(CornerCubieMove[m]);
-        }
-    },
-    initSymMult: function(){
-        let prod = [{},{},{},{},{},{},{},{}];
-        for(let i = 0; i < 48; i++){
-            let multArr = [];
-            this.symMult.push(multArr);
-            for(let j = 0; j < 48; j++){
-                cornerMultiply(this.cornerSymmetries[i], this.cornerSymmetries[j], prod);
-                for(let k = 0; k < 48; k++){
-                    let sym = this.cornerSymmetries[k];
-                    if(sym[URF].c == prod[URF].c && sym[UFL].c == prod[UFL].c && sym[ULB].c == prod[ULB].c){
-                        multArr.push(k);
-                        break;
-                    }
-                }
-            }
-        }
-    },
-    getConjugateMove: function(symIndex, move){
-        return this.symMove[symIndex][move];
-    },
-    symMultiply: function(symIdx1, symIdx2){
-        return this.symMult[symIdx1][symIdx2];
     }
 };
 
-const getClassIndexByRawCoordinate = (rawCoordinate, classIndexToRepresentantArray) => {  // 二分查找
-    if(rawCoordinate <= classIndexToRepresentantArray[classIndexToRepresentantArray.length - 1]){
-        let l = 0, r = classIndexToRepresentantArray.length - 1, mid = -1;
-        while(l <= r){
-            mid = (l + r) >> 1;
-            let c = classIndexToRepresentantArray[mid];
-            if(c > rawCoordinate){
-                r = mid - 1;
-            }else if(c < rawCoordinate){
-                l = mid + 1;
+
+const CornerOrientationRawCoordinate = {    // 角块朝向原始坐标
+    count: 2187, // 3^7
+    moveTable: null,
+    init: function(){
+        this.initMoveTable();
+    },
+    initMoveTable: function(){
+        this.moveTable = [];
+        let cubie = new CubieCube();
+        for(let coordinate = 0; coordinate < this.count; coordinate++){
+            cubie.setCornersByCornerOrientationCoordinate(coordinate);
+
+            let offset = 0;
+            let moveEntries;
+            if((coordinate & 1) == 1){
+                offset = 12;
+                moveEntries = this.moveTable[coordinate >> 1];
             }else{
-                return mid;
+                moveEntries = new Array(18).fill(0);
+                this.moveTable.push(moveEntries);
+            }
+            let j = 0;
+            for(let m = U; m <= B; m++){
+                for(let i = 0; i < 3; i++){
+                    cubie.cornerMult(CornerCubieMove[m]);
+                    moveEntries[j] = moveEntries[j] | (cubie.getCornerOrientationCoordinate() << offset);
+                    j++;
+                }
+                cubie.cornerMult(CornerCubieMove[m]);
             }
         }
+    },
+    applyRawMove: function(coordinate, move, moveI){
+        let moveEntries = this.moveTable[coordinate >> 1];
+        return (moveEntries[move * 3 + moveI] >> ((coordinate & 1) ? 12 : 0)) & 0xFFF;
+    },
+    _invCornerOrientationCoordinate: function(corners, coordinate){
+        let cornerOriSum = 0;
+        let o = 0;
+        for(let i = 6; i >= 0; i--){
+            o = coordinate % 3;
+            corners[i].o = o;
+            cornerOriSum = cornerOriSum + o;
+            coordinate = Math.floor(coordinate / 3);
+        }
+        // 所有角块朝向之和一定能被3整除
+        cornerOriSum = cornerOriSum % 3;
+        corners[DRB].o = cornerOriSum ? (3 - cornerOriSum) : 0;
+    },
+    _cornerOrientationCoordinate: function(corners){
+        let result = 0;
+        for(let i = 0; i < 7; i++){ // 最后一个不用计算, 前7个确定之后, 最后一个也就确定了
+            result = 3 * result + corners[i].o;
+        }
+        return result;
     }
-    return -1;
-}
+};
 
-// 角块朝向坐标(对称坐标)
-const CornerOrientationSymCoordinate = {
+const CornerOrientationSymCoordinate = {    // 角块朝向对称坐标
     moveTable: null,
     classIndexToRepresentantArray: null,
+    rawToSymIdxTable: null, // 原始坐标到对称i映射表
+    symmetryTable: null,
     init: function(){
+        this.initSymmetryTable();
         this.initClassIndexToRepresentantArray();
         this.initMoveTable();
     },
+    initSymmetryTable: function(){
+        this.symmetryTable = new Array(CornerOrientationRawCoordinate.count >> 1).fill(null);
+        let corners = [{c:URF,o:0},{c:UFL,o:0},{c:ULB,o:0},{c:UBR,o:0},{c:DFR,o:0},{c:DLF,o:0},{c:DBL,o:0},{c:DRB,o:0}];
+        let midProd = [{},{},{},{},{},{},{},{}];
+        let prod = [{},{},{},{},{},{},{},{}];
+        for(let coordinate = 0; coordinate < CornerOrientationRawCoordinate.count; coordinate++){
+            CornerOrientationRawCoordinate._invCornerOrientationCoordinate(corners, coordinate);
+            let symEntries;
+            let offset = 0;
+            if((coordinate & 1) == 1){
+                offset = 12;
+                symEntries = this.symmetryTable[coordinate >> 1];
+            }else{
+                symEntries = new Array(16).fill(0);
+                this.symmetryTable[coordinate >> 1] = symEntries;
+            }
+            symEntries[0] = symEntries[0] | (coordinate << offset);
+            for(let s = 1; s < 16; s++){
+                cornerMultiply(Symmetries.cornerSymmetries[Symmetries.invIdx[s]], corners, midProd);
+                cornerMultiply(midProd, Symmetries.cornerSymmetries[s], prod);
+                symEntries[s] = symEntries[s] | (CornerOrientationRawCoordinate._cornerOrientationCoordinate(prod) << offset);
+            }
+        }
+    },
     initClassIndexToRepresentantArray: function(){
-        let len = (2187 >> 5) + 1; // 3^7 / 32
+        let len = (CornerOrientationRawCoordinate.count >> 5) + 1; // 3^7 / 32
         let used = new Array(len).fill(0);
         this.classIndexToRepresentantArray = [];
-        let startCubie = new CubieCube();
-        let resultCubie = new CubieCube();
-        let midProd = [{},{},{},{},{},{},{},{}];
+        this.rawToSymIdxTable = new Array(len >> 2).fill(0);
         for(let c = 0; c < len; c++){
             for(let i = 0; i < 32; i++){
                 if((used[c] & (1 << i)) == 0){ // 说明这个原始坐标在之前的等价类中没有出现过
                     let rawCoordinate = c << 5 | i; // c * 32 + i
-                    if(rawCoordinate >= 2187){ return; }
+                    let representant = rawCoordinate;
+                    if(rawCoordinate >= CornerOrientationRawCoordinate.count){ return; }
                     this.classIndexToRepresentantArray.push(rawCoordinate);
-                    startCubie.setCornersByCornerOrientationCoordinate(rawCoordinate);
                     for(let s = 0; s < 16; s++){  // 计算该等价类中的所有元素, 并将其位置标记为占用
-                        cornerMultiply(Symmetries.cornerSymmetries[Symmetries.invIdx[s]], startCubie.corners, midProd);
-                        cornerMultiply(midProd, Symmetries.cornerSymmetries[s], resultCubie.corners);
-                        rawCoordinate = resultCubie.getCornerOrientationCoordinate();
-                        used[rawCoordinate >> 5] = used[rawCoordinate >> 5] | (1 << (rawCoordinate & 31));
+                        rawCoordinate = this.rawToRawBySymmetry(representant, s);
+                        let u = used[rawCoordinate >> 5];
+                        if((u & (1 << (rawCoordinate & 31))) == 0){
+                            used[rawCoordinate >> 5] = u | (1 << (rawCoordinate & 31));
+                            // this.rawToSymIdxTable[rawCoordinate / 8] = this.rawToSymIdxTable[rawCoordinate / 8] | (s << ((rawCoordinate % 8) * 4))
+                            this.rawToSymIdxTable[rawCoordinate >> 3] = this.rawToSymIdxTable[rawCoordinate >> 3] | (s << ((rawCoordinate & 7) << 2));
+                        }
                     }
                 }
             }
@@ -418,11 +415,8 @@ const CornerOrientationSymCoordinate = {
     },
     initMoveTable: function(){
         this.moveTable = [];
-        let cubie = new CubieCube();
         for(let classIdx = 0; classIdx < this.classIndexToRepresentantArray.length; classIdx++){
             let rawCoordinate = this.classIndexToRepresentantArray[classIdx];
-            cubie.setCornersByCornerOrientationCoordinate(rawCoordinate);
-
             let odd = classIdx & 1;
             let offset = 0;
             let moveEntries;
@@ -436,42 +430,23 @@ const CornerOrientationSymCoordinate = {
             let j = 0;
             for(let move = U; move <= B; move++){
                 for(let r = 0; r < 3; r++){
-                    cubie.cornerMult(CornerCubieMove[move]);
-                    moveEntries[j] = moveEntries[j] | (this.getSymCoordinate(cubie) << offset);
+                    let coord = CornerOrientationRawCoordinate.applyRawMove(rawCoordinate, move, r);
+                    moveEntries[j] = moveEntries[j] | (this.getSymCoordinateByRawCoordinate(coord) << offset);
                     j++;
                 }
-                cubie.cornerMult(CornerCubieMove[move]);
             }
         }
     },
-    queryFromSymMoveTable: function(classIdx, move, moveI){
+    rawToRawBySymmetry: function(rawCoordinate, symIdx){ // 求一个原始坐标经过对称后的原始坐
+        let symEntries = this.symmetryTable[rawCoordinate >> 1];
+        return (symEntries[symIdx] >> ((rawCoordinate & 1) ? 12 : 0)) & 0xFFF;
+    },
+    applySymMove: function(classIdx, move, moveI){
         let moveEntries = this.moveTable[classIdx >> 1];
         return (moveEntries[move * 3 + moveI] >> ((classIdx & 1) ? 16 : 0)) & 0xFFFF;
     },
-    applySymMove: function(symCoordinate, move, moveI){
-        let j = symCoordinate >> 4;
-        let i = symCoordinate & 15;
-        let conjMove = Symmetries.getConjugateMove(i, move * 3 + moveI);
-        let moveEntries = this.moveTable[j >> 1];
-        let conjCoord = (moveEntries[conjMove] >> ((j & 1) ? 16 : 0)) & 0xFFFF;
-        let pair = this.getSymCoordinatePair(conjCoord);
-        let i2 = Symmetries.symMultiply(pair.sym, i);
-        return pair.clzIdx << 4 | i2;
-    },
     getSymCoordinate: function(cubie){  // 根据原始坐标, 得到对称坐标
-        let midProd = [{},{},{},{},{},{},{},{}];
-        let resultCubie = new CubieCube();
-        for(let i = 0; i < 16; i++){
-            cornerMultiply(Symmetries.cornerSymmetries[i], cubie.corners, midProd);
-            cornerMultiply(midProd, Symmetries.cornerSymmetries[Symmetries.invIdx[i]], resultCubie.corners);
-            let rawCoordinate = resultCubie.getCornerOrientationCoordinate();
-            let clzIndex = getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray);
-            if(clzIndex != -1){
-                return clzIndex << 4 | i;
-            }
-        }
-        console.error("no sym coordinate find");
-        return -1;
+        return this.getSymCoordinateByRawCoordinate(cubie.getCornerOrientationCoordinate());
     },
     getSymCoordinatePair: function(symCoordinate){
         return {
@@ -483,30 +458,96 @@ const CornerOrientationSymCoordinate = {
         return this.classIndexToRepresentantArray[classIdx];
     },
     isRepresentantCoordinate: function(rawCoordinate){
-        return getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray) != -1;
+        return binarySearch(rawCoordinate, this.classIndexToRepresentantArray) != -1;
     },
     getEquivalenceClassCount: function(){
         return this.classIndexToRepresentantArray.length;
     },
     getClassIdxByRawCoordinate: function(rawCoordinate){
-        return getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray);
+        return this.getSymCoordinateByRawCoordinate(rawCoordinate) >> 4;
+    },
+    getSymCoordinateByRawCoordinate: function(rawCoordinate){
+        let symIdx = ((this.rawToSymIdxTable[rawCoordinate >> 3]) >> ((rawCoordinate & 7) << 2)) & 0xF;
+        if(symIdx > 0){
+            rawCoordinate = this.rawToRawBySymmetry(rawCoordinate, Symmetries.invIdx[symIdx]);
+        }
+        let clzIdx = binarySearch(rawCoordinate, this.classIndexToRepresentantArray);
+        if(clzIdx == -1){
+            console.warn("not find", rawCoordinate);
+        }
+        return clzIdx << 4 | symIdx;
     }
 };
 
-// 棱块朝向坐标(原始坐标)
-const EdgeOrientationCoordinate = {
-    count: 2048, // 坐标数量: 2048 = 2 ^ 11
+const EdgeOrientationRawCoordinate = {  // 棱块朝向原始坐标
+    count: 2048, // 2^11
     moveTable: null,
-    conjugateTable: null,
     init: function(){
         this.initMoveTable();
-        this.initConjugateTable();
     },
     initMoveTable: function(){
         this.moveTable = [];
         let cubie = new CubieCube();
         for(let coordinate = 0; coordinate < this.count; coordinate++){
             cubie.setEdgesByEdgeOrientationCoordinate(coordinate);
+
+            let offset = 0;
+            let moveEntries;
+            if((coordinate & 1) == 1){
+                offset = 11;
+                moveEntries = this.moveTable[coordinate >> 1];
+            }else{
+                moveEntries = new Array(18).fill(0);
+                this.moveTable.push(moveEntries);
+            }
+            let j = 0;
+            for(let m = U; m <= B; m++){
+                for(let i = 0; i < 3; i++){
+                    cubie.edgeMult(EdgeCubieMove[m]);
+                    moveEntries[j] = moveEntries[j] | (cubie.getEdgeOrientationCoordinate() << offset);
+                    j++;
+                }
+                cubie.edgeMult(EdgeCubieMove[m]);
+            }
+        }
+    },
+    applyRawMove: function(coordinate, move, moveI){
+        let moveEntries = this.moveTable[coordinate >> 1];
+        return (moveEntries[move * 3 + moveI] >> ((coordinate & 1) ? 11 : 0)) & 0x7FF;
+    },
+    _invEdgeOrientationCoordinate: function(edges, coordinate){
+        let edgeOriSum = 0;
+        let o = 0;
+        for(let i = 10; i >= 0; i--){
+            o = coordinate & 1;
+            edges[i].o = o;
+            edgeOriSum = edgeOriSum + o;
+            coordinate = coordinate >> 1;
+        }
+        // 所有角块朝向之和一定能被2整除
+        edges[BR].o = edgeOriSum & 1;
+    },
+    _edgeOrientationCoordinate: function(edges){
+        let result = 0;
+        for(let i = 0; i < 11; i++){    // 最后一个不用计算, 前面11个确定之后, 最后一个也就确定了 
+            result = 2 * result + edges[i].o;
+        }
+        return result;
+    }
+
+};
+
+const UDSliceRawCoordinate = { // ud-slice原始坐标
+    count: 495, // 12 * 11 * 10 * 9 / 4!
+    moveTable: null,
+    init: function(){
+        this.initMoveTable();
+    },
+    initMoveTable: function(){
+        this.moveTable = [];
+        let cubie = new CubieCube();
+        for(let coordinate = 0; coordinate < this.count; coordinate++){
+            this.invUDSliceCoordinate(cubie, coordinate);
             let odd = coordinate & 1;
             let offset = 0;
             let moveEntries;
@@ -521,235 +562,6 @@ const EdgeOrientationCoordinate = {
             for(let move = U; move <= B; move++){
                 for(let r = 0; r < 3; r++){
                     cubie.edgeMult(EdgeCubieMove[move]);
-                    moveEntries[j] = moveEntries[j] | (cubie.getEdgeOrientationCoordinate() << offset);
-                    j++;
-                }
-                cubie.edgeMult(EdgeCubieMove[move]);
-            }
-        }
-    },
-    applyMove: function(coordinate, move, moveI){
-        let moveEntries = this.moveTable[coordinate >> 1];
-        return (moveEntries[move * 3 + moveI] >> ((coordinate & 1) ? 12 : 0)) & 0xFFF;
-    },
-    initConjugateTable: function(){
-        this.conjugateTable = [];
-        let cubieStart = new CubieCube();
-        let cubieProd = new CubieCube();
-        let midProd = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        for(let coordinate = 0; coordinate < this.count; coordinate++){
-            cubieStart.setEdgesByEdgeOrientationCoordinate(coordinate);
-
-            let odd = coordinate & 1;
-            let offset = 0;
-            let symEntries;
-            if(odd){
-                offset = 12;
-                symEntries = this.conjugateTable[coordinate >> 1];
-            }else{
-                symEntries = new Array(16).fill(0);
-                this.conjugateTable.push(symEntries);
-            }
-            for(let s = 0; s < 16; s++){
-                edgeMultiply(Symmetries.edgeSymmetries[s], cubieStart.edges, midProd);
-                edgeMultiply(midProd, Symmetries.edgeSymmetries[Symmetries.invIdx[s]], cubieProd.edges);
-                symEntries[s] = symEntries[s] | (cubieProd.getEdgeOrientationCoordinate() << offset);
-            }
-        }
-    },
-    exceuteConjugate: function(coordinate, udSliceRawCoordinate, symIndex){
-        let cubieStart = new CubieCube();
-        let cubieProd = new CubieCube();
-        let midProd = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        cubieStart.setEdgesByEdgeOrientationCoordinate(coordinate);
-        UDSliceCoordinate.invUDSliceCoordinate(cubieStart, udSliceRawCoordinate);
-        edgeMultiply(Symmetries.edgeSymmetries[symIndex], cubieStart.edges, midProd);
-        edgeMultiply(midProd, Symmetries.edgeSymmetries[Symmetries.invIdx[symIndex]], cubieProd.edges);
-        return cubieProd.getEdgeOrientationCoordinate();
-    }
-};
-
-// 棱块朝向对称坐标
-const EdgeOrientationSymCoordinate = {
-    moveTable: null,
-    classIndexToRepresentantArray: null,
-    init: function(){
-        this.initClassIndexToRepresentantArray();
-        this.initMoveTable();
-    },
-    initClassIndexToRepresentantArray: function(){
-        let len = 2048 >> 5; // 2 ^ 11 / 32
-        let used = new Array(len).fill(0);
-        this.classIndexToRepresentantArray = [];
-        let startCubie = new CubieCube();
-        let resultCubie = new CubieCube();
-        let midProd = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        for(let c = 0; c < len; c++){
-            for(let i = 0; i < 32; i++){
-                if((used[c] & (1 << i)) == 0){ // 说明这个原始坐标在之前的等价类中没有出现过
-                    let rawCoordinate = c << 5 | i; // c * 32 + i
-                    this.classIndexToRepresentantArray.push(rawCoordinate);
-                    startCubie.setEdgesByEdgeOrientationCoordinate(rawCoordinate);
-                    for(let s = 0; s < 16; s++){  // 计算该等价类中的所有元素, 并将其位置标记为占用
-                        edgeMultiply(Symmetries.edgeSymmetries[Symmetries.invIdx[s]], startCubie.edges, midProd);
-                        edgeMultiply(midProd, Symmetries.edgeSymmetries[s], resultCubie.edges);
-                        rawCoordinate = resultCubie.getEdgeOrientationCoordinate();
-                        used[rawCoordinate >> 5] = used[rawCoordinate >> 5] | (1 << (rawCoordinate & 31));
-                    }
-                }
-            }
-        }
-    },
-    initMoveTable: function(){
-        this.moveTable = [];
-        let cubie = new CubieCube();
-        for(let classIdx = 0; classIdx < this.classIndexToRepresentantArray.length; classIdx++){
-            let rawCoordinate = this.classIndexToRepresentantArray[classIdx];
-            cubie.setEdgesByEdgeOrientationCoordinate(rawCoordinate);
-
-            let odd = classIdx & 1;
-            let offset = 0;
-            let moveEntries;
-            if(odd){
-                offset = 12;
-                moveEntries = this.moveTable[classIdx >> 1];
-            }else{
-                moveEntries = new Array(18).fill(0);
-                this.moveTable.push(moveEntries);
-            }
-            let j = 0;
-            for(let move = U; move <= B; move++){
-                for(let r = 0; r < 3; r++){
-                    cubie.edgeMult(EdgeCubieMove[move]);
-                    moveEntries[j] = moveEntries[j] | (this.getSymCoordinate(cubie) << offset);
-                    j++;
-                }
-                cubie.edgeMult(EdgeCubieMove[move]);
-            }
-        }
-    },
-    queryFromSymMoveTable: function(classIdx, move, moveI){
-        let moveEntries = this.moveTable[classIdx >> 1];
-        return (moveEntries[move * 3 + moveI] >> ((classIdx & 1) ? 12 : 0)) & 0xFFF;
-    },
-    getSymCoordinate: function(cubie){  // 根据原始坐标, 得到对称坐标
-        let originCubie = new CubieCube();
-        originCubie.setEdgesByEdgeOrientationCoordinate(cubie.getEdgeOrientationCoordinate());
-        let midProd = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        let resultCubie = new CubieCube();
-        for(let i = 0; i < 16; i++){
-            edgeMultiply(Symmetries.edgeSymmetries[i], originCubie.edges, midProd);
-            edgeMultiply(midProd, Symmetries.edgeSymmetries[Symmetries.invIdx[i]], resultCubie.edges);
-            let rawCoordinate = resultCubie.getEdgeOrientationCoordinate();
-            let clzIndex = getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray);
-            if(clzIndex != -1){
-                return clzIndex << 4 | i;
-            }
-        }
-        console.error("no sym coordinate find", cubie.getEdgeOrientationCoordinate());
-        return -1;
-    },
-    getSymCoordinatePair: function(symCoordinate){
-        return {
-            clzIdx : symCoordinate >> 4,
-            sym: symCoordinate & 15
-        }
-    },
-    queryRawRepresentantCoordinateByClassIndex: function(classIdx){
-        return this.classIndexToRepresentantArray[classIdx];
-    },
-    getEquivalenceClassCount: function(){
-        return this.classIndexToRepresentantArray.length;
-    },
-    getClassIdxByRawCoordinate: function(rawCoordinate){
-        return getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray);
-    }
-}
-
-// UD中间层棱块位置(FR, FL, BL, BR)(对称坐标)
-const UDSliceCoordinate = {
-    count: 495, // C(12,4)=12*11*10*9/4!=495
-    rawMoveTable: null,
-    symMoveTable: null,
-    classIndexToRepresentantArray: null,
-    conjugateTable: null,
-    init: function(){
-        this.initClassIndexToRepresentantArray();
-        this.initSymCoordMoveTable();
-        this.initRawCoordMoveTable();
-        this.initConjugateTable();
-    },
-    initClassIndexToRepresentantArray: function(){
-        let len = (this.count >> 5) + 1; // 495 / 32
-        let used = new Array(len).fill(0);
-        this.classIndexToRepresentantArray = [];
-        let startCubie = new CubieCube();
-        let resultCubie = new CubieCube();
-        let midProd = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        for(let c = 0; c < len; c++){
-            for(let i = 0; i < 32; i++){
-                if((used[c] & (1 << i)) == 0){ // 说明这个原始坐标在之前的等价类中没有出现过
-                    let rawCoordinate = c << 5 | i; // c * 32 + i
-                    if(rawCoordinate >= this.count){ return; }
-                    this.classIndexToRepresentantArray.push(rawCoordinate);
-                    this.invUDSliceCoordinate(startCubie, rawCoordinate);
-                    for(let s = 0; s < 16; s++){  // 计算该等价类中的所有元素, 并将其位置标记为占用
-                        edgeMultiply(Symmetries.edgeSymmetries[Symmetries.invIdx[s]], startCubie.edges, midProd);
-                        edgeMultiply(midProd, Symmetries.edgeSymmetries[s], resultCubie.edges);
-                        rawCoordinate = this.getUDSliceCoordinate(resultCubie);
-                        used[rawCoordinate >> 5] = used[rawCoordinate >> 5] | (1 << (rawCoordinate & 31));
-                    }
-                }
-            }
-        }
-    },
-    initSymCoordMoveTable: function(){
-        this.symMoveTable = [];
-        let cubie = new CubieCube();
-        for(let classIdx = 0; classIdx < this.classIndexToRepresentantArray.length; classIdx++){
-            let rawCoordinate = this.classIndexToRepresentantArray[classIdx];
-            this.invUDSliceCoordinate(cubie, rawCoordinate);
-
-            let odd = classIdx & 1;
-            let offset = 0;
-            let moveEntries;
-            if(odd){
-                offset = 12;
-                moveEntries = this.symMoveTable[classIdx >> 1];
-            }else{
-                moveEntries = new Array(18).fill(0);
-                this.symMoveTable.push(moveEntries);
-            }
-            let j = 0;
-            for(let move = U; move <= B; move++){
-                for(let r = 0; r < 3; r++){
-                    cubie.edgeMult(EdgeCubieMove[move]);
-                    moveEntries[j] = moveEntries[j] | (this.getSymCoordinate(cubie) << offset);
-                    j++;
-                }
-                cubie.edgeMult(EdgeCubieMove[move]);
-            }
-        }
-    },
-    initRawCoordMoveTable: function(){
-        this.rawMoveTable = [];
-        let cubie = new CubieCube();
-        for(let coordinate = 0; coordinate < this.count; coordinate++){
-            this.invUDSliceCoordinate(cubie, coordinate);
-            let odd = coordinate & 1;
-            let offset = 0;
-            let moveEntries;
-            if(odd){
-                offset = 12;
-                moveEntries = this.rawMoveTable[coordinate >> 1];
-            }else{
-                moveEntries = new Array(18).fill(0);
-                this.rawMoveTable.push(moveEntries);
-            }
-            let j = 0;
-            for(let move = U; move <= B; move++){
-                for(let r = 0; r < 3; r++){
-                    cubie.edgeMult(EdgeCubieMove[move]);
                     moveEntries[j] = moveEntries[j] | (this.getUDSliceCoordinate(cubie) << offset);
                     j++;
                 }
@@ -758,13 +570,19 @@ const UDSliceCoordinate = {
         }
     },
     applyRawMove: function(rawCoordinate, move, moveI){
-        let moveEntries = this.rawMoveTable[rawCoordinate >> 1];
+        let moveEntries = this.moveTable[rawCoordinate >> 1];
         return (moveEntries[move * 3 + moveI] >> ((rawCoordinate & 1) ? 12 : 0)) & 0xFFF;
     },
     getUDSliceCoordinate: function(cubie){
+        return this._UDSliceCoordinate(cubie.edges);
+    },
+    invUDSliceCoordinate: function(cubie, rawCoordinate){
+        this._invUDSliceCoordinate(cubie.edges, rawCoordinate);
+    },
+    _UDSliceCoordinate: function(edges){
         let used = new Array(12);
         for(let i = 0; i < 12; i++){
-            used[i] = cubie.edges[i].e >= FR;
+            used[i] = edges[i].e >= FR;
         }
         let k = 3;
         let i = 11;
@@ -779,7 +597,7 @@ const UDSliceCoordinate = {
         }
         return s;
     },
-    invUDSliceCoordinate: function(cubie, rawCoordinate){
+    _invUDSliceCoordinate: function(edges, rawCoordinate){
         let k = 3, n = 11;
         let v = 0;
         let used = new Array(12);
@@ -799,68 +617,33 @@ const UDSliceCoordinate = {
         for(let i = UR; i <= BR; i++){
             if(used[i]){
                 for(let j = UR; j <= BR; j++){
-                    if(cubie.edges[j].e == udSliceEdge){
-                        cubie.edges[j].e = cubie.edges[i].e;
+                    if(edges[j].e == udSliceEdge){
+                        edges[j].e = edges[i].e;
                         break;
                     }
                 }
-                cubie.edges[i].e = udSliceEdge;
+                edges[i].e = udSliceEdge;
                 udSliceEdge++;
             }
         }
-    },
-    applySymMove: function(symCoordinate, move, moveI){
-        let j = symCoordinate >> 4;
-        let i = symCoordinate & 15;
-        let conjMove = Symmetries.getConjugateMove(i, move * 3 + moveI);
-        let moveEntries = this.symMoveTable[j];
-        let conjCoord = (moveEntries[conjMove] >> ((j & 1) ? 12 : 0)) & 0xFFFF;
-        let j1 = conjCoord >> 4;
-        let i1 = conjCoord & 15;
-        let i2 = Symmetries.symMultiply(i1, i);
-        return j1 << 4 | i2;
-    },
-    getSymCoordinate: function(cubie){  // 根据原始坐标, 得到对称坐标
-        let midProd = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        let resultCubie = new CubieCube();
-        for(let i = 0; i < 16; i++){
-            edgeMultiply(Symmetries.edgeSymmetries[i], cubie.edges, midProd);
-            edgeMultiply(midProd, Symmetries.edgeSymmetries[Symmetries.invIdx[i]], resultCubie.edges);
-            let rawCoordinate = this.getUDSliceCoordinate(resultCubie);
-            let clzIndex = getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray);
-            if(clzIndex != -1){
-                return clzIndex << 4 | i;
-            }
-        }
-        console.error("no sym coordinate find");
-        return -1;
-    },
-    queryFromSymMoveTable: function(classIdx, move, moveI){
-        let moveEntries = this.symMoveTable[classIdx >> 1];
-        return (moveEntries[move * 3 + moveI] >> ((classIdx & 1) ? 12 : 0)) & 0xFFF;
-    },
-    queryRawRepresentantCoordinateByClassIndex: function(classIdx){
-        return this.classIndexToRepresentantArray[classIdx];
-    },
-    isRepresentantCoordinate: function(rawCoordinate){
-        return getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray) != -1;
-    },
-    getEquivalenceClassCount: function(){
-        return this.classIndexToRepresentantArray.length;
-    },
-    getSymCoordinatePair: function(symCoordinate){
-        return {
-            clzIdx : symCoordinate >> 4,
-            sym: symCoordinate & 15
-        }
+    }
+};
+
+const UDSliceSymCoordinate = {  // ud-slice对称坐标
+    rawMoveTable: null,
+    symMoveTable: null,
+    classIndexToRepresentantArray: null,
+    conjugateTable: null,
+    init: function(){
+        this.initConjugateTable();
     },
     initConjugateTable: function(){
         this.conjugateTable = [];
         let cubieStart = new CubieCube();
         let cubieProd = new CubieCube();
         let midProd = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        for(let coordinate = 0; coordinate < this.count; coordinate++){
-            this.invUDSliceCoordinate(cubieStart, coordinate);
+        for(let coordinate = 0; coordinate < UDSliceRawCoordinate.count; coordinate++){
+            UDSliceRawCoordinate.invUDSliceCoordinate(cubieStart, coordinate);
 
             let odd = coordinate & 1;
             let offset = 0;
@@ -875,7 +658,7 @@ const UDSliceCoordinate = {
             for(let s = 0; s < 16; s++){
                 edgeMultiply(Symmetries.edgeSymmetries[s], cubieStart.edges, midProd);
                 edgeMultiply(midProd, Symmetries.edgeSymmetries[Symmetries.invIdx[s]], cubieProd.edges);
-                symEntries[s] = symEntries[s] | (this.getUDSliceCoordinate(cubieProd) << offset);
+                symEntries[s] = symEntries[s] | (UDSliceRawCoordinate.getUDSliceCoordinate(cubieProd) << offset);
             }
         }
     },
@@ -885,23 +668,50 @@ const UDSliceCoordinate = {
     }
 };
 
+const FlipUDSliceRawCoordinate = {  // flip + ud-slice 原始坐标
+    getCoordinate: function(cubie){
+        return (UDSliceRawCoordinate.getUDSliceCoordinate(cubie) << 11) | cubie.getEdgeOrientationCoordinate();
+    },
+    invFlipUDSliceCoordinate: function(cubie, rawCoordinate){
+        UDSliceRawCoordinate.invUDSliceCoordinate(cubie, rawCoordinate >> 11);
+        cubie.setEdgesByEdgeOrientationCoordinate(rawCoordinate & 2047);
+    },
+    splitCoordinate: function(coordinate){
+        return {
+            udSlice: coordinate >> 11,
+            flip: coordinate & 2047
+        };
+    },
+    combine: function(flip, udSlice){
+        return udSlice << 11 | flip;
+    },
+    _invFlipUDSliceCoordinate: function(edges, rawCoordinate){
+        UDSliceRawCoordinate._invUDSliceCoordinate(edges, rawCoordinate >> 11);
+        EdgeOrientationRawCoordinate._invEdgeOrientationCoordinate(edges, rawCoordinate & 2047);
+    },
+    _flipUDSliceCoordinate: function(edges){
+        return (UDSliceRawCoordinate._UDSliceCoordinate(edges) << 11) | EdgeOrientationRawCoordinate._edgeOrientationCoordinate(edges);
+    }
+};
+
 // 棱块朝向+中间层棱块位置  -- 对称坐标(FlipUDSliceCoordinate = UDSliceCoordinate * 2048 + EdgeOrientationCoordinate)
-const FlipUDSliceCoordinate = {
+const FlipUDSliceSymCoordinate = {
     moveTable: [],
     classIndexToRepresentantArray: null,
+    rawToSymIdxTable: null,
     init: function(){
         this.initClassIndexToRepresentantArray();
         this.initMoveTable();
     },
     initClassIndexToRepresentantArray: function(){
-        let len = 31680; // 495 * 2048 / 32;
-        let used = new Array(len).fill(0);
+        let used = new Array((UDSliceRawCoordinate.count * EdgeOrientationRawCoordinate.count) >> 5).fill(0); // 495 * 2048 / 32
         let cubie = new CubieCube();
         let cubieP = new CubieCube();
         this.classIndexToRepresentantArray = [];
+        this.rawToSymIdxTable = new Array((UDSliceRawCoordinate.count * EdgeOrientationRawCoordinate.count) >> 3).fill(0); // 495 * 2048 / 8
         let symResult = [{},{},{},{},{},{},{},{},{},{},{},{}];
         for(let ud = 0; ud < 495; ud++){
-            UDSliceCoordinate.invUDSliceCoordinate(cubie, ud);
+            UDSliceRawCoordinate.invUDSliceCoordinate(cubie, ud);
             for(let e = 0; e < 64; e++){ // 64 = 2048 / 32
                 let byteOffset = ud << 6 | e;
                 for(let k = 0; k < 32; k++){
@@ -911,8 +721,13 @@ const FlipUDSliceCoordinate = {
                         for(let s = 0; s < 16; s++){ // 计算该等价类中的所有元素, 并将其位置标记为占用
                             edgeMultiply(Symmetries.edgeSymmetries[Symmetries.invIdx[s]], cubie.edges, symResult);
                             edgeMultiply(symResult, Symmetries.edgeSymmetries[s], cubieP.edges);
-                            let rawCoordinate = this.getRawCoordinate(cubieP);
-                            used[rawCoordinate >> 5] = used[rawCoordinate >> 5] | (1 << (rawCoordinate & 31));
+                            let rawCoordinate = FlipUDSliceRawCoordinate.getCoordinate(cubieP);
+                            let u = used[rawCoordinate >> 5];
+                            if((u & (1 << (rawCoordinate & 31))) == 0){
+                                used[rawCoordinate >> 5] = u | (1 << (rawCoordinate & 31));
+                                // this.rawToSymIdxTable[rawCoordinate / 8] = this.rawToSymIdxTable[rawCoordinate / 8] | (s << ((rawCoordinate % 8) * 4))
+                                this.rawToSymIdxTable[rawCoordinate >> 3] = this.rawToSymIdxTable[rawCoordinate >> 3] | (s << ((rawCoordinate & 7) << 2));
+                            }
                         }
                     }
                 }
@@ -920,58 +735,58 @@ const FlipUDSliceCoordinate = {
         }
     },
     initMoveTable: function(){
-        let cubie = new CubieCube();
+        this.moveTable = [];
         for(const coordinate of this.classIndexToRepresentantArray){ // 共有64430个等价类
-            let rawCoordinate = coordinate; // 获取代表元的原始坐标
-            this.invFlipUDSliceCoordinateRawCoordinate(cubie, rawCoordinate);
-
+            let info = FlipUDSliceRawCoordinate.splitCoordinate(coordinate);
             let moveEntries = new Array(18).fill(0);
             this.moveTable.push(moveEntries);
             let j = 0;
             for(let move = U; move <= B; move++){
                 for(let r = 0; r < 3; r++){
-                    cubie.edgeMult(EdgeCubieMove[move]);
-                    moveEntries[j] = this.getSymCoordinate(cubie);
+                    let coord = FlipUDSliceRawCoordinate.combine(
+                        EdgeOrientationRawCoordinate.applyRawMove(info.flip, move, r),
+                        UDSliceRawCoordinate.applyRawMove(info.udSlice, move, r)
+                    );
+                    moveEntries[j] = this.getSymCoordinateByRawCoordinate(coord);
                     j++;
                 }
-                cubie.edgeMult(EdgeCubieMove[move]);
             }
         }
     },
-    applyMove: function(coordinate, move, moveI){   // 对称移动
-        return this.moveTable[coordinate][move * 3 + moveI];
+    applySymMove: function(clzIdx, move, moveI){
+        return this.moveTable[clzIdx][move * 3 + moveI];
     },
-    getClassIdxByRawCoordinate: function(rawCoordinate){  // 二分查找
-        return getClassIndexByRawCoordinate(rawCoordinate, this.classIndexToRepresentantArray);
+    getClassIdxByRawCoordinate: function(rawCoordinate){
+        return this.getSymCoordinateByRawCoordinate(rawCoordinate) >> 4;
     },
-    getRawCoordinate: function(cubie){
-        return (UDSliceCoordinate.getUDSliceCoordinate(cubie) << 11) | cubie.getEdgeOrientationCoordinate();
+    getSymCoordinateByRawCoordinate: function(rawCoordinate){
+        let symIdx = ((this.rawToSymIdxTable[rawCoordinate >> 3]) >> ((rawCoordinate & 7) << 2)) & 0xF;
+        let clzIdx = -1;
+        if(symIdx == 0){
+            clzIdx = binarySearch(rawCoordinate, this.classIndexToRepresentantArray);
+        }else{
+            let edges = [{e:UR,o:0},{e:UF,o:0},{e:UL,o:0},{e:UB,o:0},{e:DR,o:0},{e:DF,o:0},{e:DL,o:0},{e:DB,o:0},{e:FR,o:0},{e:FL,o:0},{e:BL,o:0},{e:BR,o:0}];
+            FlipUDSliceRawCoordinate._invFlipUDSliceCoordinate(edges, rawCoordinate);
+            let midResult = [{},{},{},{},{},{},{},{},{},{},{},{}];
+            let prod = [{e:UR,o:0},{e:UF,o:0},{e:UL,o:0},{e:UB,o:0},{e:DR,o:0},{e:DF,o:0},{e:DL,o:0},{e:DB,o:0},{e:FR,o:0},{e:FL,o:0},{e:BL,o:0},{e:BR,o:0}];
+            edgeMultiply(Symmetries.edgeSymmetries[symIdx], edges, midResult);
+            edgeMultiply(midResult, Symmetries.edgeSymmetries[Symmetries.invIdx[symIdx]], prod);
+            let representant = FlipUDSliceRawCoordinate._flipUDSliceCoordinate(prod);
+            clzIdx = binarySearch(representant, this.classIndexToRepresentantArray);
+        }
+        if(clzIdx == -1){
+            console.warn("not find", rawCoordinate);
+        }
+        return clzIdx << 4 | symIdx;
     },
     getSymCoordinate: function(cubie){
-        // 原始坐标转对称坐标
-        let result = [{},{},{},{},{},{},{},{},{},{},{},{}];
-        let prodCubie = new CubieCube();
-        for(let i = 0; i < 16; i++){
-            edgeMultiply(Symmetries.edgeSymmetries[i], cubie.edges, result);
-            edgeMultiply(result, Symmetries.edgeSymmetries[Symmetries.invIdx[i]], prodCubie.edges);
-            let rawCoordinate = this.getRawCoordinate(prodCubie);
-            let clzIndex = this.getClassIdxByRawCoordinate(rawCoordinate);
-            if(clzIndex != -1){
-                return clzIndex << 4 | i;
-            }
-        }
-        console.error("no sym coordinate find");
-        return -1;
+        return this.getSymCoordinateByRawCoordinate(FlipUDSliceRawCoordinate.getCoordinate(cubie));
     },
     getSymCoordinatePair: function(symCoordinate){
         return {
             clzIdx : symCoordinate >> 4,
             sym: symCoordinate & 15
         };
-    },
-    invFlipUDSliceCoordinateRawCoordinate: function(cubie, rawCoordinate){
-        UDSliceCoordinate.invUDSliceCoordinate(cubie, rawCoordinate >> 11);
-        cubie.setEdgesByEdgeOrientationCoordinate(rawCoordinate & 2047);
     },
     queryRawRepresentantCoordinateByClassIndex: function(classIndex){
         return this.classIndexToRepresentantArray[classIndex];
@@ -984,7 +799,7 @@ const FlipUDSliceCoordinate = {
 const FlipUDSlicePruningTable = {
     table: null,
     init: function(){
-        let total = FlipUDSliceCoordinate.getEquivalenceClassCount();
+        let total = FlipUDSliceSymCoordinate.getEquivalenceClassCount();
         let len =  (total >> 4) + ((total & 15) > 0 ? 1 : 0); // 32位中, 每两位存储一个步数记录
         this.table = new Array(len).fill(0xFFFFFFFF);
         this.setPrunValue(0, 0);
@@ -1001,8 +816,8 @@ const FlipUDSlicePruningTable = {
                 if(match){
                     for(let m = U; m <= B; m++){
                         for(let r = 0; r < 3; r++){
-                            let flipUdSlice = FlipUDSliceCoordinate.applyMove(i, m, r);
-                            let symCoordPair = FlipUDSliceCoordinate.getSymCoordinatePair(flipUdSlice);
+                            let flipUdSlice = FlipUDSliceSymCoordinate.applySymMove(i, m, r);
+                            let symCoordPair = FlipUDSliceSymCoordinate.getSymCoordinatePair(flipUdSlice);
                             let index = symCoordPair.clzIdx;
                             if(backward){
                                 if(this.getPrunValue(index) == depth){
@@ -1031,8 +846,8 @@ const FlipUDSlicePruningTable = {
         this.table[base] = this.table[base] & (~(0b11 << (offset << 1))) | (value << (offset << 1));
     },
     getDistance: function(cubie){
-        let flipUDSliceCoordinate = FlipUDSliceCoordinate.getSymCoordinate(cubie);
-        let symCoordIdx = FlipUDSliceCoordinate.getSymCoordinatePair(flipUDSliceCoordinate).clzIdx;
+        let flipUDSliceCoordinate = FlipUDSliceSymCoordinate.getSymCoordinate(cubie);
+        let symCoordIdx = FlipUDSliceSymCoordinate.getSymCoordinatePair(flipUDSliceCoordinate).clzIdx;
         let depth = 0;
         let depthMod3 = 0;
         while(symCoordIdx != 0){
@@ -1041,8 +856,8 @@ const FlipUDSlicePruningTable = {
             let find = false;
             for(let m = U; (m <= B && !find); m++){
                 for(let r = 0; (r < 3 && !find); r++){
-                    let symCoord1 = FlipUDSliceCoordinate.applyMove(symCoordIdx, m, r);
-                    let symPair = FlipUDSliceCoordinate.getSymCoordinatePair(symCoord1);
+                    let symCoord1 = FlipUDSliceSymCoordinate.applySymMove(symCoordIdx, m, r);
+                    let symPair = FlipUDSliceSymCoordinate.getSymCoordinatePair(symCoord1);
                     if(this.getPrunValue(symPair.clzIdx) == expectDepth){
                         depth++;
                         symCoordIdx = symPair.clzIdx;
@@ -1057,6 +872,10 @@ const FlipUDSlicePruningTable = {
             }
         }
         return depth;
+    },
+    getMod3Distance: function(flipRaw, udSlice){
+        let flipUdSliceRaw = FlipUDSliceRawCoordinate.combine(flipRaw, udSlice);
+        return this.getPrunValue(FlipUDSliceSymCoordinate.getClassIdxByRawCoordinate(flipUdSliceRaw));
     }
 }
 
@@ -1083,7 +902,7 @@ const TwistUDSlicePruningTable = {
             }
         }
 
-        let total = eqlClassCount * UDSliceCoordinate.count;
+        let total = eqlClassCount * UDSliceRawCoordinate.count;
         let len =  (total >> 4) + ((total & 15) > 0 ? 1 : 0); // 32位中, 每两位存储一个步数记录
         this.table = new Array(len).fill(0xFFFFFFFF);
         this.setPrunValue(0, 0);
@@ -1098,14 +917,14 @@ const TwistUDSlicePruningTable = {
                 let p = this.getPrunValue(i);
                 let match = backward ? (p == 0b11) : (p == depth);
                 if(match){
-                    let cornerOrientationClzIdx = Math.floor(i / UDSliceCoordinate.count);
-                    let udSliceCoordinate = i % UDSliceCoordinate.count;
+                    let cornerOrientationClzIdx = Math.floor(i / UDSliceRawCoordinate.count);
+                    let udSliceCoordinate = i % UDSliceRawCoordinate.count;
                     for(let m = U; m <= B; m++){
                         for(let r = 0; r < 3; r++){
-                            let udSliceCoord = UDSliceCoordinate.applyRawMove(udSliceCoordinate, m, r);
-                            let cornOriCoord = CornerOrientationSymCoordinate.queryFromSymMoveTable(cornerOrientationClzIdx, m, r);
+                            let udSliceCoord = UDSliceRawCoordinate.applyRawMove(udSliceCoordinate, m, r);
+                            let cornOriCoord = CornerOrientationSymCoordinate.applySymMove(cornerOrientationClzIdx, m, r);
                             let symCoordPair = CornerOrientationSymCoordinate.getSymCoordinatePair(cornOriCoord);
-                            udSliceCoord = UDSliceCoordinate.getConjugate(udSliceCoord, symCoordPair.sym);
+                            udSliceCoord = UDSliceSymCoordinate.getConjugate(udSliceCoord, symCoordPair.sym);
                             let index = this.makePrunIndex(symCoordPair.clzIdx, udSliceCoord);
                             if(backward){
                                 if(this.getPrunValue(index) == depth){
@@ -1124,7 +943,7 @@ const TwistUDSlicePruningTable = {
                                         for(let s = 1; s < 16; s++){
                                             sym = sym >> 1;
                                             if((sym & 1) == 1){
-                                                altUdSliceCoord = UDSliceCoordinate.getConjugate(udSliceCoord, s);
+                                                altUdSliceCoord = UDSliceSymCoordinate.getConjugate(udSliceCoord, s);
                                                 index = this.makePrunIndex(symCoordPair.clzIdx, altUdSliceCoord);
                                                 if(this.getPrunValue(index) == 0b11){
                                                     this.setPrunValue(index, d);
@@ -1147,17 +966,22 @@ const TwistUDSlicePruningTable = {
     setPrunValue: function(index, value){
         let base = index >> 4;
         let offset = index & 15;
-        this.table[base] = this.table[base] & (~(0b11 << (offset << 1))) | (value << (offset << 1));
+        this.table[base] = this.table[base] & (~(0b11 << (offset << 1))) | (value << (offset << 1))
     },
     makePrunIndex: function(twist, udSlice){
-        return twist * UDSliceCoordinate.count + udSlice;
+        return twist * UDSliceRawCoordinate.count + udSlice;
+    },
+    getMod3Distance: function(cornerRawOri, udSliceRaw){
+        let cornerSymOri = CornerOrientationSymCoordinate.getSymCoordinateByRawCoordinate(cornerRawOri);
+        let pair = CornerOrientationSymCoordinate.getSymCoordinatePair(cornerSymOri);
+        return this.getPrunValue(this.makePrunIndex(pair.clzIdx, UDSliceSymCoordinate.getConjugate(udSliceRaw, pair.sym)));
     },
     getDistance: function(cubie){
         let cornerOriSymCoord = CornerOrientationSymCoordinate.getSymCoordinate(cubie);
         let symPair = CornerOrientationSymCoordinate.getSymCoordinatePair(cornerOriSymCoord);
         let cornerOriClzIdx = symPair.clzIdx;
-        let udSliceRawCoord = UDSliceCoordinate.getUDSliceCoordinate(cubie);
-        udSliceRawCoord = UDSliceCoordinate.getConjugate(udSliceRawCoord, symPair.sym);
+        let udSliceRawCoord = UDSliceRawCoordinate.getUDSliceCoordinate(cubie);
+        udSliceRawCoord = UDSliceSymCoordinate.getConjugate(udSliceRawCoord, symPair.sym);
 
         let depth = 0;
         let depthMod3 = 0;
@@ -1168,10 +992,10 @@ const TwistUDSlicePruningTable = {
             let find = false;
             for(let m = U; (m <= B && !find); m++){
                 for(let r = 0; (r < 3 && !find); r++){
-                    let udSliceCoord1 = UDSliceCoordinate.applyRawMove(udSliceRawCoord, m, r);
-                    let cornOriCoord1 = CornerOrientationSymCoordinate.queryFromSymMoveTable(cornerOriClzIdx, m, r);
+                    let udSliceCoord1 = UDSliceRawCoordinate.applyRawMove(udSliceRawCoord, m, r);
+                    let cornOriCoord1 = CornerOrientationSymCoordinate.applySymMove(cornerOriClzIdx, m, r);
                     symPair = CornerOrientationSymCoordinate.getSymCoordinatePair(cornOriCoord1);
-                    udSliceCoord1 = UDSliceCoordinate.getConjugate(udSliceCoord1, symPair.sym);
+                    udSliceCoord1 = UDSliceSymCoordinate.getConjugate(udSliceCoord1, symPair.sym);
                     let index = this.makePrunIndex(symPair.clzIdx, udSliceCoord1);
                     if(this.getPrunValue(index) == expectDepth){
                         depth++;
@@ -1201,9 +1025,23 @@ const Phase1PruningTable = {
     getStepLowerBound: function(cubie){
         let twistUDSliceDistance = TwistUDSlicePruningTable.getDistance(cubie);
         let flipUDSliceDistance = FlipUDSlicePruningTable.getDistance(cubie);
-        return Math.max(twistUDSliceDistance, flipUDSliceDistance);
+        return [ twistUDSliceDistance, flipUDSliceDistance ];
+    },
+    estimateStep: function(cornerRawOri, edgeRawOri, udSliceRaw, baseSteps){
+        let m1 = TwistUDSlicePruningTable.getMod3Distance(cornerRawOri, udSliceRaw);
+        let m2 = FlipUDSlicePruningTable.getMod3Distance(edgeRawOri, udSliceRaw);
+        return [ adjustStep(baseSteps[0], m1), adjustStep(baseSteps[1], m2) ];
     }
 };
+
+const StepByStep = [
+    [0, 1, -1],
+    [-1, 0, 1],
+    [1, -1, 0]
+];
+function adjustStep(baseStep, mod3){
+    return baseStep + StepByStep[baseStep % 3][mod3];
+}
 
 var initState = 0;
 function init(){
@@ -1211,15 +1049,104 @@ function init(){
         initState = 1;
         Symmetries.init();
 
+        EdgeOrientationRawCoordinate.init();
+        CornerOrientationRawCoordinate.init();
+        UDSliceRawCoordinate.init();
+
         CornerOrientationSymCoordinate.init();
-        EdgeOrientationSymCoordinate.init();
-        UDSliceCoordinate.init();
-        FlipUDSliceCoordinate.init();
+        UDSliceSymCoordinate.init();
+        FlipUDSliceSymCoordinate.init();
         
         Phase1PruningTable.init();
 
         initState = 2;
     }
+}
+
+function search(cubie){
+    return phase1(cubie);
+}
+
+const MAX_DEPTH_PHASE1 = 20;
+const MAC_DEPTH_PHASE2 = 18;
+function phase1(cubie){
+    let distanceArr = Phase1PruningTable.getStepLowerBound(cubie);
+    let distance = max(distanceArr);
+    if(distance == 0){
+        return [];
+    }
+    console.log("estimate distance : ", distance);
+
+    let cornerRawOri = cubie.getCornerOrientationCoordinate();
+    let edgeRawOri = cubie.getEdgeOrientationCoordinate();
+    let udSliceRaw = UDSliceRawCoordinate.getUDSliceCoordinate(cubie);
+
+    let depth = distance;
+    while(depth <= MAX_DEPTH_PHASE1){
+        let result = phase1DFSAStar(cornerRawOri, edgeRawOri, udSliceRaw, distanceArr, depth);
+        if(result){
+            return buildPath(result);
+        }
+        depth++;
+    }
+    return [];
+}
+
+function phase1DFSAStar(cornerRawOri, edgeRawOri, udSliceRaw, distanceArr, maxDepth){
+    let stack = [];
+    let root = new Node(0, -1, 0, null, [ cornerRawOri, edgeRawOri, udSliceRaw ]);
+    root.distanceArr = distanceArr;
+    stack.push(root);
+    while(stack.length > 0){
+        let parent = stack.pop();
+        for(let m = B; m >= R; m--){
+            for(let r = 2; r >= 0; r--){
+                cornerRawOri = CornerOrientationRawCoordinate.applyRawMove(parent.coordinate[0], m, r);
+                edgeRawOri = EdgeOrientationRawCoordinate.applyRawMove(parent.coordinate[1], m, r);
+                udSliceRaw = UDSliceRawCoordinate.applyRawMove(parent.coordinate[2], m, r);
+                let node = new Node(parent.depth + 1, m, r, parent, [ cornerRawOri, edgeRawOri, udSliceRaw ]);
+                if(cornerRawOri == 0 && edgeRawOri == 0 && udSliceRaw == 0){
+                    return node;
+                }else{
+                    let newDistanceArr = Phase1PruningTable.estimateStep(cornerRawOri, edgeRawOri, udSliceRaw, parent.distanceArr);
+                    node.distanceArr = newDistanceArr;
+                    if(node.depth + max(newDistanceArr) < maxDepth){
+                        stack.push(node);
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
+
+class Node{
+    constructor(depth, move, moveRepeat, parent, coordinate){
+        this.depth = depth; // 当前已经行进的深度
+        this.move = move;
+        this.moveRepeat = moveRepeat;
+        this.parent = parent;
+        this.coordinate = coordinate;
+        this.distanceArr = null;   // 距离目标的预估深度
+    }
+}
+
+const STEP_MAP = [
+    ["U", "U2", "U'"],
+    ["R", "R2", "R'"],
+    ["F", "F2", "F'"],
+    ["D", "D2", "D'"],
+    ["L", "L2", "L'"],
+    ["B", "B2", "B'"]
+];
+function buildPath(node){
+    let path = [];
+    let cursor = node;
+    while(cursor.depth > 0){
+        path.unshift(STEP_MAP[cursor.move][cursor.moveRepeat]);
+        cursor = cursor.parent;
+    }
+    return path;
 }
 
 /**
@@ -1243,18 +1170,15 @@ function init(){
  * B4, B5, B6,
  * B7, B8, B9
  */
-function solve(cube){
-    var cubie = getCubieCubeForFaceCube(cube);
-    phase1(cubie);
-}
-
-function phase1(cubie){
-    console.log("distance", Phase1PruningTable.getStepLowerBound(cubie));
-}
-
-export function debug(cube){
+export function solve(cube){
+    console.time("totalInit");
     init();
-    solve(cube);
+    console.timeEnd("totalInit");
+    var cubie = getCubieCubeForFaceCube(cube);
+    console.time("search");
+    let solution = search(cubie);
+    console.timeEnd("search");
+    return solution;
 }
 
 const FaceletToEdge = [
@@ -1351,7 +1275,22 @@ function getCubieCubeForFaceCube(cube){
         cubie.corners[i].c = FaceletToCorner[firstFace][secondFace][centerMap.get(corner[2])];
     }
 
+    // TODO 魔方状态合法性校验
+
     return cubie;
+}
+
+/**
+ * 求数组最大值, 仅适用于正整数
+ */
+function max(arr){
+    let m = 0;
+    for(let a of arr){
+        if(m < a){
+            m = a;
+        }
+    }
+    return m;
 }
 
 // 求组合数
@@ -1364,4 +1303,23 @@ function C(n, m){
         result /= i;
     }
     return Math.floor(result);
+}
+
+// 二分查找
+function binarySearch(target, array){
+    if(target <= array[array.length - 1]){
+        let l = 0, r = array.length - 1, mid = -1;
+        while(l <= r){
+            mid = (l + r) >> 1;
+            let c = array[mid];
+            if(c > target){
+                r = mid - 1;
+            }else if(c < target){
+                l = mid + 1;
+            }else{
+                return mid;
+            }
+        }
+    }
+    return -1;
 }
