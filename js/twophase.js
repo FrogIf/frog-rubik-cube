@@ -1092,6 +1092,9 @@ function phase1(cubie){
     return [];
 }
 
+const SYM_MOVE = [
+    D, /* U --> D */ L, /* R --> L */ B, /* F --> B */ U, /* D --> U */ R, /* L --> R */ F /* B --> F */
+];
 function phase1DFSAStar(cornerRawOri, edgeRawOri, udSliceRaw, distanceArr, maxDepth){
     let stack = [];
     let root = new Node(0, -1, 0, null, [ cornerRawOri, edgeRawOri, udSliceRaw ]);
@@ -1100,6 +1103,10 @@ function phase1DFSAStar(cornerRawOri, edgeRawOri, udSliceRaw, distanceArr, maxDe
     while(stack.length > 0){
         let parent = stack.pop();
         for(let m = B; m >= R; m--){
+            if(m == parent.move 
+                || (parent.parent != null && parent.parent.move == m && parent.move != -1 && parent.parent.move == SYM_MOVE[parent.move])){ 
+                    continue; 
+            }
             for(let r = 2; r >= 0; r--){
                 cornerRawOri = CornerOrientationRawCoordinate.applyRawMove(parent.coordinate[0], m, r);
                 edgeRawOri = EdgeOrientationRawCoordinate.applyRawMove(parent.coordinate[1], m, r);
