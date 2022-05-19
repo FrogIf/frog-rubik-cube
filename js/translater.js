@@ -7,7 +7,8 @@ const zh = {
     "scramble":"打乱",
     "solve": "还原",
     "two-phase": "两阶段算法",
-    "not-exec": "不执行"
+    "not-exec": "不执行",
+    "basic-scramble": "基础打乱"
 };
 
 const en = {
@@ -19,7 +20,8 @@ const en = {
     "scramble": "scramble",
     "solve": "solve",
     "two-phase": "Two-Phase Algorithm",
-    "not-exec":"not execute"
+    "not-exec":"not execute",
+    "basic-scramble": "basic scramble"
 };
 
 export function translate(key, lang){

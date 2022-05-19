@@ -319,7 +319,8 @@
 
             document.getElementById("scrambleBtn").onclick = () => {
                 OutputConsole.println();
-                doAction(frog.scramble());
+                let basicScramble = document.getElementById("basicScramble").checked;
+                doAction(frog.scramble(basicScramble));
             }
 
             document.getElementById("solveBtn").onclick = () => {
@@ -472,11 +473,15 @@
                 <button class="trans-lang" data-lang-key="rebase" id="rebaseBtn">rebase</button>
                 <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
                 <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
-                <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
                 <button class="debug-clz" id="debugBtn">debug</button>
             </div>
-
-            <div style="border: 1px solid gray; border-radius: 5px; padding: 5px;">
+            <div style="border: 1px solid gray; border-radius: 5px; padding: 5px; margin-top: 5px;">
+                <div>
+                    <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
+                    <input id="basicScramble" type="checkbox" /><span class="trans-lang" data-lang-key="basic-scramble">basic scramble<span>
+                </div>
+            </div>
+            <div style="border: 1px solid gray; border-radius: 5px; padding: 5px; margin-top: 5px;">
                 <select id="solveAlg" style="border: 1px solid gray; border-radius: 3px;background-color:darkgray;">
                     <option value="1" class="trans-lang" data-lang-key="two-phase">Two-Phase Algorithm</option>
                     <option value="2">CFOP</option>

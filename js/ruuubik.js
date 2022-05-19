@@ -395,6 +395,8 @@ class CubeAction{
     }
 }
 
+const BasicActions = ["U", "U2", "U_", "R", "R2", "R_", "F", "F2", "F_", "D", "D2", "D_", "L", "L2", "L_", "B", "B2", "B_"];
+
 /**
  * "动作群"(有限生成群)的生成元
  */
@@ -1299,20 +1301,17 @@ const rubikCube = {
             }
             rotateIndex++;
         }
-        if(rotateCount % 3 != 0){
-            return false;
-        }
-
-        return true;
+        return rotateCount % 3 == 0;
     },
     /**
      * 简单的打乱, 不保证满足WCA的打乱要求, 返回打乱后的公式数组
+     * @param onlyBasic -- 是否只使用18个基本动作
      */
-    scramble: function(){
+    scramble: function(onlyBasic){
         let step = 10 + Math.ceil(Math.random() * 10);  // 生成的总步数, 最小10步, 最大20步
         let exclude;
         let result = [];
-        let actions = Object.keys(ActionGroup);
+        let actions = onlyBasic ? BasicActions : Object.keys(ActionGroup);
         for(let i = 0; i < step; i++){
             let index = Math.floor(Math.random() * actions.length);
             while(actions[index] == exclude){
@@ -1339,8 +1338,8 @@ export function debug(){
     };
 }
 
-export function scramble(){
-    return rubikCube.scramble();
+export function scramble(onlyBasic){
+    return rubikCube.scramble(onlyBasic);
 }
 
 /**
