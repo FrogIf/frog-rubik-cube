@@ -24,7 +24,7 @@ nginx:
 
 ## Demo
 
-address : [rubik-cube](https://frogif.github.io/rubik-cube/)
+address : [rubik-cube](https://frogif.github.io/frog-rubik-cube/)
 
 ![image](./_doc/img/rubik-demo.png)
 
