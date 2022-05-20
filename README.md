@@ -28,6 +28,13 @@ address : [rubik-cube](https://frogif.github.io/frog-rubik-cube/)
 
 ![image](./_doc/img/rubik-demo.png)
 
+## Plan
+
+* 页面交互
+* 两阶段算法翻译调整
+* CFOP
+* 层先法
+
 ## Reference
 
 * https://github.com/liuxinyu95/unplugged
