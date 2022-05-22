@@ -152,3 +152,10 @@ body {
     background-color: white;
     border-radius: 10px;
 }
+
+.group-panel{
+    border: 1px solid gray; 
+    border-radius: 5px; 
+    padding: 5px; 
+    margin-top: 5px;
+}

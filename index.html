@@ -12,7 +12,7 @@
             import * as trans from './js/translater.js';
             import * as twoPhase from './js/twophase.js';
 
-            const isDebug = true;
+            const isDebug = false;
 
             var lang = window.navigator.language.slice(0, 2);
             function translatePage(){
@@ -120,7 +120,7 @@
             for(let i = 0; i < elements.length; i++){
                 elements[i].onclick = (e) =>{
                     let action = e.target.getAttribute("action");
-                    doAction([action])
+                    doAction([action]);
                 }
             }
 
@@ -132,10 +132,6 @@
                         e.target.value = "";
                     });
                 }
-            }
-
-            document.getElementById("rebaseBtn").onclick = () => {
-                frog.rebase();
             }
 
             document.getElementById("resetBtn").onclick = () => {
@@ -367,6 +363,30 @@
                     alert("开发中...");
                 }
             }
+
+            document.getElementById("xAction").onclick = () => {
+                doAction(['x']);
+            }
+            document.getElementById("yAction").onclick = () => {
+                doAction(['y']);
+            }
+            document.getElementById("zAction").onclick = () => {
+                doAction(['z']);
+            }
+
+            function disableButton(){
+                let btns = document.getElementsByTagName("button");
+                for(let b of btns){
+                    b.disabled = true;
+                }
+            }
+
+            function enableButton(){
+                let btns = document.getElementsByTagName("button");
+                for(let b of btns){
+                    b.disabled = false;
+                }
+            }
         </script>
 	</head>
 	<body>
@@ -470,19 +490,18 @@
         </div>
         <div id="rightControlPanel" class="right-control-panel">
             <div style="margin-bottom: 10px;">
-                <button class="trans-lang" data-lang-key="rebase" id="rebaseBtn">rebase</button>
                 <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
                 <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
                 <button class="debug-clz" id="debugBtn">debug</button>
             </div>
-            <div style="border: 1px solid gray; border-radius: 5px; padding: 5px; margin-top: 5px;">
+            <div class="group-panel">
                 <div>
                     <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
                     <input id="basicScramble" type="checkbox" /><span class="trans-lang" data-lang-key="basic-scramble">basic scramble<span>
                 </div>
             </div>
-            <div style="border: 1px solid gray; border-radius: 5px; padding: 5px; margin-top: 5px;">
-                <select id="solveAlg" style="border: 1px solid gray; border-radius: 3px;background-color:darkgray;">
+            <div class="group-panel">
+                <select id="solveAlg" style="height:25px; border: 1px solid gray; border-radius: 3px;background-color:rgb(207, 207, 207);margin: 5px 0px;">
                     <option value="1" class="trans-lang" data-lang-key="two-phase">Two-Phase Algorithm</option>
                     <option value="2">CFOP</option>
                 </select>
@@ -490,6 +509,11 @@
                     <button class="trans-lang" data-lang-key="solve" id="solveBtn">solve</button>
                     <input id="execSolution" type="checkbox" /><span class="trans-lang" data-lang-key="not-exec">not execute<span>
                 </div>
+            </div>
+            <div class="group-panel" style="text-align: center;">
+                <button id="xAction" style="height: 30px; width: 30px; margin: 0px 5px;">x</button>
+                <button id="yAction" style="height: 30px; width: 30px; margin: 0px 5px;">y</button>
+                <button id="zAction" style="height: 30px; width: 30px; margin: 0px 5px;">z</button>
             </div>
             <span class="trans-button">
                 <a href="javascript:;" id="translateBtn">中/EN</a>
