@@ -2,6 +2,10 @@
 
 a rubik's cube game
 
+## Document
+
+document access [here](./_doc/)
+
 ## deploy
 
 nginx:
