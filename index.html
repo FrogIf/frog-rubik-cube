@@ -320,6 +320,7 @@
             }
 
             document.getElementById("solveBtn").onclick = () => {
+                OutputConsole.println("solving, please wait...");
                 let colorMap = new Map();
                 colorMap.set(frog.getFaceColor("U", 5), 0);
                 colorMap.set(frog.getFaceColor("R", 5), 1);
