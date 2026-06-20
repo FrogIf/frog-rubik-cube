@@ -1,8 +1,6 @@
-import * as THREE from './threejs/three.module.js';
-import { OrbitControls } from './threejs/jsm/controls/OrbitControls.js';
-
+(function(){
 // 场景背景色
-const SCENE_BACKGROUND_COLOR = 0xFFFFFF;
+const SCENE_BACKGROUND_COLOR = 0x1a1a2e;
 // 魔方颜色
 const CubeColor = {
     D: 0,
@@ -80,7 +78,7 @@ const ThreeJsContainer = {
         parentDom.appendChild(this.renderer.domElement);
 
         // 初始化轨道控制器
-        this.orbitControler = new OrbitControls(this.camera, this.renderer.domElement);
+        this.orbitControler = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.orbitControler.rotateSpeed = 0.5;
 
         // 初始化魔方模型
@@ -221,8 +219,8 @@ function getRotatePathForRotatePermutationGroup(source, target){
         let fullsource = fillRotateStatusForRotatePermutation(source);
         if(fullsource == null){
             console.warn("nonexistent source status : ", source);
-            return null;
-        }
+    return null;
+}
         source = fullsource;
     }
     if(specialMatch(source, target)){
@@ -1330,7 +1328,7 @@ const rubikCube = {
     }
 };
 
-export function debug(){
+function debug(){
     // nothing
     return {
         position: rubikCube.cubeIndexMap,
@@ -1338,7 +1336,7 @@ export function debug(){
     };
 }
 
-export function scramble(onlyBasic){
+function scramble(onlyBasic){
     return rubikCube.scramble(onlyBasic);
 }
 
@@ -1358,7 +1356,7 @@ function decomposeCubeIndexToCoordinate(index){
 }
 
 // 添加魔方转动动作完成监听
-export function addActionDoneCallback(callback){
+function addActionDoneCallback(callback){
     if(rubikCube.actionDoneCallback == null){
         rubikCube.actionDoneCallback = callback;
     }else{
@@ -1371,49 +1369,49 @@ export function addActionDoneCallback(callback){
 }
 
 // 获取6个面中指定的面的指定位置的颜色, 面: F, R, U, D, B, L. 位置: 1 -- 9
-export function getFaceColor(face, index){
+function getFaceColor(face, index){
     return rubikCube.getColorByPosInfo(face, index);
 }
 
 // 调整魔方基
-export function rebase(){
+function rebase(){
     rubikCube.rebase();
 }
 
 // 执行指定的动作
-export function doAction(notation){
+function doAction(notation){
     let action = StandardCubeAction[notation];
     if(action){
         rubikCube.move(action, notation);
     }else{
-        console.warn("unrecognized notation");
+        console.warn("unrecognized notation", notation);
     }
 }
 
 // 重置魔方到初始状态
-export function reset(){
+function reset(){
     rubikCube.reset();
 }
 
 // 相机恢复至初始视角
-export function back(){
+function back(){
     ThreeJsContainer.cameraResetDefault();
 }
 
 // 初始化魔方
-export function init(domContainer, debug) {
+function init(domContainer, debug) {
     ThreeJsContainer.init(domContainer, rubikCube, debug);
     addListener();
 }
 
 // 3d窗体自适应
-export function resize() {
+function resize() {
     ThreeJsContainer.camera.aspect = window.innerWidth / window.innerHeight;
     ThreeJsContainer.camera.updateProjectionMatrix();
     ThreeJsContainer.renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-export function getColorSchemes(){
+function getColorSchemes(){
     let colors = [];
     for(let k in CubeColor){
         if(CubeColor.properties[CubeColor[k]]){
@@ -1423,7 +1421,7 @@ export function getColorSchemes(){
     return colors;
 }
 
-export function applyColorMap(colorMap, failedCallback, successCallback){
+function applyColorMap(colorMap, failedCallback, successCallback){
     let realColorMap = {};
     for(let k in colorMap){
         let v = colorMap[k];
@@ -1582,3 +1580,19 @@ function getIntersect(event) {
     }
     return null;
 }
+window.frog = {
+    init: init,
+    doAction: doAction,
+    reset: reset,
+    back: back,
+    resize: resize,
+    scramble: scramble,
+    getFaceColor: getFaceColor,
+    getColorSchemes: getColorSchemes,
+    applyColorMap: applyColorMap,
+    addActionDoneCallback: addActionDoneCallback,
+    debug: debug,
+    rebase: rebase
+};
+
+})();

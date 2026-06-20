@@ -1,3 +1,4 @@
+(function(){
 const zh = {
     "rebase": "变基",
     "reset": "重置",
@@ -24,7 +25,7 @@ const en = {
     "basic-scramble": "basic"
 };
 
-export function translate(key, lang){
+function translateText(key, lang){
     let t;
     if(lang == 'zh'){
         t = zh[key];
@@ -36,3 +37,7 @@ export function translate(key, lang){
     }
     return t;
 }
+
+window.trans = { translate: translateText };
+
+})();

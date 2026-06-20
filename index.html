@@ -6,12 +6,269 @@
         <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico" >
         <link rel="stylesheet" type="text/css" href="css/colorcube.css">
         <link rel="stylesheet" type="text/css" href="css/index.css">
-        <script type="module">
-            import * as frog from './js/ruuubik.js';
-            import * as lexer from './js/cube-lexer.js';
-            import * as trans from './js/translater.js';
-            import * as twoPhase from './js/twophase.js';
+	</head>
+	<body>
+        <div id="cubeBoxPanelClose" class="eye-button" style="position:absolute;left:12px;top:12px;">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="cubeBoxPanel" class="cube-box">
+            <div style="position:absolute;top:6px;left:280px;display:flex;gap:4px;">
+                <div id="cancelEditCubeColor" style="display: none;" class="eye-button">
+                    <img src="img/error.svg" alt="cancel" width="16" height="16"/>
+                </div>
+                <div id="editCubeBoxColor" class="eye-button">
+                    <img src="img/pen.svg" style="display: block;" id="beginEditCubeColor" alt="edit" width="16" height="16"/>
+                    <img src="img/right.svg" style="display: none;" id="finishEditCubeColor" alt="finish" width="16" height="16"/>
+                </div>
+                <div id="clampColor" class="eye-button" style="display: none;">
+                    <img src="img/chopsticks.svg" alt="color-picker" width="16" height="16"/>
+                </div>
+            </div>
+            <div id="colorEditTip" class="trans-lang" data-lang-key="color.edit.tip" style="display:none;position:absolute;top:34px;left:150px;width:120px;color:#888;font-size:10px;">
+                press 'ctrl' to multi-select
+            </div>
+            <div class="cube cube-box-row-0 cube-box-col-3" ><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-4" ><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-0 cube-box-col-5"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-3"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-4"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-1 cube-box-col-5"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-3"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-4"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-2 cube-box-col-5"><span class="debug-clz">9</span></div>
 
+            <div class="cube cube-box-row-3 cube-box-col-0"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-1"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-2"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-0"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-1"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-2"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-0"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-1"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-2"><span class="debug-clz">9</span></div>
+
+            <div class="cube cube-box-row-3 cube-box-col-3"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-4"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-5"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-3"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-4"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-5"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-3"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-4"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-5"><span class="debug-clz">9</span></div>
+
+            <div class="cube cube-box-row-3 cube-box-col-6"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-7"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-8"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-6"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-7"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-8"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-6"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-7"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-8"><span class="debug-clz">9</span></div>
+
+            <div class="cube cube-box-row-3 cube-box-col-9"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-10"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-3 cube-box-col-11"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-9"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-10"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-4 cube-box-col-11"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-9"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-10"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-5 cube-box-col-11"><span class="debug-clz">9</span></div>
+
+            <div class="cube cube-box-row-6 cube-box-col-3"><span class="debug-clz">1</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-4"><span class="debug-clz">2</span></div>
+            <div class="cube cube-box-row-6 cube-box-col-5"><span class="debug-clz">3</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-3"><span class="debug-clz">4</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-4"><span class="debug-clz">5</span></div>
+            <div class="cube cube-box-row-7 cube-box-col-5"><span class="debug-clz">6</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-3"><span class="debug-clz">7</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-4"><span class="debug-clz">8</span></div>
+            <div class="cube cube-box-row-8 cube-box-col-5"><span class="debug-clz">9</span></div>
+        </div>
+        <div id="rightPanelClose" class="eye-button" style="position:absolute;right:16px;top:16px;">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="rightControlPanel" class="right-control-panel">
+            <div style="display:flex;gap:6px;margin-bottom:10px;">
+                <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
+                <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
+                <button class="debug-clz" id="debugBtn">debug</button>
+            </div>
+            <div class="group-panel">
+                <div>
+                    <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
+                    <input id="basicScramble" type="checkbox" style="margin-left:6px;" /><span class="trans-lang" data-lang-key="basic-scramble">basic scramble</span>
+                </div>
+            </div>
+            <div class="group-panel">
+                <select id="solveAlg">
+                    <option value="1" class="trans-lang" data-lang-key="two-phase">Two-Phase Algorithm</option>
+                    <option value="2">CFOP</option>
+                </select>
+                <div>
+                    <button class="trans-lang" data-lang-key="solve" id="solveBtn">solve</button>
+                    <input id="execSolution" type="checkbox" style="margin-left:6px;" /><span class="trans-lang" data-lang-key="not-exec">not execute</span>
+                </div>
+            </div>
+            <div class="group-panel" style="text-align:center;">
+                <button id="xAction" style="width:32px;height:32px;padding:0;font-weight:600;">x</button>
+                <button id="yAction" style="width:32px;height:32px;padding:0;font-weight:600;margin:0 4px;">y</button>
+                <button id="zAction" style="width:32px;height:32px;padding:0;font-weight:600;">z</button>
+            </div>
+            <span class="trans-button">
+                <a href="javascript:;" id="translateBtn">中/EN</a>
+            </span>
+        </div>
+        <div id="bottomControlPanel" class="bottom-control-panel">
+            <div class="command-panel">
+                <div class="log-ouput-panel">
+                    <textarea id="logTextarea" readonly class="log-output"></textarea>
+                    <button id="textCleanBtn">C</button>
+                </div>
+                <div>
+                    <input id="commandInput" class="command-input" type="text"/>
+                    <button class="trans-lang" data-lang-key="run" id="runBtn" >run</button>
+                </div>
+            </div>
+            <div class="action-panel">
+                <div class="action-control-group">
+                    <button action="R" class="action-control"  >R</button>
+                    <button action="R_" class="action-control"  >R'</button>
+                    <button action="R2" class="action-control"  >R2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="U" class="action-control"  >U</button>
+                    <button action="U_" class="action-control"  >U'</button>
+                    <button action="U2" class="action-control"  >U2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="F" class="action-control"  >F</button>
+                    <button action="F_" class="action-control"  >F'</button>
+                    <button action="F2" class="action-control"  >F2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="D" class="action-control"  >D</button>
+                    <button action="D_" class="action-control"  >D'</button>
+                    <button action="D2" class="action-control"  >D2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="L" class="action-control"  >L</button>
+                    <button action="L_" class="action-control"  >L'</button>
+                    <button action="L2" class="action-control"  >L2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="B" class="action-control"  >B</button>
+                    <button action="B_" class="action-control"  >B'</button>
+                    <button action="B2" class="action-control"  >B2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="E" class="action-control"  >E</button>
+                    <button action="E_" class="action-control"  >E'</button>
+                    <button action="E2" class="action-control"  >E2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="M" class="action-control"  >M</button>
+                    <button action="M_" class="action-control"  >M'</button>
+                    <button action="M2" class="action-control"  >M2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="S" class="action-control"  >S</button>
+                    <button action="S_" class="action-control"  >S'</button>
+                    <button action="S2" class="action-control"  >S2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="r" class="action-control"  >r</button>
+                    <button action="r_" class="action-control"  >r'</button>
+                    <button action="r2" class="action-control"  >r2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="u" class="action-control"  >u</button>
+                    <button action="u_" class="action-control"  >u'</button>
+                    <button action="u2" class="action-control"  >u2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="f" class="action-control"  >f</button>
+                    <button action="f_" class="action-control"  >f'</button>
+                    <button action="f2" class="action-control"  >f2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="d" class="action-control"  >d</button>
+                    <button action="d_" class="action-control"  >d'</button>
+                    <button action="d2" class="action-control"  >d2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="l" class="action-control"  >l</button>
+                    <button action="l_" class="action-control"  >l'</button>
+                    <button action="l2" class="action-control"  >l2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="b" class="action-control"  >b</button>
+                    <button action="b_" class="action-control"  >b'</button>
+                    <button action="b2" class="action-control"  >b2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="x" class="action-control"  >x</button>
+                    <button action="x_" class="action-control"  >x'</button>
+                    <button action="x2" class="action-control"  >x2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="y" class="action-control"  >y</button>
+                    <button action="y_" class="action-control"  >y'</button>
+                    <button action="y2" class="action-control"  >y2</button>
+                </div>
+                <div class="action-control-group">
+                    <button action="z" class="action-control"  >z</button>
+                    <button action="z_" class="action-control"  >z'</button>
+                    <button action="z2" class="action-control"  >z2</button>
+                </div>
+            </div>
+        </div>
+        <div id="bottomPanelClose" class="eye-button" style="position:absolute;bottom:168px;right:16px;">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div id="over" style="display:none;">
+            <div>
+                <div style="font-size:13px;margin-bottom:14px;color:#aaa;">Select Color</div>
+                <div id="colorOptional"></div>
+                <div style="margin-top:6px;">
+                    <button type="button" id="colorDiscConfirm">OK</button>
+                    <button type="button" id="colorDiscCancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+        <script src="js/threejs/three.min.js"></script>
+        <script src="js/threejs/jsm/controls/OrbitControls-global.js"></script>
+        <script src="js/translater.js"></script>
+        <script src="js/cube-lexer.js"></script>
+        <script src="js/twophase.js"></script>
+        <script src="js/ruuubik.js"></script>
+        <script>
             const isDebug = false;
 
             var lang = window.navigator.language.slice(0, 2);
@@ -46,7 +303,11 @@
                 }
             }
 
-            window.onload = function(){
+            function startApp(){
+                if(!document.body){
+                    requestAnimationFrame(startApp);
+                    return;
+                }
                 frog.init(document.body, isDebug);
                 faceColorRefresh();
                 colourDisc.refreshColorOptional(frog.getColorSchemes());
@@ -66,6 +327,9 @@
 
                 });
             }
+
+            setTimeout(startApp, 0);
+
             window.onresize = function () {
                 frog.resize();
             };
@@ -283,16 +547,10 @@
                 refreshColorOptional: function (colors){
                     let dom = document.getElementById("colorOptional");
                     dom.innerHTML = '';
-                    let line = Math.floor(Math.sqrt(colors.length));
                     for(let i = 0; i < colors.length; i++){
                         let color = colors[i];
                         let ele = document.createElement('div');
-                        ele.style.margin = '2px 10px';
-                        ele.style.height = '20px';
-                        ele.style.cursor = 'pointer';
-                        ele.style.position = 'relative';
                         ele.style.backgroundColor = color;
-                        ele.style.border = '1px solid black';
                         ele.onclick = () => {
                             this.selectColor = color;
                         };
@@ -320,7 +578,7 @@
             }
 
             document.getElementById("solveBtn").onclick = () => {
-                OutputConsole.println("solving, please wait...");
+                OutputConsole.println("\nsolving, please wait...");
                 let colorMap = new Map();
                 colorMap.set(frog.getFaceColor("U", 5), 0);
                 colorMap.set(frog.getFaceColor("R", 5), 1);
@@ -389,260 +647,5 @@
                 }
             }
         </script>
-	</head>
-	<body>
-        <div id="cubeBoxPanelClose" class="eye-button" style="position:absolute;left:0px;top:0px;">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div id="cubeBoxPanel" class="cube-box">
-            <div style="position:absolute;top:0px;left:270px;">
-                <div id="cancelEditCubeColor" style="display: none;" class="eye-button">
-                    <img src="img/error.svg" alt="right" width="15" height="15"/>
-                </div>
-                <div id="editCubeBoxColor" class="eye-button">
-                    <img src="img/pen.svg" style="display: block;" id="beginEditCubeColor" alt="edit" width="15" height="15"/>
-                    <img src="img/right.svg" style="display: none;" id="finishEditCubeColor" alt="right" width="15" height="15"/>
-                </div>
-                <div id="clampColor" class="eye-button" style="display: none;">
-                    <img src="img/chopsticks.svg" alt="chopsticks" width="15" height="15"/>
-                </div>
-            </div>
-            <div id="colorEditTip" class="trans-lang" data-lang-key="color.edit.tip" style="display:none;position:absolute;top:0px;left:150px;width: 100px;color: grey;font-size: 10px;">
-                press 'ctrl' to multi-select
-            </div>
-            <div class="cube cube-box-row-0 cube-box-col-3" ><span class="debug-clz">1</span></div>
-            <div class="cube cube-box-row-0 cube-box-col-4" ><span class="debug-clz">2</span></div>
-            <div class="cube cube-box-row-0 cube-box-col-5"><span class="debug-clz">3</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-3"><span class="debug-clz">4</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-4"><span class="debug-clz">5</span></div>
-            <div class="cube cube-box-row-1 cube-box-col-5"><span class="debug-clz">6</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-3"><span class="debug-clz">7</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-4"><span class="debug-clz">8</span></div>
-            <div class="cube cube-box-row-2 cube-box-col-5"><span class="debug-clz">9</span></div>
-
-            <div class="cube cube-box-row-3 cube-box-col-0"><span class="debug-clz">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-1"><span class="debug-clz">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-2"><span class="debug-clz">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-0"><span class="debug-clz">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-1"><span class="debug-clz">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-2"><span class="debug-clz">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-0"><span class="debug-clz">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-1"><span class="debug-clz">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-2"><span class="debug-clz">9</span></div>
-
-            <div class="cube cube-box-row-3 cube-box-col-3"><span class="debug-clz">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-4"><span class="debug-clz">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-5"><span class="debug-clz">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-3"><span class="debug-clz">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-4"><span class="debug-clz">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-5"><span class="debug-clz">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-3"><span class="debug-clz">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-4"><span class="debug-clz">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-5"><span class="debug-clz">9</span></div>
-
-            <div class="cube cube-box-row-3 cube-box-col-6"><span class="debug-clz">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-7"><span class="debug-clz">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-8"><span class="debug-clz">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-6"><span class="debug-clz">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-7"><span class="debug-clz">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-8"><span class="debug-clz">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-6"><span class="debug-clz">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-7"><span class="debug-clz">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-8"><span class="debug-clz">9</span></div>
-
-            <div class="cube cube-box-row-3 cube-box-col-9"><span class="debug-clz">1</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-10"><span class="debug-clz">2</span></div>
-            <div class="cube cube-box-row-3 cube-box-col-11"><span class="debug-clz">3</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-9"><span class="debug-clz">4</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-10"><span class="debug-clz">5</span></div>
-            <div class="cube cube-box-row-4 cube-box-col-11"><span class="debug-clz">6</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-9"><span class="debug-clz">7</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-10"><span class="debug-clz">8</span></div>
-            <div class="cube cube-box-row-5 cube-box-col-11"><span class="debug-clz">9</span></div>
-
-            <div class="cube cube-box-row-6 cube-box-col-3"><span class="debug-clz">1</span></div>
-            <div class="cube cube-box-row-6 cube-box-col-4"><span class="debug-clz">2</span></div>
-            <div class="cube cube-box-row-6 cube-box-col-5"><span class="debug-clz">3</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-3"><span class="debug-clz">4</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-4"><span class="debug-clz">5</span></div>
-            <div class="cube cube-box-row-7 cube-box-col-5"><span class="debug-clz">6</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-3"><span class="debug-clz">7</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-4"><span class="debug-clz">8</span></div>
-            <div class="cube cube-box-row-8 cube-box-col-5"><span class="debug-clz">9</span></div>
-        </div>
-        <div id="rightPanelClose" class="eye-button" style="position:absolute;right:0px;top:0px;">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div id="rightControlPanel" class="right-control-panel">
-            <div style="margin-bottom: 10px;">
-                <button class="trans-lang" data-lang-key="reset" id="resetBtn">reset</button>
-                <button class="trans-lang" data-lang-key="home" id="homeBtn">home</button>
-                <button class="debug-clz" id="debugBtn">debug</button>
-            </div>
-            <div class="group-panel">
-                <div>
-                    <button class="trans-lang" data-lang-key="scramble" id="scrambleBtn">scramble</button>
-                    <input id="basicScramble" type="checkbox" /><span class="trans-lang" data-lang-key="basic-scramble">basic scramble<span>
-                </div>
-            </div>
-            <div class="group-panel">
-                <select id="solveAlg" style="height:25px; border: 1px solid gray; border-radius: 3px;background-color:rgb(207, 207, 207);margin: 5px 0px;">
-                    <option value="1" class="trans-lang" data-lang-key="two-phase">Two-Phase Algorithm</option>
-                    <option value="2">CFOP</option>
-                </select>
-                <div>
-                    <button class="trans-lang" data-lang-key="solve" id="solveBtn">solve</button>
-                    <input id="execSolution" type="checkbox" /><span class="trans-lang" data-lang-key="not-exec">not execute<span>
-                </div>
-            </div>
-            <div class="group-panel" style="text-align: center;">
-                <button id="xAction" style="height: 30px; width: 30px; margin: 0px 5px;">x</button>
-                <button id="yAction" style="height: 30px; width: 30px; margin: 0px 5px;">y</button>
-                <button id="zAction" style="height: 30px; width: 30px; margin: 0px 5px;">z</button>
-            </div>
-            <span class="trans-button">
-                <a href="javascript:;" id="translateBtn">中/EN</a>
-            </span>
-        </div>
-        <div id="bottomControlPanel" class="bottom-control-panel">
-            <div class="command-panel">
-                <div class="log-ouput-panel">
-                    <textarea id="logTextarea" readonly class="log-output"></textarea>
-                    <button id="textCleanBtn">C</button>
-                </div>
-                <div>
-                    <input id="commandInput" class="command-input" type="text"/>
-                    <button class="trans-lang" data-lang-key="run" id="runBtn" >run</button>
-                </div>
-            </div>
-            <div class="action-panel">
-                <div class="action-control-group">
-                    <button action="R" class="action-control"  >R</button>
-                    <button action="R_" class="action-control"  >R'</button>
-                    <button action="R2" class="action-control"  >R2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="U" class="action-control"  >U</button>
-                    <button action="U_" class="action-control"  >U'</button>
-                    <button action="U2" class="action-control"  >U2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="F" class="action-control"  >F</button>
-                    <button action="F_" class="action-control"  >F'</button>
-                    <button action="F2" class="action-control"  >F2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="D" class="action-control"  >D</button>
-                    <button action="D_" class="action-control"  >D'</button>
-                    <button action="D2" class="action-control"  >D2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="L" class="action-control"  >L</button>
-                    <button action="L_" class="action-control"  >L'</button>
-                    <button action="L2" class="action-control"  >L2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="B" class="action-control"  >B</button>
-                    <button action="B_" class="action-control"  >B'</button>
-                    <button action="B2" class="action-control"  >B2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="E" class="action-control"  >E</button>
-                    <button action="E_" class="action-control"  >E'</button>
-                    <button action="E2" class="action-control"  >E2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="M" class="action-control"  >M</button>
-                    <button action="M_" class="action-control"  >M'</a>
-                    <button action="M2" class="action-control"  >M2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="S" class="action-control"  >S</button>
-                    <button action="S_" class="action-control"  >S'</button>
-                    <button action="S2" class="action-control"  >S2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="r" class="action-control"  >r</button>
-                    <button action="r_" class="action-control"  >r'</button>
-                    <button action="r2" class="action-control"  >r2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="u" class="action-control"  >u</button>
-                    <button action="u_" class="action-control"  >u'</button>
-                    <button action="u2" class="action-control"  >u2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="f" class="action-control"  >f</button>
-                    <button action="f_" class="action-control"  >f'</button>
-                    <button action="f2" class="action-control"  >f2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="d" class="action-control"  >d</button>
-                    <button action="d_" class="action-control"  >d'</button>
-                    <button action="d2" class="action-control"  >d2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="l" class="action-control"  >l</button>
-                    <button action="l_" class="action-control"  >l'</button>
-                    <button action="l2" class="action-control"  >l2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="b" class="action-control"  >b</button>
-                    <button action="b_" class="action-control"  >b'</button>
-                    <button action="b2" class="action-control"  >b2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="x" class="action-control"  >x</button>
-                    <button action="x_" class="action-control"  >x'</button>
-                    <button action="x2" class="action-control"  >x2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="y" class="action-control"  >y</button>
-                    <button action="y_" class="action-control"  >y'</button>
-                    <button action="y2" class="action-control"  >y2</button>
-                </div>
-                <div class="action-control-group">
-                    <button action="z" class="action-control"  >z</button>
-                    <button action="z_" class="action-control"  >z'</button>
-                    <button action="z2" class="action-control"  >z2</button>
-                </div>
-            </div>
-        </div>
-        <div id="bottomPanelClose" class="eye-button" style="position:absolute;bottom:0px;right:0px;">
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-        <div id="over" style="display:none;">
-            <div style="padding: 20px 20px;">
-                <div id="colorOptional"></div>
-                <div style="padding: 20px 20px;">
-                    <button type="button" id="colorDiscConfirm" >确定</button>
-                    <button type="button" id="colorDiscCancel" >取消</button>
-                </div>
-            </div>
-        </div>
 	</body>
 </html>
