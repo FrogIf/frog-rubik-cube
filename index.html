@@ -28,12 +28,9 @@
                     <img src="img/pen.svg" style="display: block;" id="beginEditCubeColor" alt="edit" width="16" height="16"/>
                     <img src="img/right.svg" style="display: none;" id="finishEditCubeColor" alt="finish" width="16" height="16"/>
                 </div>
-                <div id="clampColor" class="eye-button" style="display: none;">
-                    <img src="img/chopsticks.svg" alt="color-picker" width="16" height="16"/>
-                </div>
             </div>
-            <div id="colorEditTip" class="trans-lang" data-lang-key="color.edit.tip" style="display:none;position:absolute;top:34px;left:150px;width:120px;color:#888;font-size:10px;">
-                press 'ctrl' to multi-select
+            <div id="colorEditTip" style="display:none;position:absolute;top:252px;left:30px;width:260px;color:#888;font-size:10px;">
+                pick a color then click blocks to paint (9 per color)
             </div>
             <div class="cube cube-box-row-0 cube-box-col-3" ><span class="debug-clz">1</span></div>
             <div class="cube cube-box-row-0 cube-box-col-4" ><span class="debug-clz">2</span></div>
@@ -94,6 +91,7 @@
             <div class="cube cube-box-row-8 cube-box-col-3"><span class="debug-clz">7</span></div>
             <div class="cube cube-box-row-8 cube-box-col-4"><span class="debug-clz">8</span></div>
             <div class="cube cube-box-row-8 cube-box-col-5"><span class="debug-clz">9</span></div>
+            <div id="brushPalette" style="display:none;position:absolute;top:218px;left:30px;gap:8px;"></div>
         </div>
         <div id="rightPanelClose" class="eye-button" style="position:absolute;right:16px;top:16px;">
             <span></span>
@@ -252,16 +250,6 @@
             <span></span>
             <span></span>
         </div>
-        <div id="over" style="display:none;">
-            <div>
-                <div style="font-size:13px;margin-bottom:14px;color:#aaa;">Select Color</div>
-                <div id="colorOptional"></div>
-                <div style="margin-top:6px;">
-                    <button type="button" id="colorDiscConfirm">OK</button>
-                    <button type="button" id="colorDiscCancel">Cancel</button>
-                </div>
-            </div>
-        </div>
         <script src="js/threejs/three.min.js"></script>
         <script src="js/threejs/jsm/controls/OrbitControls-global.js"></script>
         <script src="js/translater.js"></script>
@@ -310,8 +298,6 @@
                 }
                 frog.init(document.body, isDebug);
                 faceColorRefresh();
-                colourDisc.refreshColorOptional(frog.getColorSchemes());
-                colourDisc.init();
                 if(isDebug){
                     debug();
                 }
@@ -444,18 +430,22 @@
 
             function overCubeColorEdit(){
                 document.getElementById("beginEditCubeColor").style.display = 'block';
-                    document.getElementById("finishEditCubeColor").style.display = 'none';
-                    document.getElementById("cancelEditCubeColor").style.display = 'none';
-                    document.getElementById("clampColor").style.display = 'none';
-                    document.getElementById("colorEditTip").style.display = 'none';
+                document.getElementById("finishEditCubeColor").style.display = 'none';
+                document.getElementById("cancelEditCubeColor").style.display = 'none';
+                document.getElementById("colorEditTip").style.display = 'none';
+                document.getElementById("brushPalette").style.display = 'none';
 
-                    let cubes = document.getElementsByClassName("cube");
-                    for(let cube of cubes){
-                        cube.classList.remove('cube-editable');
-                        cube.classList.remove('cube-selected');
-                        cube.classList.remove('cube-changed');
-                        cube.onclick = null;
-                    }
+                brushState.activeColor = null;
+                brushState.counters = {};
+
+                let cubes = document.getElementsByClassName("cube");
+                for(let cube of cubes){
+                    cube.classList.remove('cube-editable');
+                    cube.classList.remove('cube-selected');
+                    cube.classList.remove('cube-changed');
+                    cube.onclick = null;
+                    cube.removeAttribute('data-brush-color');
+                }
             }
 
             document.getElementById("editCubeBoxColor").onclick = () => {
@@ -464,28 +454,17 @@
                     document.getElementById("beginEditCubeColor").style.display = 'none';
                     document.getElementById("cancelEditCubeColor").style.display = 'block';
                     document.getElementById("colorEditTip").style.display = 'block';
+                    document.getElementById("brushPalette").style.display = 'flex';
+
+                    initBrushPalette();
 
                     let cubes = document.getElementsByClassName("cube");
-                    for(let i = 0; i < cubes.length; i++){
-                        let cube = cubes[i];
+                    for(let cube of cubes){
                         cube.classList.add('cube-editable');
-                        cube.onclick = (e) => {
-                            if(cube.classList.contains('cube-selected')){
-                                cube.classList.remove('cube-selected');
-                            }else{
-                                if(!window.event.ctrlKey){
-                                    document.getElementById("clampColor").style.display = 'none';
-                                    for(let c of cubes){
-                                        c.classList.remove('cube-selected');
-                                    }
-                                    cube.classList.add('cube-selected');
-                                    colourDisc.openDisc();
-                                }else{
-                                    document.getElementById("clampColor").style.display = 'block';
-                                    cube.classList.add('cube-selected');
-                                }
-                            }
-                        }
+                        cube.removeAttribute('data-brush-color');
+                        cube.onclick = () => {
+                            paintCube(cube);
+                        };
                     }
                 }else{ // 完成编辑
                     frog.applyColorMap(convertToStandardColorInfo(), () => {
@@ -499,10 +478,6 @@
             document.getElementById("cancelEditCubeColor").onclick = () => {
                 faceColorRefresh();
                 overCubeColorEdit();
-            };
-
-            document.getElementById("clampColor").onclick = () => {
-                colourDisc.openDisc();
             };
 
             // 转换为标准的颜色分布
@@ -520,56 +495,92 @@
                 return colorMap;
             }
 
-            // 色盘
-            const colourDisc = {
-                selectColor: "#FFFFFF",
-                init: function(){
-                    document.getElementById("colorDiscConfirm").onclick = () => {
-                        this.confirm();
-                    };
-                    document.getElementById("colorDiscCancel").onclick = () => {
-                        this.closeDisc();
-                    };
-                },
-                openDisc: function(){
-                    var over = document.querySelector('#over');
-                    over.style.display = 'block';
-                },
-                closeDisc: function(){
-                    var over = document.querySelector('#over');
-                    over.style.display = 'none';
-                    let cubes = document.getElementsByClassName("cube");
-                    for(let cube of cubes){
-                        cube.classList.remove('cube-selected');
-                    }
-                },
-                // 刷新颜色可选值dom
-                refreshColorOptional: function (colors){
-                    let dom = document.getElementById("colorOptional");
-                    dom.innerHTML = '';
-                    for(let i = 0; i < colors.length; i++){
-                        let color = colors[i];
-                        let ele = document.createElement('div');
-                        ele.style.backgroundColor = color;
-                        ele.onclick = () => {
-                            this.selectColor = color;
-                        };
-                        ele.ondblclick = () => {
-                            this.selectColor = color;
-                            this.confirm();
-                        };
-                        dom.appendChild(ele);
-                    }
-                },
-                confirm: function(){
-                    let cubes = document.getElementsByClassName("cube-selected");
-                    for(let cube of cubes){
-                        cube.style.backgroundColor = this.selectColor;
-                        cube.classList.add('cube-changed');
-                    }
-                    this.closeDisc();
-                }
+            // brush palette
+            const brushState = {
+                activeColor: null,
+                counters: {}
             };
+
+            function initBrushPalette(){
+                let palette = document.getElementById('brushPalette');
+                let colors = frog.getColorSchemes();
+                palette.innerHTML = '';
+                brushState.counters = {};
+                brushState.activeColor = null;
+
+                colors.forEach(function(color){
+                    brushState.counters[color] = 9;
+
+                    let swatch = document.createElement('div');
+                    swatch.className = 'brush-swatch';
+                    swatch.style.backgroundColor = color;
+                    swatch.setAttribute('data-color', color);
+
+                    let counter = document.createElement('span');
+                    counter.className = 'brush-counter';
+                    counter.textContent = '9';
+                    swatch.appendChild(counter);
+
+                    swatch.onclick = function(){
+                        if(brushState.counters[color] <= 0) return;
+                        if(brushState.activeColor === color){
+                            swatch.classList.remove('selected');
+                            brushState.activeColor = null;
+                        }else{
+                            palette.querySelectorAll('.brush-swatch').forEach(function(s){ s.classList.remove('selected'); });
+                            swatch.classList.add('selected');
+                            brushState.activeColor = color;
+                        }
+                    };
+
+                    palette.appendChild(swatch);
+                });
+            }
+
+            function updateBrushCounter(color){
+                let palette = document.getElementById('brushPalette');
+                let swatch = palette.querySelector('[data-color="' + color + '"]');
+                if(!swatch) return;
+                let count = brushState.counters[color];
+                swatch.querySelector('.brush-counter').textContent = count;
+                if(count <= 0){
+                    swatch.classList.add('exhausted');
+                    if(brushState.activeColor === color){
+                        brushState.activeColor = null;
+                        swatch.classList.remove('selected');
+                    }
+                }else{
+                    swatch.classList.remove('exhausted');
+                }
+            }
+
+            function paintCube(cube){
+                if(!brushState.activeColor) return;
+                let color = brushState.activeColor;
+
+                let prevColor = cube.getAttribute('data-brush-color');
+
+                if(prevColor === color){
+                    cube.removeAttribute('data-brush-color');
+                    cube.style.backgroundColor = '#555555';
+                    cube.classList.remove('cube-changed');
+                    brushState.counters[color]++;
+                    updateBrushCounter(color);
+                    return;
+                }
+
+                if(prevColor && brushState.counters[prevColor] !== undefined){
+                    brushState.counters[prevColor]++;
+                    updateBrushCounter(prevColor);
+                }
+
+                cube.setAttribute('data-brush-color', color);
+                cube.style.backgroundColor = color;
+                cube.classList.add('cube-changed');
+
+                brushState.counters[color]--;
+                updateBrushCounter(color);
+            }
 
             document.getElementById("scrambleBtn").onclick = () => {
                 OutputConsole.println();

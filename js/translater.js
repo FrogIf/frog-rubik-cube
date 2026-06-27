@@ -2,9 +2,8 @@
 const zh = {
     "rebase": "变基",
     "reset": "重置",
-    "home": "归位",
+    "home": "视角归位",
     "run": "运行",
-    "color.edit.tip":"按'ctrl'多选",
     "scramble":"打乱",
     "solve": "还原",
     "two-phase": "两阶段算法",
@@ -15,9 +14,8 @@ const zh = {
 const en = {
     "rebase": "rebase",
     "reset": "reset",
-    "home": "home",
+    "home": "perspective restored",
     "run": "run",
-    "color.edit.tip":"press 'ctrl' to multi-select",
     "scramble": "scramble",
     "solve": "solve",
     "two-phase": "Two-Phase Algorithm",
