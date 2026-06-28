@@ -608,30 +608,33 @@
 
                 let alg = document.getElementById("solveAlg").value;
                 let notexec = document.getElementById("execSolution").checked;
-                let path = null;
-                if(alg == 1){   // 使用两阶段算法还原
-                    path = twoPhase.solve(cubeStatus);
-                    if(path && path.length > 0){
-                        let commandStr = '';
-                        for(let p of path){
-                            commandStr += p + ' ';
-                        }
-                        if(!notexec){
-                            executeActionLine(commandStr, () => {
+
+                setTimeout(function(){
+                    let path = null;
+                    if(alg == 1){   // 使用两阶段算法还原
+                        path = twoPhase.solve(cubeStatus);
+                        if(path && path.length > 0){
+                            let commandStr = '';
+                            for(let p of path){
+                                commandStr += p + ' ';
+                            }
+                            if(!notexec){
+                                executeActionLine(commandStr, () => {
+                                    OutputConsole.println();
+                                    OutputConsole.println("finish");
+                                });
+                            }else{
                                 OutputConsole.println();
-                                OutputConsole.println("finish");
-                            });
+                                OutputConsole.println("solution : " + commandStr);
+                            }
                         }else{
                             OutputConsole.println();
-                            OutputConsole.println("solution : " + commandStr);
+                            OutputConsole.println("no move");
                         }
                     }else{
-                        OutputConsole.println();
-                        OutputConsole.println("no move");
+                        alert("开发中...");
                     }
-                }else{
-                    alert("开发中...");
-                }
+                }, 0);
             }
 
             document.getElementById("xAction").onclick = () => {
