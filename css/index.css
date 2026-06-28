@@ -140,86 +140,104 @@ input[type="checkbox"] + span {
   display: flex;
 }
 .bottom-control-panel .command-panel {
-  width: 63%;
+  width: 55%;
   padding: 12px 14px;
-  height: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   border-right: 1px solid var(--border-subtle);
   box-sizing: border-box;
 }
 .bottom-control-panel .action-panel {
   flex: 1;
-  height: 160px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   box-sizing: border-box;
   overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 5px;
 }
 
 /* === Log Output === */
 .log-output {
-  width: 92%;
-  height: 90px;
+  flex: 1;
   border: 1px solid var(--border-normal);
   border-radius: var(--radius-sm);
   background: var(--bg-input);
   color: var(--text-primary);
   font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-  font-size: 12px;
-  padding: 8px;
+  font-size: 11px;
+  padding: 8px 10px;
   resize: none;
   outline: none;
+  box-sizing: border-box;
 }
 .log-output:focus {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* === Command Input === */
+/* === Command Input Row === */
+.command-input-row {
+  display: flex;
+  gap: 6px;
+}
 .command-input {
-  width: 82%;
+  flex: 1;
   border: 1px solid var(--border-normal);
   border-radius: var(--radius-sm);
   background: var(--bg-input);
   color: var(--text-primary);
-  padding: 6px 10px;
+  padding: 7px 10px;
   font-size: 13px;
   outline: none;
   font-family: inherit;
   transition: border-color var(--transition-fast);
+  box-sizing: border-box;
 }
 .command-input:focus {
   border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* === Action Buttons Grid === */
+/* === Action Button Groups === */
+.action-control-group {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px 4px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* === Action Buttons === */
 .action-control {
-  margin: 2px 2px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.07);
-  color: #ccc;
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #bbb;
   cursor: pointer;
   font-size: 11px;
-  font-weight: 500;
-  padding: 3px 8px;
-  min-width: 26px;
+  font-weight: 600;
   text-align: center;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   transition: all var(--transition-fast);
+  min-width: auto;
 }
 .action-control:hover {
-  background: rgba(255, 255, 255, 0.14);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
   color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 .action-control:active {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(0.93);
-}
-.action-control-group {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-sm);
-  display: inline-block;
-  margin-bottom: 4px;
-  padding: 3px 3px;
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(0.94) translateY(0);
+  box-shadow: none;
 }
 
 /* === Action panel scrollbar === */
@@ -350,10 +368,21 @@ input[type="checkbox"] + span {
   box-sizing: border-box;
 }
 
-/* === Text Clean Button === */
-#textCleanBtn {
-  vertical-align: top;
-  margin-left: 4px;
+/* === Log Output Panel === */
+.log-ouput-panel {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  flex: 1;
+  min-height: 0;
+}
+.log-ouput-panel button {
+  flex-shrink: 0;
+  align-self: stretch;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 /* === Debug Helper === */
@@ -364,17 +393,6 @@ input[type="checkbox"] + span {
 /* === Color Edit Tip === */
 #colorEditTip {
   color: var(--text-muted) !important;
-}
-
-/* === Log Output Panel === */
-.log-ouput-panel {
-  display: flex;
-  align-items: flex-start;
-}
-.log-ouput-panel button {
-  padding: 4px 8px;
-  font-size: 10px;
-  line-height: 1;
 }
 
 /* === Transition for collapsing panels === */

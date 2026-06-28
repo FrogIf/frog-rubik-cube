@@ -147,7 +147,7 @@
                     <textarea id="logTextarea" readonly class="log-output"></textarea>
                     <button id="textCleanBtn">C</button>
                 </div>
-                <div>
+                <div class="command-input-row">
                     <input id="commandInput" class="command-input" type="text"/>
                     <button class="trans-lang" data-lang-key="run" id="runBtn" >run</button>
                 </div>
@@ -626,7 +626,7 @@
                             }
                             if(!notexec){
                                 executeActionLine(commandStr, () => {
-                                    OutputConsole.println();
+                                    // OutputConsole.println();
                                     OutputConsole.println("finish");
                                 });
                             }else{
