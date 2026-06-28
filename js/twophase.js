@@ -1,3 +1,4 @@
+(function(){
 /**
  * 两阶段算法(HTM)
  * author: frogif
@@ -2009,7 +2010,7 @@ function convertPath(path){
  * B4, B5, B6,
  * B7, B8, B9
  */
-export function solve(cube){
+function solve(cube){
     console.time("totalInit");
     init();
     console.timeEnd("totalInit");
@@ -2162,3 +2163,7 @@ function binarySearch(target, array){
     }
     return -1;
 }
+
+window.twoPhase = { solve: solve };
+
+})();

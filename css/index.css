@@ -1,161 +1,434 @@
+/* === Root Variables === */
+:root {
+  --bg-panel: rgba(20, 20, 40, 0.82);
+  --bg-panel-solid: #1a1a2e;
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --bg-surface-hover: rgba(255, 255, 255, 0.08);
+  --bg-surface-active: rgba(255, 255, 255, 0.12);
+  --bg-input: rgba(0, 0, 0, 0.3);
+  --border-subtle: rgba(255, 255, 255, 0.07);
+  --border-normal: rgba(255, 255, 255, 0.12);
+  --text-primary: #e0e0e0;
+  --text-secondary: #999;
+  --text-muted: #666;
+  --shadow-panel: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* === Base === */
 body {
-    overflow-y: hidden; 
-    margin: 0; 
-}
-.right-control-panel{
-    right: 10px;
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    border-radius: 5px;
-    background-color: rgba(191,191,191,0.4);
-    padding: 10px 10px;
-}
-.right-control-panel .trans-button{
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
+  overflow-y: hidden;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+  background: #12121f;
 }
 
-.right-control-panel .trans-button a{
-    text-decoration:none;
-    color:gray;
+/* === Standard Button === */
+button {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  outline: none;
+}
+button:hover {
+  background: var(--bg-surface-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+button:active {
+  background: var(--bg-surface-active);
+  transform: scale(0.96);
+}
+button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
-.bottom-control-panel{
-    position: absolute;
-    bottom: 0px;
-    width: 100%;
-    height: 160px;
-    border-radius: 5px;
-    background-color: rgba(191,191,191,0.4);
-    box-sizing: border-box;
+/* === Right Control Panel === */
+.right-control-panel {
+  position: absolute;
+  right: 16px;
+  top: 6px;
+  width: 210px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  padding: 16px;
+  box-shadow: var(--shadow-panel);
+  color: var(--text-primary);
+  z-index: 10;
 }
-.bottom-control-panel .command-panel{
-    width: 63%;
-    display: inline-block;
-    padding: 10px 10px;
-    height: 160px;
-    border-right: 1px dotted rgba(0, 0, 0, 0.8);
-    box-sizing: border-box;
+.right-control-panel .trans-button {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
 }
-.bottom-control-panel .action-panel{
-    display: inline-block; 
-    width: 36%;
-    height: 160px;
-    padding: 10px 10px;
-    box-sizing: border-box;
-    position: absolute;
-    overflow: auto;
+.right-control-panel .trans-button a {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-size: 11px;
+  transition: color var(--transition-fast);
 }
-.action-control{
-    margin: 3px 3px;
-    border-radius: 2px;
-    border: 1px solid black; 
-    cursor: pointer;
-    font-size: 10px;
-}
-.action-control-group{
-    border: 1px dotted rgba(0, 0, 0, 0.8);
-    border-radius: 5px;
-    display: inline-block;
-    margin-bottom: 1px;
-}
-.log-output{
-    width:92%;
-    height: 100px;
+.right-control-panel .trans-button a:hover {
+  color: var(--text-primary);
 }
 
-.command-input{
-    width: 90%;
+/* === Panel Group === */
+.group-panel {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-top: 8px;
+}
+.group-panel select {
+  height: 28px;
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 12px;
+  padding: 0 6px;
+  margin: 6px 0;
+  width: 100%;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+}
+.group-panel select option {
+  background: var(--bg-panel-solid);
+  color: var(--text-primary);
 }
 
-#textCleanBtn{
-    vertical-align:top;
+/* === Checkbox Label === */
+input[type="checkbox"] {
+  accent-color: #0051BA;
+  cursor: pointer;
+  vertical-align: middle;
+}
+input[type="checkbox"] + span {
+  color: var(--text-secondary);
+  font-size: 11px;
+  vertical-align: middle;
 }
 
-.eye-button{
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
+/* === Resize Handle === */
+.resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 5;
 }
-.eye-button span{
-    width: 2px;
-    height: 2px;
-    position: absolute;
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background var(--transition-fast);
 }
-.eye-button span:nth-of-type(1){
-    right: 20%;
-    top: 20%;
-    background-color: #009E60;
-}
-.eye-button span:nth-of-type(2){
-    right: 50%;
-    top: 20%;
-    background-color: #FF5800;
-}
-.eye-button span:nth-of-type(3){
-    right: 80%;
-    top: 20%;
-    background-color: #FFD500;
-}
-.eye-button span:nth-of-type(4){
-    right: 20%;
-    top: 50%;
-    background-color: #C41E3A;
-}
-.eye-button span:nth-of-type(5){
-    right: 50%;
-    top: 50%;
-    background-color: #FFFFFF;
-}
-.eye-button span:nth-of-type(6){
-    right: 80%;
-    top: 50%;
-    background-color: #0051BA;
-}
-.eye-button span:nth-of-type(7){
-    right: 20%;
-    top: 80%;
-    background-color: #FFD500;
-}
-.eye-button span:nth-of-type(8){
-    right: 50%;
-    top: 80%;
-    background-color: #FF5800;
-}
-.eye-button span:nth-of-type(9){
-    right: 80%;
-    top: 80%;
-    background-color: #009E60;
+.resize-handle:hover::after {
+  background: rgba(255, 255, 255, 0.4);
 }
 
-.debug-clz{
-    display: none;
+/* === Bottom Control Panel === */
+.bottom-control-panel {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 160px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border-subtle);
+  box-shadow: 0 -2px 24px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  z-index: 10;
+  display: flex;
+}
+.bottom-control-panel .command-panel {
+  width: 55%;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-right: 1px solid var(--border-subtle);
+  box-sizing: border-box;
+}
+.bottom-control-panel .action-panel {
+  flex: 1;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 5px;
 }
 
-#over {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    background-color: rgba(145,152, 159, 0.5);
-    z-index: 20;
+/* === Log Output === */
+.log-output {
+  flex: 1;
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+  font-size: 11px;
+  padding: 8px 10px;
+  resize: none;
+  outline: none;
+  box-sizing: border-box;
+}
+.log-output:focus {
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-#over>div {
-    width: 300px;
-    height: 200px;
-    margin: 0 auto;
-    margin-top: 200px;
-    text-align: center;
-    padding: 1px;
-    background-color: white;
-    border-radius: 10px;
+/* === Command Input Row === */
+.command-input-row {
+  display: flex;
+  gap: 6px;
+}
+.command-input {
+  flex: 1;
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  padding: 7px 10px;
+  font-size: 13px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--transition-fast);
+  box-sizing: border-box;
+}
+.command-input:focus {
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
-.group-panel{
-    border: 1px solid gray; 
-    border-radius: 5px; 
-    padding: 5px; 
-    margin-top: 5px;
+/* === Action Button Groups === */
+.action-control-group {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px 4px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* === Action Buttons === */
+.action-control {
+  width: 30px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #bbb;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.2px;
+  transition: all var(--transition-fast);
+  min-width: auto;
+}
+.action-control:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+.action-control:active {
+  background: rgba(255, 255, 255, 0.18);
+  transform: scale(0.94) translateY(0);
+  box-shadow: none;
+}
+
+/* === Action panel scrollbar === */
+.action-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.action-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.action-panel::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+.action-panel::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* === Eye Buttons (Panel Toggles) === */
+.eye-button {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  flex-wrap: wrap;
+  padding: 6px;
+  gap: 2px;
+  box-sizing: border-box;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  z-index: 15;
+}
+.eye-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: scale(1.08);
+}
+.eye-button img {
+  width: 16px;
+  height: 16px;
+  filter: invert(0.7);
+}
+.eye-button span {
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  display: block;
+}
+.eye-button span:nth-of-type(1) { background-color: #009E60; }
+.eye-button span:nth-of-type(2) { background-color: #FF5800; }
+.eye-button span:nth-of-type(3) { background-color: #FFD500; }
+.eye-button span:nth-of-type(4) { background-color: #C41E3A; }
+.eye-button span:nth-of-type(5) { background-color: #FFFFFF; }
+.eye-button span:nth-of-type(6) { background-color: #0051BA; }
+.eye-button span:nth-of-type(7) { background-color: #FFD500; }
+.eye-button span:nth-of-type(8) { background-color: #FF5800; }
+.eye-button span:nth-of-type(9) { background-color: #009E60; }
+
+/* === Cube Box Panel === */
+/* .cube-box {
+  position: absolute;
+  left: 12px;
+  top: 40px;
+  z-index: 5;
+  padding: 10px;
+  background: var(--bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-panel);
+} */
+
+/* === Brush Palette === */
+#brushPalette {
+  display: flex;
+  align-items: flex-start;
+}
+.brush-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  position: relative;
+  transition: border-color 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+.brush-swatch:hover {
+  transform: scale(1.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.brush-swatch.selected {
+  border-color: #00e676 !important;
+  box-shadow: 0 0 10px rgba(0, 230, 118, 0.5) !important;
+  transform: scale(1.15);
+}
+.brush-swatch.exhausted {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+.brush-swatch.exhausted:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.brush-counter {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 18px;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  padding: 0 3px;
+  box-sizing: border-box;
+}
+
+/* === Log Output Panel === */
+.log-ouput-panel {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  flex: 1;
+  min-height: 0;
+}
+.log-ouput-panel button {
+  flex-shrink: 0;
+  align-self: stretch;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* === Debug Helper === */
+.debug-clz {
+  display: none;
+}
+
+/* === Color Edit Tip === */
+#colorEditTip {
+  color: var(--text-muted) !important;
+}
+
+/* === Transition for collapsing panels === */
+.right-control-panel,
+.bottom-control-panel,
+.cube-box {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* === Right panel row spacing === */
+.right-control-panel > div {
+  margin-bottom: 4px;
 }

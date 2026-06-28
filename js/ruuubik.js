@@ -1,8 +1,6 @@
-import * as THREE from './threejs/three.module.js';
-import { OrbitControls } from './threejs/jsm/controls/OrbitControls.js';
-
+(function(){
 // 场景背景色
-const SCENE_BACKGROUND_COLOR = 0xFFFFFF;
+const SCENE_BACKGROUND_COLOR = 0x1a1a2e;
 // 魔方颜色
 const CubeColor = {
     D: 0,
@@ -80,7 +78,7 @@ const ThreeJsContainer = {
         parentDom.appendChild(this.renderer.domElement);
 
         // 初始化轨道控制器
-        this.orbitControler = new OrbitControls(this.camera, this.renderer.domElement);
+        this.orbitControler = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.orbitControler.rotateSpeed = 0.5;
 
         // 初始化魔方模型
@@ -221,8 +219,8 @@ function getRotatePathForRotatePermutationGroup(source, target){
         let fullsource = fillRotateStatusForRotatePermutation(source);
         if(fullsource == null){
             console.warn("nonexistent source status : ", source);
-            return null;
-        }
+    return null;
+}
         source = fullsource;
     }
     if(specialMatch(source, target)){
@@ -1330,7 +1328,7 @@ const rubikCube = {
     }
 };
 
-export function debug(){
+function debug(){
     // nothing
     return {
         position: rubikCube.cubeIndexMap,
@@ -1338,7 +1336,7 @@ export function debug(){
     };
 }
 
-export function scramble(onlyBasic){
+function scramble(onlyBasic){
     return rubikCube.scramble(onlyBasic);
 }
 
@@ -1358,7 +1356,7 @@ function decomposeCubeIndexToCoordinate(index){
 }
 
 // 添加魔方转动动作完成监听
-export function addActionDoneCallback(callback){
+function addActionDoneCallback(callback){
     if(rubikCube.actionDoneCallback == null){
         rubikCube.actionDoneCallback = callback;
     }else{
@@ -1371,49 +1369,49 @@ export function addActionDoneCallback(callback){
 }
 
 // 获取6个面中指定的面的指定位置的颜色, 面: F, R, U, D, B, L. 位置: 1 -- 9
-export function getFaceColor(face, index){
+function getFaceColor(face, index){
     return rubikCube.getColorByPosInfo(face, index);
 }
 
 // 调整魔方基
-export function rebase(){
+function rebase(){
     rubikCube.rebase();
 }
 
 // 执行指定的动作
-export function doAction(notation){
+function doAction(notation){
     let action = StandardCubeAction[notation];
     if(action){
         rubikCube.move(action, notation);
     }else{
-        console.warn("unrecognized notation");
+        console.warn("unrecognized notation", notation);
     }
 }
 
 // 重置魔方到初始状态
-export function reset(){
+function reset(){
     rubikCube.reset();
 }
 
 // 相机恢复至初始视角
-export function back(){
+function back(){
     ThreeJsContainer.cameraResetDefault();
 }
 
 // 初始化魔方
-export function init(domContainer, debug) {
+function init(domContainer, debug) {
     ThreeJsContainer.init(domContainer, rubikCube, debug);
     addListener();
 }
 
 // 3d窗体自适应
-export function resize() {
+function resize() {
     ThreeJsContainer.camera.aspect = window.innerWidth / window.innerHeight;
     ThreeJsContainer.camera.updateProjectionMatrix();
     ThreeJsContainer.renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-export function getColorSchemes(){
+function getColorSchemes(){
     let colors = [];
     for(let k in CubeColor){
         if(CubeColor.properties[CubeColor[k]]){
@@ -1423,7 +1421,7 @@ export function getColorSchemes(){
     return colors;
 }
 
-export function applyColorMap(colorMap, failedCallback, successCallback){
+function applyColorMap(colorMap, failedCallback, successCallback){
     let realColorMap = {};
     for(let k in colorMap){
         let v = colorMap[k];
@@ -1446,139 +1444,223 @@ export function applyColorMap(colorMap, failedCallback, successCallback){
 
 
 // -- 鼠标交互相关 --
-function addListener() {
-    ThreeJsContainer.renderer.domElement.addEventListener('mousedown', startCube, false);
-    ThreeJsContainer.renderer.domElement.addEventListener('mousemove', moveCube, false);
-    ThreeJsContainer.renderer.domElement.addEventListener('mouseup', stopCube, false);
+const DRAG_THRESHOLD_PX = 25;
 
-    ThreeJsContainer.renderer.domElement.addEventListener('touchstart', startCube, false);
-    ThreeJsContainer.renderer.domElement.addEventListener('touchmove', moveCube, false);
-    ThreeJsContainer.renderer.domElement.addEventListener('touchend', stopCube, false);
+const faceMap = ["R", "L", "U", "D", "F", "B"];
+
+function addListener() {
+    let dom = ThreeJsContainer.renderer.domElement;
+    dom.addEventListener('mousedown', startCube, false);
+    dom.addEventListener('mousemove', moveCube, false);
+    dom.addEventListener('mouseup', stopCube, false);
+    dom.addEventListener('mouseleave', stopCube, false);
+
+    dom.addEventListener('touchstart', function(e) { e.preventDefault(); startCube(e); }, false);
+    dom.addEventListener('touchmove', function(e) { e.preventDefault(); moveCube(e); }, false);
+    dom.addEventListener('touchend', function(e) { e.preventDefault(); stopCube(e); }, false);
 }
 
 const mouseMonitor = {
     startPoint: null,
-    endPoint: null
+    triggered: false
 };
 
-function startCube(event) {
-    if(rubikCube.isRotating()){
-        return;
-    }
-    mouseMonitor.startPoint = getIntersect(event);
-    if(mouseMonitor.startPoint){
-        ThreeJsContainer.orbitControler.enabled = false;
-    }else{
-        ThreeJsContainer.orbitControler.enabled = true;
-    }
+function getHand(event) {
+    if (event.touches && event.touches.length > 0) return event.touches[0];
+    if (event.changedTouches && event.changedTouches.length > 0) return event.changedTouches[0];
+    return event;
 }
 
-function moveCube(event) {
-    if(!mouseMonitor.startPoint || rubikCube.isRotating()){
-        return;
+function getFaceLocalNormal(faceName) {
+    switch (faceName) {
+        case 'R': return new THREE.Vector3(1, 0, 0);
+        case 'L': return new THREE.Vector3(-1, 0, 0);
+        case 'U': return new THREE.Vector3(0, 1, 0);
+        case 'D': return new THREE.Vector3(0, -1, 0);
+        case 'F': return new THREE.Vector3(0, 0, 1);
+        case 'B': return new THREE.Vector3(0, 0, -1);
     }
-    if(!mouseMonitor.endPoint){
-        let point = getIntersect(event);
-        if(point && point.instanceIndex != mouseMonitor.startPoint.instanceIndex){
-            mouseMonitor.endPoint = point;
-        }
-    }
+    return new THREE.Vector3(0, 0, 0);
 }
 
-function stopCube(event) {
-    ThreeJsContainer.orbitControler.enabled = true;
-    if(mouseMonitor.startPoint && mouseMonitor.endPoint){
-        // 确定经过的块位置
-        let startPos = -1;
-        let endPos = -1;
-        for(let pos = 0; pos < rubikCube.cubeIndexMap.length; pos++){
-            if(rubikCube.cubeIndexMap[pos] == mouseMonitor.startPoint.instanceIndex){
-                startPos = pos;
-            }else if(rubikCube.cubeIndexMap[pos] == mouseMonitor.endPoint.instanceIndex){
-                endPos = pos;
-            }
-        }
-
-        let startFacePos = -1;
-        let endFacePos = -1;
-
-        // 确定滑动的面
-        let startCubeStatus = rubikCube.colorMap[startPos];
-        for(let i = 0; i < startCubeStatus.length; i++){
-            if(mouseMonitor.startPoint.face == startCubeStatus[i]){
-                startFacePos = i;
-                break;
-            }
-        }
-        let endCubeStatus = rubikCube.colorMap[endPos];
-        for(let i = 0; i < endCubeStatus.length; i++){
-            if(mouseMonitor.endPoint.face == endCubeStatus[i]){
-                endFacePos = i;
-                break;
-            }
-        }
-
-        // 确定最终要执行的动作
-        if(startFacePos >= 0 && startFacePos == endFacePos && startPos >= 0 && endPos >= 0){
-            let moveAction = [];
-            let startCoordinate = decomposeCubeIndexToCoordinate(startPos);
-            let endCoordinate = decomposeCubeIndexToCoordinate(endPos);
-            let direction = new THREE.Vector3(endCoordinate.x - startCoordinate.x, endCoordinate.y - startCoordinate.y, endCoordinate.z - startCoordinate.z);
-            for(let k in ActionGroup){
-                let v = ActionGroup[k];
-                if(v.permutation[startPos] > -1 && v.permutation[endPos] > -1
-                    && v.colorPermutation[startFacePos] != startFacePos && v.colorPermutation[endFacePos] != endFacePos){
-
-                    let fixedPoint = -1;
-                    for(let i = 0; i < v.permutation.length; i++){
-                        if(i == v.permutation[i]){
-                            fixedPoint = i;
-                            break;
-                        }
-                    }
-                    let fixCoordinate = decomposeCubeIndexToCoordinate(fixedPoint);
-                    let armV = new THREE.Vector3(startCoordinate.x - fixCoordinate.x, startCoordinate.y - fixCoordinate.y, startCoordinate.z - fixCoordinate.z);
-                    // 求取叉集, 即满足右手定则的法向量, 并进行归一化
-                    let axis = armV.cross(direction).normalize();
-                    if(axis.x == v.axis.x && axis.y == v.axis.y && axis.z == v.axis.z){
-                        moveAction = {
-                            name: k,
-                            action: v
-                        };
-                        break;
-                    }
-                }
-            }
-            
-            if(moveAction){
-                rubikCube.move([moveAction.action], moveAction.name);
-            }
-        }
-    }
-    mouseMonitor.startPoint = null;
-    mouseMonitor.endPoint = null;
+function getWorldFaceNormal(instanceIndex, faceName) {
+    let localNormal = getFaceLocalNormal(faceName);
+    let matrix = new THREE.Matrix4();
+    rubikCube.cubes.getMatrixAt(instanceIndex, matrix);
+    let normalMat = new THREE.Matrix3();
+    normalMat.getNormalMatrix(matrix);
+    return localNormal.applyMatrix3(normalMat).normalize();
 }
 
-// 面索引, 每一个BoxGeometry都是由12个三角形面组成, 每个面由两个三角形构成, 这个数组功能, faceMap[faceIndex/2]可以确定所属的面
-const faceMap = ["R", "L", "U", "D", "F", "B"];
+function getRichIntersect(event) {
+    let hand = getHand(event);
+    if (!hand) return null;
 
-//获取操作焦点以及该焦点所在平面
-function getIntersect(event) {
-    //触摸事件和鼠标事件获得坐标的方式有点区别
-    var hand = event;
-    if (event.touches) {
-        hand = event.touches[0];
-    }
     ThreeJsContainer.mouse.x = (hand.clientX / ThreeJsContainer.width) * 2 - 1;
     ThreeJsContainer.mouse.y = -(hand.clientY / ThreeJsContainer.height) * 2 + 1;
     ThreeJsContainer.raycaster.setFromCamera(ThreeJsContainer.mouse, ThreeJsContainer.camera);
-    //Raycaster方式定位选取元素，可能会选取多个，以第一个为准
-    var intersects = ThreeJsContainer.raycaster.intersectObjects(ThreeJsContainer.scene.children);
+
+    let intersects = ThreeJsContainer.raycaster.intersectObjects(ThreeJsContainer.scene.children);
     if (intersects.length && intersects[0].object instanceof THREE.InstancedMesh) {
+        let inter = intersects[0];
+        let faceName = faceMap[Math.floor(inter.faceIndex / 2)];
+        let faceNumber = rubikCube.getFaceNumber(faceName);
+        let worldNormal = getWorldFaceNormal(inter.instanceId, faceName);
         return {
-            instanceIndex : intersects[0].instanceId,
-            face : rubikCube.getFaceNumber(faceMap[Math.floor(intersects[0].faceIndex / 2)])
+            instanceIndex: inter.instanceId,
+            face: faceNumber,
+            faceName: faceName,
+            worldPoint: inter.point.clone(),
+            worldNormal: worldNormal
         };
     }
     return null;
 }
+
+function getPointOnFacePlane(event, facePoint, faceNormal) {
+    let hand = getHand(event);
+    if (!hand) return null;
+
+    let mouse = new THREE.Vector2(
+        (hand.clientX / ThreeJsContainer.width) * 2 - 1,
+        -(hand.clientY / ThreeJsContainer.height) * 2 + 1
+    );
+    ThreeJsContainer.raycaster.setFromCamera(mouse, ThreeJsContainer.camera);
+
+    let plane = new THREE.Plane();
+    plane.setFromNormalAndCoplanarPoint(faceNormal, facePoint);
+    let intersection = new THREE.Vector3();
+    return ThreeJsContainer.raycaster.ray.intersectPlane(plane, intersection);
+}
+
+function findPositionOfInstance(instanceIndex) {
+    for (let i = 0; i < rubikCube.cubeIndexMap.length; i++) {
+        if (rubikCube.cubeIndexMap[i] === instanceIndex) return i;
+    }
+    return -1;
+}
+
+function determineMove(startPos, startCoord, dragDir) {
+    let bestMatch = null;
+    let bestDot = 0.01;
+
+    for (let k in ActionGroup) {
+        let v = ActionGroup[k];
+        if (v.permutation[startPos] < 0) continue;
+
+        let fixedPoint = -1;
+        for (let i = 0; i < v.permutation.length; i++) {
+            if (i === v.permutation[i]) {
+                fixedPoint = i;
+                break;
+            }
+        }
+        if (fixedPoint < 0) continue;
+
+        let fixCoord = decomposeCubeIndexToCoordinate(fixedPoint);
+        let armV = new THREE.Vector3(
+            startCoord.x - fixCoord.x,
+            startCoord.y - fixCoord.y,
+            startCoord.z - fixCoord.z
+        );
+        if (armV.length() < 0.001) continue;
+
+        let velocity = new THREE.Vector3();
+        velocity.crossVectors(v.axis, armV).normalize();
+
+        let dot = velocity.dot(dragDir);
+        if (dot > bestDot) {
+            bestDot = dot;
+            bestMatch = { name: k, action: v };
+        }
+    }
+    return bestMatch;
+}
+
+function startCube(event) {
+    if (rubikCube.isRotating()) return;
+
+    let intersect = getRichIntersect(event);
+    if (!intersect) {
+        ThreeJsContainer.orbitControler.enabled = true;
+        mouseMonitor.startPoint = null;
+        return;
+    }
+
+    let hand = getHand(event);
+    let pos = findPositionOfInstance(intersect.instanceIndex);
+    if (pos < 0) {
+        ThreeJsContainer.orbitControler.enabled = true;
+        return;
+    }
+
+    let coordinate = decomposeCubeIndexToCoordinate(pos);
+
+    mouseMonitor.startPoint = {
+        instanceIndex: intersect.instanceIndex,
+        face: intersect.face,
+        faceName: intersect.faceName,
+        worldPoint: intersect.worldPoint,
+        worldNormal: intersect.worldNormal,
+        screenX: hand.clientX,
+        screenY: hand.clientY,
+        coordinate: coordinate,
+        pos: pos
+    };
+    mouseMonitor.triggered = false;
+    ThreeJsContainer.orbitControler.enabled = false;
+}
+
+function moveCube(event) {
+    if (!mouseMonitor.startPoint || mouseMonitor.triggered || rubikCube.isRotating()) return;
+
+    let hand = getHand(event);
+    if (!hand) return;
+
+    let dx = hand.clientX - mouseMonitor.startPoint.screenX;
+    let dy = hand.clientY - mouseMonitor.startPoint.screenY;
+
+    if (Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD_PX) return;
+
+    let endPoint = getPointOnFacePlane(event, mouseMonitor.startPoint.worldPoint, mouseMonitor.startPoint.worldNormal);
+    if (!endPoint) return;
+
+    let dragDir = endPoint.clone().sub(mouseMonitor.startPoint.worldPoint);
+    let dragLen = dragDir.length();
+    if (dragLen < 0.001) return;
+    dragDir.divideScalar(dragLen);
+
+    let moveAction = determineMove(
+        mouseMonitor.startPoint.pos,
+        mouseMonitor.startPoint.coordinate,
+        dragDir
+    );
+
+    if (moveAction) {
+        rubikCube.move([moveAction.action], moveAction.name);
+    }
+
+    mouseMonitor.triggered = true;
+}
+
+function stopCube(event) {
+    ThreeJsContainer.orbitControler.enabled = true;
+    mouseMonitor.startPoint = null;
+    mouseMonitor.triggered = false;
+}
+window.frog = {
+    init: init,
+    doAction: doAction,
+    reset: reset,
+    back: back,
+    resize: resize,
+    scramble: scramble,
+    getFaceColor: getFaceColor,
+    getColorSchemes: getColorSchemes,
+    applyColorMap: applyColorMap,
+    addActionDoneCallback: addActionDoneCallback,
+    debug: debug,
+    rebase: rebase
+};
+
+})();

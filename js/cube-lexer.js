@@ -1,3 +1,4 @@
+(function(){
 const commands = {
     "R": ["R", "R_", "R2"], 
     "U": ["U", "U_", "U2"], 
@@ -19,7 +20,7 @@ const commands = {
     "z":["z", "z_", "z2"]
 };
 
-export function parse(commandStr, exceptionCallback){
+function parseCommand(commandStr, exceptionCallback){
     if(commandStr == null || commandStr.length == 0){
         return [];
     }
@@ -71,3 +72,7 @@ function reportException(exceptionCallback, cmd){
 function isWhitespace(c){
     return c == ' ' || c == '\n' || c == '\r' || c == '\t';
 }
+
+window.lexer = { parse: parseCommand };
+
+})();
