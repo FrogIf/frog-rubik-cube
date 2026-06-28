@@ -59,7 +59,7 @@ button:disabled {
 .right-control-panel {
   position: absolute;
   right: 16px;
-  top: 50px;
+  top: 6px;
   width: 210px;
   background: var(--bg-panel);
   backdrop-filter: blur(16px);
