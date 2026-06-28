@@ -142,6 +142,7 @@
             </span>
         </div>
         <div id="bottomControlPanel" class="bottom-control-panel">
+            <div class="resize-handle"></div>
             <div class="command-panel">
                 <div class="log-ouput-panel">
                     <textarea id="logTextarea" readonly class="log-output"></textarea>
@@ -414,6 +415,34 @@
             document.getElementById("bottomPanelClose").onclick = (e) => {
                 panelDisplayToggle(document.getElementById("bottomControlPanel"));
             }
+
+            let resizeDragging = false;
+            let resizeStartY = 0;
+            let resizeStartH = 0;
+            let resizePanel = document.getElementById("bottomControlPanel");
+
+            document.querySelector('.resize-handle').addEventListener('mousedown', function(e){
+                resizeDragging = true;
+                resizeStartY = e.clientY;
+                resizeStartH = resizePanel.offsetHeight;
+                document.body.style.userSelect = 'none';
+                document.body.style.cursor = 'ns-resize';
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', function(e){
+                if(!resizeDragging) return;
+                let newH = resizeStartH + (resizeStartY - e.clientY);
+                newH = Math.max(80, Math.min(window.innerHeight * 0.6, newH));
+                resizePanel.style.height = newH + 'px';
+            });
+
+            document.addEventListener('mouseup', function(){
+                if(!resizeDragging) return;
+                resizeDragging = false;
+                document.body.style.userSelect = '';
+                document.body.style.cursor = '';
+            });
 
             document.getElementById("rightPanelClose").onclick = (e) => {
                 panelDisplayToggle(document.getElementById("rightControlPanel"));
