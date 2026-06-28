@@ -57,7 +57,7 @@ Do **not** use `window.onload` or `DOMContentLoaded` — they interfere with the
 
 ```js
 // cubeStatus: flat array of 54 color indices (6 faces × 9 stickers)
-//   faces order: U, R, F, D, L, B (matching FACES array in index.html:440)
+//   faces order: U, R, F, D, L, B (matching FACES array in index.html)
 //   each face read top-to-bottom, left-to-right (index 0-8)
 //   color index 0-5 maps to face centers:
 //     U=0(yellow), R=1(red), F=2(blue), D=3(white), L=4(orange), B=5(green)
@@ -68,20 +68,23 @@ window.twoPhase.solve(cubeStatus)
 
 The inline script builds `cubeStatus` by reading `frog.getFaceColor(face, 1..9)` for each face, then mapping colors → indices via `colorMap` (keyed by center sticker color).
 
+**Important**: `twoPhase.solve()` is synchronous and blocks the main thread. The solve button handler wraps it in `setTimeout(fn, 0)` so the "solving, please wait..." message renders before the solver starts.
+
 ## Key globals
 
 | Global | Source | API |
 |---|---|---|
 | `window.THREE` | `three.min.js` | Three.js namespace |
 | `THREE.OrbitControls` | `OrbitControls-global.js` | Camera orbit controls |
-| `window.frog` | `ruuubik.js` | `init(dom, debug)`, `doAction(move)`, `getFaceColor(face, pos)`, `scramble(basic)`, `applyColorMap(map, failCb, okCb)`, `resize()`, `reset()`, `back()`, `rebase()`, `addActionDoneCallback(cb)` |
+| `window.frog` | `ruuubik.js` | `init(dom, debug)`, `doAction(move)`, `getFaceColor(face, pos)`, `getColorSchemes()`, `scramble(basic)`, `applyColorMap(map, failCb, okCb)`, `resize()`, `reset()`, `back()`, `rebase()`, `debug()`, `addActionDoneCallback(cb)` |
 | `window.twoPhase` | `twophase.js` | `solve(cubeStatus)` |
 | `window.lexer` | `cube-lexer.js` | `parse(cmdStr, errorCb)` returns move array |
 | `window.trans` | `translater.js` | `translate(key, lang)` where lang is `'zh'` or `'en'` |
 
 ## UI conventions
 
-- Dark theme (`#1a1a2e` → `#16213e` → `#0f3460` gradient), glassmorphism panels with `backdrop-filter: blur()`
-- 2D color panel: 9 per face, uses `cube` CSS class, color editing via ctrl+click
-- Bottom control panel uses `flex` layout (was `inline-block`, which caused overflow)
-- SVG icons in `img/` (pen, error, right, eye, etc.)
+- Dark glassmorphism theme with `backdrop-filter: blur()`
+- **2D cube panel** (`#cubeBoxPanel`): 54 colored stickers in a 6-face unfolded net layout, each positioned absolutely via `cube-box-row-N` / `cube-box-col-N` CSS classes. Face labels (U, F, L, D, R, B) overlay the center sticker of each face via `.face-label` elements with `pointer-events: none`.
+- **Color editing** (pen icon): brush-first interaction. Pick a color from the brush palette (6 swatches, each with a counter starting at 9), then click blocks to paint. Counters auto-update; switching colors mid-paint repaints the block. Clicking an already-painted block with the same brush toggles it off (gray placeholder) and restores the counter. Clicking the same swatch again deselects the brush.
+- **Bottom control panel**: command log + input (left 55%), action buttons (right 45%). The panel is resizable via a drag handle at its top edge (6px tall, min 80px, max 60vh). Panel toggle uses `display: ""` (not `"block"`) to preserve CSS `display: flex`.
+- SVG icons in `img/` (pen, error, right). `chopsticks.svg` is unused (leftover from removed clampColor feature).
